@@ -167,20 +167,19 @@ except OSError:
     pass
 
 print t.clear
-print '=' * 61
-print t.bold_red + """
- _       ___       ____              __                __
-| |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____
-| | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/
-| |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )
-|__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/
-                           /____/
-"""
-print t.normal + '=' * 61
+print '=' * t.width + t.bold_red
+print " _       ___       ____              __                __".center(t.width)
+print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(t.width)
+print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(t.width)
+print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.width)
+print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
+print "   /____/".center(t.width)
+print t.normal + '=' * t.width
 
 try:
-    menuchoice = raw_input(
-        '=' * 61 + '\n[1] Windows Reverse Shell\n[2] Windows Meterpreter Reverse Shell(staged)\n[3] Windows Meterpreter Bind Shell(staged)\n[4] Linux x86 Meterpreter Reverse Shell(staged)\n' + '=' * 61 + '\n>')
+    print '[1] Windows Reverse Shell'.center(t.width) + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + '[4] Linux x86 Meterpreter Reverse Shell(staged)'.center(t.width)
+    print '=' * t.width
+    menuchoice = raw_input('> ')
     if menuchoice == '1':
         payloadchoice = windows_rev_shell
         payload = 'Windows Reverse Shell'
