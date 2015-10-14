@@ -8,7 +8,7 @@ echo '[*] Git Cloning Pyinstaller Into /opt'
 git clone https://github.com/pyinstaller/pyinstaller.git /opt/
 echo '[*] Downloading Python27 For Wine'
 wget https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
-wine msiexec python-2.7.10.msi
+wine msiexec /i python-2.7.10.msi
 echo '[*] Setting Up Shellter'
 mkdir shellter
 cd shellter
