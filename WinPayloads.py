@@ -267,6 +267,10 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
     if want_to_payloadinexe.lower() == 'y':
         os.chdir(os.getcwd() + '/shellter')
+        try:
+            os.mkdir('compiled')
+        except:
+            pass
         with open('payloadbin', 'wb') as Csave:
             Csave.write(shellcode)
             Csave.close()
