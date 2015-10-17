@@ -4,8 +4,8 @@ apt-get update
 apt-get install wine -y
 echo '[*] Installing Python Requirements'
 pip install blessings
-echo '[*] Git Cloning Pyinstaller Into /opt'
-git clone https://github.com/pyinstaller/pyinstaller.git /opt/pyinstaller
+echo '[*] Installting Pyinstaller'
+apt-get install pyinstaller -y
 echo '[*] Downloading Python27 For Wine'
 wget https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
 wine msiexec /i python-2.7.10.msi

