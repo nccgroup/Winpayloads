@@ -253,7 +253,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
         print '[*] Creating Payload.exe From Payload.py...'
 
-        subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/usr/share/pyinstaller/pyinstaller.py',
+        subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
                          '%s/payload.py' % payloaddir, '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print '[*] Cleaning Up...'
         os.system('mv %s/dist/payload.exe %s/payload.exe' %
