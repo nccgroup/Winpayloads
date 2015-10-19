@@ -1,7 +1,10 @@
 #!/bin/bash
-echo '[*] Installing Wine'
+echo '[*] Installing Dependencies'
 apt-get update
-apt-get install wine -y
+apt-get -y install mingw-w64 monodoc-browser monodevelop mono-mcs wine unzip golang wget git python python-crypto python-pefile python-pip ca-certificates ttf-mscorefonts-installer
+echo '[*] Installing Wine '
+apt-get -y install wine32
+apt-get -y install wine
 echo '[*] Installing Python Requirements'
 pip install blessings
 echo '[*] Installting Pyinstaller'
