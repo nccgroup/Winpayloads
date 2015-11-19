@@ -227,7 +227,7 @@ try:
         ip1, ip2, ip3, ip4 = ipaddr.split('.')
         iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
         porthex = struct.pack('>h', int(portnum))
-        porthex2 = struct.pack('>h', int(portnum + 1))
+        porthex2 = struct.pack('>h', int(portnum)+1)
         shellcode = payloadchoice % (iphex, porthex)
         shellcode2 = payloadchoice % (iphex, porthex2)
     elif menuchoice == '3':
@@ -236,7 +236,7 @@ try:
         if len(bindport) is 0:
             bindport = 4444
         bindporthex = struct.pack('>h', int(bindport))
-        bindporthex2 = struct.pack('>h', int(bindport + 1))
+        bindporthex2 = struct.pack('>h', int(bindport)+1)
         shellcode = payloadchoice % (bindporthex)
         shellcode2 = payloadchoice % (bindporthex2)
 
