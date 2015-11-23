@@ -184,11 +184,16 @@ print "   /____/".center(t.width)
 print t.normal + '=' * t.width
 
 try:
-    print ('[1] Windows Reverse Shell' + t.bold_green +'(Stageless)' + t.bold_red + ' [Shellter]').center(t.width-15) + t.normal
-    print ('[2] Windows Reverse Meterpreter' + t.bold_green +'(Staged)' + t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks]').center(t.width+15) + t.normal
-    print ('[3] Windows Bind Meterpreter' + t.bold_green +'(Staged)' + t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks]').center(t.width+13) + t.normal
-    print ('[4] Windows Reverse Meterpreter' + t.bold_green +'(Raw Shellcode)' + t.bold_red + ' [Base64 Encode]').center(t.width-1) + t.normal
-    print ('[5] Windows Reverse Meterpreter' + t.bold_green +'(Registry Persistence)' + t.bold_red + ' [Shellter]').center(t.width+1) + t.normal
+    print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
+           t.bold_red + ' [Shellter]').center(t.width - 15) + t.normal
+    print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
+           ' [Shellter, UacBypass, Priv Esc Checks]').center(t.width + 15) + t.normal
+    print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
+           ' [Shellter, UacBypass, Priv Esc Checks]').center(t.width + 13) + t.normal
+    print ('[4] Windows Reverse Meterpreter' + t.bold_green + '(Raw Shellcode)' +
+           t.bold_red + ' [Base64 Encode]').center(t.width - 1) + t.normal
+    print ('[5] Windows Reverse Meterpreter' + t.bold_green + '(Registry Persistence)' +
+           t.bold_red + ' [Shellter]').center(t.width + 1) + t.normal
     print '=' * t.width
 
     while True:
