@@ -184,27 +184,37 @@ print "   /____/".center(t.width)
 print t.normal + '=' * t.width
 
 try:
-    print '[1] Windows Reverse Shell(Stageless)'.center(t.width) + t.bold_red + '[Shellter]'.center(t.width) + t.normal + '[2] Windows Meterpreter Reverse Shell(Staged)'.center(t.width) + t.bold_red + '[Shellter, UacBypass, Priv Esc Checks]'.center(t.width) + t.normal + '[3] Windows Meterpreter Bind Shell(Staged)'.center(t.width) + t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks]'.center(t.width) + t.normal + '[4] Windows Meterpreter Reverse Shell(Raw)'.center(t.width) + t.bold_red + '[Base64 Encode]'.center(t.width) + t.normal + '[5] Windows Meterpreter Reverse Shell(Persistence)'.center(t.width) + t.bold_red + '[Shellter]'.center(t.width) + t.normal
+    print ('[1] Windows Reverse Shell' + t.bold_green +'(Stageless)' + t.bold_red + ' [Shellter]').center(t.width-15) + t.normal
+    print ('[2] Windows Reverse Meterpreter' + t.bold_green +'(Staged)' + t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks]').center(t.width+15) + t.normal
+    print ('[3] Windows Bind Meterpreter' + t.bold_green +'(Staged)' + t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks]').center(t.width+13) + t.normal
+    print ('[4] Windows Reverse Meterpreter' + t.bold_green +'(Raw Shellcode)' + t.bold_red + ' [Base64 Encode]').center(t.width-1) + t.normal
+    print ('[5] Windows Reverse Meterpreter' + t.bold_green +'(Registry Persistence)' + t.bold_red + ' [Shellter]').center(t.width+1) + t.normal
     print '=' * t.width
-    menuchoice = raw_input('> ')
-    if menuchoice == '1':
-        payloadchoice = windows_rev_shell
-        payload = 'Windows Reverse Shell'
-    elif menuchoice == '2':
-        payloadchoice = windows_met_rev_shell
-        payload = 'Windows Meterpreter Reverse Shell'
-    elif menuchoice == '3':
-        payloadchoice = windows_met_bind_shell
-        payload = 'Windows Meterpreter Bind Shell'
-    elif menuchoice == '4':
-        payloadchoice = windows_met_rev_shell
-        payload = 'Windows Meterpreter Reverse Raw '
-    elif menuchoice == '5':
-        payloadchoice = windows_met_rev_shell
-        payload = 'Windows Meterpreter Reverse Persistence '
-    else:
-        print t.bold_red + '[*] Wrong Selection' + t.normal
-        sys.exit(1)
+
+    while True:
+        menuchoice = raw_input('> ')
+        if menuchoice == '1':
+            payloadchoice = windows_rev_shell
+            payload = 'Windows Reverse Shell'
+            break
+        elif menuchoice == '2':
+            payloadchoice = windows_met_rev_shell
+            payload = 'Windows Meterpreter Reverse Shell'
+            break
+        elif menuchoice == '3':
+            payloadchoice = windows_met_bind_shell
+            payload = 'Windows Meterpreter Bind Shell'
+            break
+        elif menuchoice == '4':
+            payloadchoice = windows_met_rev_shell
+            payload = 'Windows Meterpreter Reverse Raw '
+            break
+        elif menuchoice == '5':
+            payloadchoice = windows_met_rev_shell
+            payload = 'Windows Meterpreter Reverse Persistence '
+            break
+        else:
+            print t.bold_red + '[*] Wrong Selection' + t.normal
 
     print t.bold_green + '\n[*] Payload Set As %s\n' % (payload) + t.normal
 
