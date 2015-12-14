@@ -1,12 +1,13 @@
 #!/bin/bash
 echo '[*] Installing Dependencies'
 apt-get update
-apt-get -y install mingw-w64 monodoc-browser monodevelop mono-mcs wine unzip golang wget git python python-crypto python-pefile python-pip ca-certificates ttf-mscorefonts-installer
+apt-get -y install mingw-w64 monodoc-browser monodevelop mono-mcs unzip wget git python python-crypto python-pefile python-pip
 echo '[*] Installing Wine '
 apt-get -y install wine32
 apt-get -y install wine
 echo '[*] Installing Python Requirements'
 pip install blessings
+pip install impacket
 echo '[*] Installting Pyinstaller'
 wget https://github.com/pyinstaller/pyinstaller/releases/download/v2.0/pyinstaller-2.0.zip
 unzip -q -o -d /opt pyinstaller-2.0.zip
