@@ -9,14 +9,14 @@ echo '[*] Installing Python Requirements'
 pip install blessings
 pip install impacket
 echo '[*] Installting Pyinstaller'
-wget http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe
-wine pycrypto-2.6.win32-py2.7.exe
 wget https://github.com/pyinstaller/pyinstaller/releases/download/v2.0/pyinstaller-2.0.zip
 unzip -q -o -d /opt pyinstaller-2.0.zip
-echo '[*] Downloading Python27 For Wine'
-wget https://www.microsoft.com/en-us/download/confirmation.aspx?id=29
+echo '[*] Downloading Python27 and Pycrypto For Wine'
 wget https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
 wine msiexec /i python-2.7.10.msi
+wget http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe
+wine pycrypto-2.6.win32-py2.7.exe
+wget https://download.microsoft.com/download/1/1/1/1116b75a-9ec3-481a-a3c8-1777b5381140/vcredist_x86.exe
 wine vcredist_x86.exe
 echo '[*] Setting Up Shellter'
 wget --user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0" "https://www.shellterproject.com/Downloads/Shellter/Latest/shellter.zip"
