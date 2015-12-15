@@ -1,5 +1,6 @@
 #!/bin/bash
 echo '[*] Installing Dependencies'
+dpkg --add-architecture i386
 apt-get update
 apt-get -y install mingw-w64 monodoc-browser monodevelop mono-mcs unzip wget git python python-crypto python-pefile python-pip
 echo '[*] Installing Wine '
