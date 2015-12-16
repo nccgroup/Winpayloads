@@ -24,6 +24,7 @@ wget http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-2
 mv download pywin32.exe
 unzip pywin32.exe
 cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Scripts/
+wine C://Python27//python.exe C://Python27//Scripts//pywin32_postinstall.py -install
 echo '[*] Setting Up Shellter'
 wget --user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0" "https://www.shellterproject.com/Downloads/Shellter/Latest/shellter.zip"
 unzip shellter.zip
