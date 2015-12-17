@@ -4,12 +4,13 @@ dpkg --add-architecture i386
 apt-get update
 apt-get -y install mingw-w64 monodoc-browser monodevelop mono-mcs unzip wget git python python-crypto python-pefile python-pip
 
-echo -e '\033[1;32m[*] Installing Wine '
+echo -e '\033[1;32m[*] Installing Wine \033[0m'
 apt-get -y install wine32
 apt-get -y install wine
 
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 pip install blessings
+pip install pyasn1
 
 echo '\033[1;32m[*] Installting Pyinstaller \033[0m'
 wget https://github.com/pyinstaller/pyinstaller/releases/download/v2.0/pyinstaller-2.0.zip
@@ -41,9 +42,9 @@ cd shellter
 rm -r icon shellcode_samples faq.txt readme.txt version_history.txt
 cd ..
 rm python-2.7.10.msi shellter.zip pyinstaller-2.0.zip pycrypto-2.6.win32-py2.7.exe vcredist_x86.exe pywin32.exe PLATLIB SCRIPTS -rf
+echo -e '\033[1;32m[*] Uninstalling Old Impacket Library \033[0m'
+apt-get remove python-impacket -y
 echo -e '\033[1;32m[*] Installing impacket from Git \033[0m'
-apt-get remove python-impacket
-pip uninstall impacket
 git clone https://github.com/CoreSecurity/impacket.git
 cd impacket
 python setup.py install
