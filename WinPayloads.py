@@ -19,7 +19,7 @@ import readline
 import time
 try:
     impacketerror = False
-    import psexecs
+    import psexec
 except:
     impacketerror = True
 
