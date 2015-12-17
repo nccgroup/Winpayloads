@@ -2,7 +2,7 @@
 echo -e '\033[1;32m[*] Installing Dependencies \033[0m'
 dpkg --add-architecture i386
 apt-get update
-apt-get -y install mingw-w64 monodoc-browser monodevelop mono-mcs unzip wget git python python-crypto python-pefile python-pip
+apt-get -y install mingw-w64 monodoc-browser monodevelop mono-mcs unzip wget git python python-crypto python-pefile python-pip python-impacket
 
 echo -e '\033[1;32m[*] Installing Wine '
 apt-get -y install wine32
@@ -10,7 +10,6 @@ apt-get -y install wine
 
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 pip install blessings
-pip install impacket
 
 echo '\033[1;32m[*] Installting Pyinstaller \033[0m'
 wget https://github.com/pyinstaller/pyinstaller/releases/download/v2.0/pyinstaller-2.0.zip
