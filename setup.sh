@@ -41,4 +41,10 @@ cd shellter
 rm -r icon shellcode_samples faq.txt readme.txt version_history.txt
 cd ..
 rm python-2.7.10.msi shellter.zip pyinstaller-2.0.zip pycrypto-2.6.win32-py2.7.exe vcredist_x86.exe pywin32.exe PLATLIB SCRIPTS -rf
+echo -e '\033[1;32m[*] Installing impacket from Git \033[0m'
+git clone https://github.com/CoreSecurity/impacket.git
+cd impacket
+python setup.py install
+cd ..
+rm impacket -rf
 echo -e '\033[1;32m[*] Done \033[0m'
