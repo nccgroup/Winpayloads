@@ -420,7 +420,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     options = parser.parse_args()
-
+    
     if options.debug is True:
         logging.getLogger().setLevel(logging.DEBUG)
     else:
