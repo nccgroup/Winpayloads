@@ -17,13 +17,18 @@ import re
 import glob
 import readline
 import time
+
+t = blessings.Terminal()
+
 try:
     impacketerror = False
     import psexec
 except:
     impacketerror = True
 
-t = blessings.Terminal()
+if not re.search('winpayloads',os.getcwd().lower()):
+    print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
+    sys.exit(1)
 
 try:
     iperror = False
