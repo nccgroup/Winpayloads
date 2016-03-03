@@ -15,7 +15,7 @@ try:
 except:
     iperror = True
 
-payload, payloadchoice, payloaddir, ez2read_shellcode, nullbytecount, ez2read_shellcode2, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname, iphex = '', '', '/etc/winpayloads', '', 0, '', 'n', 'n', 'n', '', ''
+payload, payloadchoice, payloaddir, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname = '', '', '/etc/winpayloads', 'n', 'n', 'n', ''
 
 try:
     os.mkdir(payloaddir)
