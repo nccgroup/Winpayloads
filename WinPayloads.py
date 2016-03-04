@@ -1,7 +1,7 @@
 #!/usr/bin/python
-from main import *
-from payloadextras import *
-from startmetasploit import *
+from lib.main import *
+from lib.payloadextras import *
+from lib.startmetasploit import *
 
 
 if not re.search('winpayloads', os.getcwd().lower()):
