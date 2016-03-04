@@ -16,6 +16,7 @@ import glob
 import readline
 import time
 import psexec
+from progress.bar import Bar
 
 t = blessings.Terminal()
 

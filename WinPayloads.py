@@ -2,7 +2,6 @@
 from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
-from progress.bar import Bar
 
 if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
@@ -264,6 +263,6 @@ except KeyboardInterrupt:
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     subprocess.call(['rm *.ps1'], shell=True,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    subprocess.call(['logdict*'], shell=True,
+    subprocess.call(['rm logdict*'], shell=True,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     sys.exit()
