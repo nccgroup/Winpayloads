@@ -12,6 +12,7 @@ apt-get -y install wine
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 pip install blessings
 pip install pyasn1
+pip install progress
 
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
 if ! [ -d "/opt/pyinstaller-2.0" ]; then
