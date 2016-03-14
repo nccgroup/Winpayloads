@@ -299,6 +299,16 @@ try:
             METASPLOIT().methttp_persistence(portnum)
         else:
             METASPLOIT().methttp_normal(portnum)
+            
+    elif menuchoice == '5':
+        if want_UACBYPASS.lower() == 'y':
+            METASPLOIT().metdns_uac(portnum)
+        elif want_ALLCHECKS.lower() == 'y':
+            METASPLOIT().metdns_allchecks(portnum)
+        elif want_PERSISTENCE.lower() == 'y':
+            METASPLOIT().metdns_persistence(portnum)
+        else:
+            METASPLOIT().metdns_normal(portnum)
 
     raise KeyboardInterrupt
 
