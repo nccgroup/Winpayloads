@@ -167,12 +167,12 @@ try:
         print '[*] Creating Payload using Pyinstaller...'
         p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
                          '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        bar = Bar('Processing', max=10)
-        print t.bold_green
-        for i in range(10):
-            bar.next()
-            time.sleep(1)
-        bar.finish()
+        i = 0
+        while p.poll() == None:
+            print t.bold_green + "/-\|"[i % 4] + '\r',
+            sys.stdout.flush()
+            i += 1
+            time.sleep(0.2)
         payloadstderr = p.stderr.read()
         if re.search('error',payloadstderr.lower()):
             print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal + payloadstderr
@@ -204,7 +204,7 @@ try:
         os.system('rm %s/build -r' % payloaddir)
         os.system('rm %s/*.spec' % payloaddir)
         os.system('rm %s/payload.py' % payloaddir)
-        print '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' % (payloaddir, payloadname) + t.normal
+        print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' % (payloaddir, payloadname) + t.normal
 
     if want_to_payloadinexe.lower() == 'y':
         payloadinexe_payloadname = raw_input(
