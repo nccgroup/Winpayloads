@@ -161,7 +161,7 @@ class FUNCTIONS(object):
     def DecodeAES(self, c, e):
         return c.decrypt(base64.b64decode(e)).rstrip(self.PADDING)
 
-    def DoPyCipher(self, filecontents): # Adaptation of PyHerion 1.0 By: @harmj0y
+    def DoPyCipher(self, filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
         key, iv = self.randKey(32), self.randKey(16)
 
         input = filecontents.split('\n')
@@ -201,7 +201,7 @@ class FUNCTIONS(object):
         except:
             print t.bold_red + '\n[*] WebServer Shutdown' + t.normal
 
-    def DoServe(self,want_to_payloadinexe,want_to_upload,IP,payloadinexe_payloadnameshort,payloadname,payloaddir):
+    def DoServe(self, want_to_payloadinexe, want_to_upload, IP, payloadinexe_payloadnameshort, payloadname, payloaddir):
         if want_to_payloadinexe == 'y' and want_to_upload.lower() == 'y' or want_to_payloadinexe == 'y' and want_to_upload.lower() == '':
             print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadinexe_payloadnameshort.group(0)) + t.normal
             a = multiprocessing.Process(
@@ -215,23 +215,26 @@ class FUNCTIONS(object):
             a.daemon = True
             a.start()
 
+
 class Spinner(object):
 
     def __init__(self):
-        self.spinner = ["|", "\\" , "-", "/" ]
-        self.loading = ['G','e','n','e','r','a','t','i','n','g',' ','P','a','y','l','o','a','d']
+        self.spinner = ["|", "\\", "-", "/"]
+        self.loading = ['G', 'e', 'n', 'e', 'r', 'a', 't', 'i',
+                        'n', 'g', ' ', 'P', 'a', 'y', 'l', 'o', 'a', 'd']
         self.spin_1 = len(self.spinner)
         self.spin_2 = len(self.loading) + 1
         self.x = 0
 
-    def Looper(self,text):
+    def Looper(self, text):
         print t.bold_green,
         sys.stdout.write('\r')
         sys.stdout.write(text)
         print t.normal,
         sys.stdout.flush()
-        
+
     def Update(self):
-        self.spin_2mod = self.x%self.spin_2
-        self.Looper(self.spinner[self.x%self.spin_1] + " " + "".join(self.loading[0: (self.spin_2mod) ]) + (" " * (self.spin_2 - self.spin_2mod)))
+        self.spin_2mod = self.x % self.spin_2
+        self.Looper(self.spinner[self.x % self.spin_1] + " " + "".join(
+            self.loading[0: (self.spin_2mod)]) + (" " * (self.spin_2 - self.spin_2mod)))
         self.x += 1

