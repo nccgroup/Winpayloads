@@ -3,9 +3,23 @@ from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
 
-print t.bold_green + '[*] Updating Modules..'
-os.system('rm ./lib/psexecspray.py')
-os.system('wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
+try:
+    print t.bold_green + '[*] Updating Modules..'
+    URL = urllib2.urlopen('https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py')
+    EMPTY, module_psexecspray_version = URL.readline(), URL.readline()
+
+    MODULEFILE = open('./lib/psexecspray.py','r')
+    EMPTY, module_psexecspray_local_version = MODULEFILE.readline(),MODULEFILE.readline()
+
+    print t.bold_green + '[*] Local Psexecspray Version = ' + module_psexecspray_local_version[1:-1]
+    print t.bold_green + '[*] Psexecspray Version = ' + module_psexecspray_version[1:-1] + t.normal
+    if float(module_psexecspray_version[1:-1]) > float(module_psexecspray_local_version[1:-1]):
+        os.system('rm ./lib/psexecspray*')
+        os.system('wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
+    elif float(module_psexecspray_version[1:-1]) == float(module_psexecspray_local_version[1:-1]):
+        print t.bold_green + '[*] Modules up to date!' + t.normal
+except:
+    pass
 from lib.psexecspray import *
 
 if not re.search('winpayloads', os.getcwd().lower()):

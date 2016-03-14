@@ -17,6 +17,7 @@ import readline
 import time
 import psexec
 from progress.bar import Bar
+import urllib2
 
 t = blessings.Terminal()
 

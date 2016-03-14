@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Copyright (c) 2003-2015 CORE Security Technologies
+# Copyright (c) 2003-2016 CORE Security Technologies
 #
 # This software is provided under under a slightly modified version
 # of the Apache Software License. See the accompanying LICENSE file
@@ -17,17 +17,19 @@ import sys
 import os
 import cmd
 import logging
-
-from impacket import version
-from impacket.smbconnection import *
-from impacket.dcerpc.v5 import transport
-from impacket.structure import Structure
 from threading import Thread, Lock
-from impacket.examples import remcomsvc, serviceinstall, logger
 import argparse
 import random
 import string
 import time
+
+from impacket.examples import logger
+from impacket import version, smb
+from impacket.smbconnection import SMBConnection
+from impacket.dcerpc.v5 import transport
+from impacket.structure import Structure
+from impacket.examples import remcomsvc, serviceinstall
+
 
 class RemComMessage(Structure):
     structure = (
@@ -161,7 +163,7 @@ class PSEXEC:
             packet = RemComMessage()
             pid = os.getpid()
 
-            packet['Machine'] = ''.join([random.choice(string.letters) for i in range(4)])
+            packet['Machine'] = ''.join([random.choice(string.letters) for _ in range(4)])
             if self.__path is not None:
                 packet['WorkingDir'] = self.__path
             packet['Command'] = self.__command
@@ -199,6 +201,8 @@ class PSEXEC:
             raise
         except:
             if unInstalled is False:
+                print "[*] Sleeping While MeterPreter Migrates"
+                time.sleep(10)
                 installService.uninstall()
                 if self.__copyFile is not None:
                     s.deleteFile(installService.getShare(), os.path.basename(self.__copyFile))
@@ -249,13 +253,13 @@ class RemoteStdOutPipe(Pipes):
         while True:
             try:
                 ans = self.server.readFile(self.tid,self.fid, 0, 1024)
-            except Exception, e:
+            except:
                 pass
             else:
                 try:
                     global LastDataSent
                     if ans != LastDataSent:
-                        sys.stdout.write(ans)
+                        sys.stdout.write(ans.decode('cp437'))
                         sys.stdout.flush()
                     else:
                         # Don't echo what I sent, and clear it up
@@ -276,7 +280,7 @@ class RemoteStdErrPipe(Pipes):
         while True:
             try:
                 ans = self.server.readFile(self.tid,self.fid, 0, 1024)
-            except Exception, e:
+            except:
                 pass
             else:
                 try:
@@ -356,7 +360,7 @@ class RemoteShell(cmd.Cmd):
             f = dst_path + '/' + src_file
             pathname = string.replace(f,'/','\\')
             logging.info("Uploading %s to %s\%s" % (src_file, self.share, dst_path))
-            self.transferClient.putFile(self.share, pathname, fh.read)
+            self.transferClient.putFile(self.share, pathname.decode(sys.stdin.encoding), fh.read)
             fh.close()
         except Exception, e:
             logging.error(str(e))
@@ -376,7 +380,7 @@ class RemoteShell(cmd.Cmd):
         return
 
     def default(self, line):
-        self.send_data(line+'\r\n')
+        self.send_data(line.decode(sys.stdin.encoding).encode('cp437')+'\r\n')
 
     def send_data(self, data, hideOutput = True):
         if hideOutput is True:
@@ -388,6 +392,7 @@ class RemoteShell(cmd.Cmd):
 
 class RemoteStdInPipe(Pipes):
     def __init__(self, transport, pipe, permisssions, share=None):
+        self.shell = None
         Pipes.__init__(self, transport, pipe, permisssions, share)
 
     def run(self):
@@ -397,6 +402,8 @@ class RemoteStdInPipe(Pipes):
 
 # Process command-line arguments.
 if __name__ == '__main__':
+    # Init the example's logger theme
+    #logger.init()
     print version.BANNER
 
     parser = argparse.ArgumentParser(add_help = True, description = "PSEXEC like functionality example using RemComSvc.")
@@ -420,7 +427,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     options = parser.parse_args()
-    
+
     if options.debug is True:
         logging.getLogger().setLevel(logging.DEBUG)
     else:
@@ -428,6 +435,11 @@ if __name__ == '__main__':
 
     import re
     domain, username, password, address = re.compile('(?:(?:([^/@:]*)/)?([^@:]*)(?::([^@]*))?@)?(.*)').match(options.target).groups('')
+
+    #In case the password contains '@'
+    if '@' in address:
+        password = password + '@' + address.rpartition('@')[0]
+        address = address.rpartition('@')[2]
 
     if domain is None:
         domain = ''
