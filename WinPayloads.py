@@ -4,7 +4,7 @@ from lib.payloadextras import *
 from lib.startmetasploit import *
 
 print t.bold_green + '[*] Updating Modules..'
-os.system('rm ./lib/psexecspray.py*')
+os.system('rm ./lib/psexecspray.py')
 os.system('wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
 from lib.psexecspray import *
 

@@ -22,7 +22,6 @@ else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
 fi
 
-
 echo -e '\033[1;32m[*] Downloading Python27, Pywin32 and Pycrypto For Wine \033[0m'
 if ! [ -d "/root/.wine/drive_c/Python27/" ]; then
   wget https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
@@ -54,10 +53,14 @@ else
 fi
 
 echo -e '\033[1;32m[*] Installing impacket from Git \033[0m'
-git clone https://github.com/CoreSecurity/impacket.git
-cd impacket
-python2.7 setup.py install
-cd ..
+if ! [ -f "/usr/local/lib/python2.7/dist-packages/impacket-0.9.15_dev.egg-info" ]; then
+  git clone https://github.com/CoreSecurity/impacket.git
+  cd impacket
+  python2.7 setup.py install
+  cd ..
+else
+  echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
+fi
 
 echo -e '\033[1;32m[*] Grabbing Modules \033[0m'
 cd lib
@@ -68,4 +71,3 @@ echo -e '\033[1;32m[*] Done \033[0m'
 echo -e '\033[1;32m[*] Cleaning Up \033[0m'
 rm python-2.7.10.msi shellter.zip pyinstaller-2.0.zip pycrypto-2.6.win32-py2.7.exe vcredist_x86.exe pywin32.exe PLATLIB SCRIPTS impacket -rf
 echo -e '\033[1;32m[*] Done \033[0m'
-
