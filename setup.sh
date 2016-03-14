@@ -64,6 +64,7 @@ fi
 
 echo -e '\033[1;32m[*] Grabbing Modules \033[0m'
 cd lib
+rm psexecspray.py
 wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py
 cd ..
 echo -e '\033[1;32m[*] Done \033[0m'
