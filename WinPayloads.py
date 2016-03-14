@@ -2,6 +2,10 @@
 from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
+
+print t.bold_green + '[*] Updating Modules..'
+os.system('rm ./lib/psexecspray.py*')
+os.system('wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
 from lib.psexecspray import *
 
 if not re.search('winpayloads', os.getcwd().lower()):
@@ -23,8 +27,9 @@ try:
 except OSError:
     pass
 
+
 print t.clear
-print '=' * t.width + t.bold_red
+print t.normal + '=' * t.width + t.bold_red
 print " _       ___       ____              __                __".center(t.width)
 print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(t.width)
 print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(t.width)
