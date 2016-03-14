@@ -4,7 +4,7 @@ from lib.payloadextras import *
 from lib.startmetasploit import *
 
 try:
-    print t.bold_green + '[*] Updating Modules..'
+    print t.clear + t.bold_green + '[*] Updating Modules..'
     URL = urllib2.urlopen('https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py')
     EMPTY, module_psexecspray_version = URL.readline(), URL.readline()
 
@@ -16,8 +16,10 @@ try:
     if float(module_psexecspray_version[1:-1]) > float(module_psexecspray_local_version[1:-1]):
         os.system('rm ./lib/psexecspray*')
         os.system('wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
+        print t.bold_green + '[*] Modules Updated!' + t.normal
     elif float(module_psexecspray_version[1:-1]) == float(module_psexecspray_local_version[1:-1]):
         print t.bold_green + '[*] Modules up to date!' + t.normal
+    del EMPTY
 except:
     pass
 from lib.psexecspray import *
@@ -42,7 +44,6 @@ except OSError:
     pass
 
 
-print t.clear
 print t.normal + '=' * t.width + t.bold_red
 print " _       ___       ____              __                __".center(t.width)
 print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(t.width)
