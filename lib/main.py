@@ -214,3 +214,24 @@ class FUNCTIONS(object):
                 target=self.ServePayload, args=(payloaddir,))
             a.daemon = True
             a.start()
+
+class Spinner(object):
+
+    def __init__(self):
+        self.spinner = ["|", "\\" , "-", "/" ]
+        self.loading = ['G','e','n','e','r','a','t','i','n','g',' ','P','a','y','l','o','a','d']
+        self.spin_1 = len(self.spinner)
+        self.spin_2 = len(self.loading) + 1
+        self.x = 0
+
+    def Looper(self,text):
+        print t.bold_green,
+        sys.stdout.write('\r')
+        sys.stdout.write(text)
+        print t.normal,
+        sys.stdout.flush()
+        
+    def Update(self):
+        self.spin_2mod = self.x%self.spin_2
+        self.Looper(self.spinner[self.x%self.spin_1] + " " + "".join(self.loading[0: (self.spin_2mod) ]) + (" " * (self.spin_2 - self.spin_2mod)))
+        self.x += 1

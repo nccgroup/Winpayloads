@@ -167,12 +167,13 @@ try:
         print '[*] Creating Payload using Pyinstaller...'
         p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
                          '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        i = 0
+        LOADING = Spinner()
         while p.poll() == None:
-            print t.bold_green + "/-\|"[i % 4] + '\r',
-            sys.stdout.flush()
-            i += 1
+            LOADING.Update()
             time.sleep(0.2)
+        print '\r',
+        sys.stdout.flush()
+
         payloadstderr = p.stderr.read()
         if re.search('error',payloadstderr.lower()):
             print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal + payloadstderr
