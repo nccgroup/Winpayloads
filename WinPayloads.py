@@ -22,7 +22,9 @@ try:
         print t.bold_green + '[*] Modules up to date!' + t.normal
     del EMPTY
 except:
-    print t.bold_red + "[!!] Please Run setup.sh Again.." +t.normal
+    os.system('rm ./lib/psexecspray*')
+    os.system(
+        'wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
 from lib.psexecspray import *
 
 
