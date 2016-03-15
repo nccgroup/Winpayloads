@@ -2,7 +2,6 @@
 from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
-
 try:
     print t.clear + t.bold_green + '[*] Updating Modules..'
     URL = urllib2.urlopen(
@@ -26,6 +25,7 @@ except:
     print t.bold_red + "[!!] Please Run setup.sh Again.." +t.normal
     sys.exit(1)
 from lib.psexecspray import *
+
 
 if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal

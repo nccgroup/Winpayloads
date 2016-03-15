@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import socket
 import re
@@ -244,10 +245,22 @@ class FUNCTIONS(object):
 class Spinner(object):
 
     def __init__(self):
-        self.spinner = ["|", "\\", "-", "/"]
+        self.spinner = [
+            ["|", "\\", "-", "/"],
+            ["▁","▃","▄","▅","▆","▇","█","▇","▆","▅","▄","▃"],
+            ["◡◡", "⊙⊙", "◠◠"],
+            ["◐","◓","◑","◒"],
+            ["▉","▊","▋","▌","▍","▎","▏","▎","▍","▌","▋","▊","▉"],
+            [".","o","O","@","*"],
+            ["◴","◷","◶","◵"],
+            ["▖","▘","▝","▗"],
+            ["←","↖","↑","↗","→","↘","↓","↙"],
+            ["◢","◣","◤","◥"]
+            ]
         self.loading = ['G', 'e', 'n', 'e', 'r', 'a', 't', 'i',
                         'n', 'g', ' ', 'P', 'a', 'y', 'l', 'o', 'a', 'd']
-        self.spin_1 = len(self.spinner)
+        self.randomchoice = random.choice(self.spinner)
+        self.spin_1 = len(self.randomchoice)
         self.spin_2 = len(self.loading) + 1
         self.x = 0
 
@@ -260,6 +273,6 @@ class Spinner(object):
 
     def Update(self):
         self.spin_2mod = self.x % self.spin_2
-        self.Looper(self.spinner[self.x % self.spin_1] + " " + "".join(
+        self.Looper(self.randomchoice[self.x % self.spin_1] + " " + "".join(
             self.loading[0: (self.spin_2mod)]) + (" " * (self.spin_2 - self.spin_2mod)))
         self.x += 1
