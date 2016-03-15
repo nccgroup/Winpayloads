@@ -306,13 +306,13 @@ try:
 
     elif menuchoice == '5':
         if want_UACBYPASS.lower() == 'y':
-            METASPLOIT().metdns_uac(portnum)
+            METASPLOIT().metdns_uac(portnum,DNSaddr)
         elif want_ALLCHECKS.lower() == 'y':
-            METASPLOIT().metdns_allchecks(portnum)
+            METASPLOIT().metdns_allchecks(portnum,DNSaddr)
         elif want_PERSISTENCE.lower() == 'y':
-            METASPLOIT().metdns_persistence(portnum)
+            METASPLOIT().metdns_persistence(portnum,DNSaddr)
         else:
-            METASPLOIT().metdns_normal(portnum)
+            METASPLOIT().metdns_normal(portnum,DNSaddr)
 
     raise KeyboardInterrupt
 
