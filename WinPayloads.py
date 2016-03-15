@@ -182,7 +182,7 @@ try:
 
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(FUNCTIONS.DoPyCipher(
+            Filesave.write(FUNCTIONS().DoPyCipher(
                 SHELLCODE.injectwindows % (ez2read_shellcode)))
             Filesave.close()
 
