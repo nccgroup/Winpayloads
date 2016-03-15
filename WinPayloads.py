@@ -23,7 +23,6 @@ try:
     del EMPTY
 except:
     print t.bold_red + "[!!] Please Run setup.sh Again.." +t.normal
-    sys.exit(1)
 from lib.psexecspray import *
 
 
