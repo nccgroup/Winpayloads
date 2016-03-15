@@ -23,7 +23,8 @@ try:
         print t.bold_green + '[*] Modules up to date!' + t.normal
     del EMPTY
 except:
-    pass
+    print t.bold_red + "[!!] Please Run setup.sh Again.." +t.normal
+    sys.exit(1)
 from lib.psexecspray import *
 
 if not re.search('winpayloads', os.getcwd().lower()):
@@ -181,7 +182,7 @@ try:
         ez2read_shellcode = EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE()
 
     want_to_payloadinexe = raw_input(
-        t.bold_red + '[*] Inject Shellcode Into an EXE (Shellter)? y/[n]: ' + t.normal)
+        t.bold_red + '[*] Inject Shellcode ilnto an EXE (Shellter)? y/[n]: ' + t.normal)
 
     if not want_to_payloadinexe == 'y':
         with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
