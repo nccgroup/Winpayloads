@@ -26,7 +26,7 @@ try:
 except OSError:
     pass
 
-
+print t.clear
 print t.normal + '=' * t.width + t.bold_red
 print " _       ___       ____              __                __".center(t.width)
 print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(t.width)
