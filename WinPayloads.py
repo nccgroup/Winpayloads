@@ -3,30 +3,9 @@ from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
 try:
-    print t.clear + t.bold_green + '[*] Updating Modules..'
-    URL = urllib2.urlopen(
-        'https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py')
-    EMPTY, module_psexecspray_version = URL.readline(), URL.readline()
-
-    MODULEFILE = open('./lib/psexecspray.py', 'r')
-    EMPTY, module_psexecspray_local_version = MODULEFILE.readline(), MODULEFILE.readline()
-
-    print t.bold_green + '[*] Local Psexecspray Version = ' + module_psexecspray_local_version[1:-1]
-    print t.bold_green + '[*] Psexecspray Version = ' + module_psexecspray_version[1:-1] + t.normal
-    if float(module_psexecspray_version[1:-1]) > float(module_psexecspray_local_version[1:-1]):
-        os.system('rm ./lib/psexecspray*')
-        os.system(
-            'wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
-        print t.bold_green + '[*] Modules Updated!' + t.normal
-    elif float(module_psexecspray_version[1:-1]) == float(module_psexecspray_local_version[1:-1]):
-        print t.bold_green + '[*] Modules up to date!' + t.normal
-    del EMPTY
+    from lib.psexecspray import *
 except:
-    os.system('rm ./lib/psexecspray*')
-    os.system(
-        'wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspray.py -O ./lib/psexecspray.py')
-from lib.psexecspray import *
-
+    print t.bold_red + "[!] Rerun the setup.sh" + t.normal
 
 if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
