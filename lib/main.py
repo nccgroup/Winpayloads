@@ -165,7 +165,8 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
 class FUNCTIONS(object):
     def winpayloads_help(self):
-        print_payloads =  """
+        print_payloads =(
+"""
 + Windows Reverse Shell
     - This payload will give the attacker a stageless reverse tcp shell
     - A listener will be automatically started using NetCat
@@ -191,8 +192,9 @@ class FUNCTIONS(object):
     - Good for dynamic ip addresses and persistence payloads
     - A listener will be automatically started using Metasploit
     - All MODULES are avalible for this payload
+""")
+        print_modules =(
 """
-        print_modules =  """
 + Shellter
     - Shellter is a dynamic shellcode injection tool, and the first truly dynamic PE infector ever created
     - It can be used in order to inject shellcode into native Windows applications (32-bit only)
@@ -212,8 +214,9 @@ class FUNCTIONS(object):
 + Persistence
     - This module will run a powershell script on the target
     - Persistence adds registry keys to automatically run the payload everytime the target boots
+""")
+        print_deployment =(
 """
-        print_deployment = """
 + SimpleHTTPServer
     - The payload will be hosted locally on a HTTP server
 
@@ -221,24 +224,24 @@ class FUNCTIONS(object):
     - Spray hashes to find a vulnerable target
     - Psexec the payload to the target
     - Runs as system
-"""
+""")
         print "\n|=------=|"
-        print t.bold_green + "|PAYLOADS|" + t.normal
-        print "|=------=|\n"
+        print "|" + t.bold_green + "PAYLOADS" + t.normal + "|"
+        print "|=------=|"
         for char in print_payloads:
             time.sleep(0.0005)
             sys.stdout.write(char)
             sys.stdout.flush()
         print "\n|=-----=|"
-        print t.bold_green + "|MODULES|" + t.normal
-        print "|=-----=|\n"
+        print "|" + t.bold_green + "MODULES" + t.normal + "|"
+        print "|=-----=|"
         for char in print_modules:
             time.sleep(0.0005)
             sys.stdout.write(char)
             sys.stdout.flush()
         print "\n|=--------=|"
-        print t.bold_green + "|DEPLOYMENT|" + t.normal
-        print "|=--------=|\n"
+        print "|" + t.bold_green + "DEPLOYMENT" + t.normal + "|"
+        print "|=--------=|"
         for char in print_deployment:
             time.sleep(0.0005)
             sys.stdout.write(char)
