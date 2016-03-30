@@ -114,9 +114,10 @@ try:
         except:
             print t.bold_red + '[!] Error in Port Syntax' + t.normal
             sys.exit(1)
-
         shellcode = payloadchoice % (bindporthex)
-        print t.bold_green + '\n[*] PORT SET AS %s\n' % (bindport) + t.normal
+        bindip = raw_input(
+            '\n[*] Target Bind IP Address ' + t.bold_red + '(REQUIRED FOR BIND PAYLOADS)' + t.normal +' \n[*] IP> ')
+        print t.bold_green + '[*] BIND IP SET AS %s\n[*] PORT SET AS %s\n' % (bindip,bindport) + t.normal
 
     elif menuchoice == '4':
         portnum = raw_input(
@@ -283,8 +284,6 @@ try:
             METASPLOIT().metrev_normal(portnum)
 
     elif menuchoice == '3':
-        bindip = raw_input(
-            '\n[*] Target Bind IP Address \n[*] IP> ')
         if want_UACBYPASS.lower() == 'y':
             METASPLOIT().metbind_uac(bindport, bindip)
         elif want_ALLCHECKS.lower() == 'y':
