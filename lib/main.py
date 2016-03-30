@@ -163,8 +163,86 @@ ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.
 ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 """
 
-
 class FUNCTIONS(object):
+    def winpayloads_help(self):
+        print_payloads =  """
++ Windows Reverse Shell
+    - This payload will give the attacker a stageless reverse tcp shell
+    - A listener will be automatically started using NetCat
+    - Shellter is the only avalible module for this payload
+
++ Windows Reverse Meterpreter
+    - This payload will give the attacker a staged reverse tcp meterpreter shell
+    - A listener will be automatically started using Metasploit
+    - All MODULES are avalible for this payload
+
++ Windows Bind Meterpreter
+    - This payload will give the attacker a staged bind tcp meterpreter shell
+    - Connection to the bind port will be automatically started using Metasploit
+    - All MODULES are avalible for this payload
+
++ Windows Reverse Meterpreter HTTPS
+    - This payload will give the attacker a staged reverse HTTPS meterpreter shell
+    - A listener will be automatically started using Metasploit
+    - All MODULES are avalible for this payload
+
++ Windows Reverse Meterpreter DNS
+    - This payload will give the attacker a staged reverse tcp meterpreter shell with DNS name resolution
+    - Good for dynamic ip addresses and persistence payloads
+    - A listener will be automatically started using Metasploit
+    - All MODULES are avalible for this payload
+"""
+        print_modules =  """
++ Shellter
+    - Shellter is a dynamic shellcode injection tool, and the first truly dynamic PE infector ever created
+    - It can be used in order to inject shellcode into native Windows applications (32-bit only)
+    - https://www.shellterproject.com/introducing-shellter/
+
++ UAC Bypass
+    - This Module only works on Local Administrator Accounts
+    - Using this module, PowerShellEmpire's UAC Bypass will execute on the target
+    - This will bypass uac and create another session running as administrator
+    - https://github.com/PowerShellEmpire/Empire
+
++ Priv Esc checks
+    - Using this module, PowerShellEmpire's PowerUp AllChecks will execute on the target
+    - This will find common privesc vulnerabilities on the target
+    - https://github.com/PowerShellEmpire/Empire
+
++ Persistence
+    - This module will run a powershell script on the target
+    - Persistence adds registry keys to automatically run the payload everytime the target boots
+"""
+        print_deployment = """
++ SimpleHTTPServer
+    - The payload will be hosted locally on a HTTP server
+
++ Psexec and Spraying
+    - Spray hashes to find a vulnerable target
+    - Psexec the payload to the target
+    - Runs as system
+"""
+        print "\n|=------=|"
+        print t.bold_green + "|PAYLOADS|" + t.normal
+        print "|=------=|\n"
+        for char in print_payloads:
+            time.sleep(0.0005)
+            sys.stdout.write(char)
+            sys.stdout.flush()
+        print "\n|=-----=|"
+        print t.bold_green + "|MODULES|" + t.normal
+        print "|=-----=|\n"
+        for char in print_modules:
+            time.sleep(0.0005)
+            sys.stdout.write(char)
+            sys.stdout.flush()
+        print "\n|=--------=|"
+        print t.bold_green + "|DEPLOYMENT|" + t.normal
+        print "|=--------=|\n"
+        for char in print_deployment:
+            time.sleep(0.0005)
+            sys.stdout.write(char)
+            sys.stdout.flush()
 
     def __init__(self):
         self.BLOCK_SIZE = 32

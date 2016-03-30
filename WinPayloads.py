@@ -46,6 +46,8 @@ print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
 print ('[5] Windows Reverse Meterpreter DNS' + t.bold_green + '(Staged)' +
        t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 4) + t.normal
 print '=' * t.width
+print ('Type \'help\' or \'?\' to get detailed infomation').center(t.width + 4) + t.normal
+
 
 try:
     while True:
@@ -70,6 +72,8 @@ try:
             payloadchoice = SHELLCODE.windows_met_rev_shell_dns
             payload = 'Windows Meterpreter Reverse Shell DNS '
             break
+        elif menuchoice == 'help' or menuchoice == '?':
+            FUNCTIONS().winpayloads_help()
         else:
             print t.bold_red + '[*] Wrong Selection' + t.normal
     print t.bold_green + '\n[*] Payload Set As %s\n' % (payload) + t.normal
