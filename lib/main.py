@@ -213,7 +213,7 @@ class FUNCTIONS(object):
 
 + Persistence
     - This module will run a powershell script on the target
-    - Persistence adds registry keys to automatically run the payload everytime the target boots
+    - Persistence adds registry keys and to the startup folder to automatically run the payload everytime the target boots
 """)
         print_deployment =(
 """
