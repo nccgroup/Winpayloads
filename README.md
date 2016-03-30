@@ -6,6 +6,7 @@ Undetectable Windows Payload Generation with extras Running on Python2.7
 2. ```cd Winpayloads```
 3. ```./setup.sh``` Will Setup Everything Needed for Winpayloads
 4. Start Winpayloads ```./winpayloads```  
+5. Type 'help' or '?' to get a detailed help page 
 
 #### Rerun setup.sh on every git pull
 
@@ -13,4 +14,3 @@ Undetectable Windows Payload Generation with extras Running on Python2.7
 
 # Video and Information on Blog  
 https://charliedean.github.io  
-
