@@ -34,8 +34,19 @@ print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(
 print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.width)
 print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
 print "    /____/Charlie Dean".center(t.width + 11)
-print t.normal
-FUNCTIONS().SplashScreen()
+print t.normal + '=' * (t.width / 2 - 3) + "-MENU-" + '=' * (t.width / 2 - 3)
+print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
+       t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
+print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
+       ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width) + t.normal
+print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
+       ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
+print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
+       t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 6) + t.normal
+print ('[5] Windows Reverse Meterpreter DNS' + t.bold_green + '(Staged)' +
+       t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 4) + t.normal
+print '=' * t.width
+print ('Type \'help\' or \'?\' to get detailed infomation').center(t.width + 4) + t.normal
 
 try:
     while True:

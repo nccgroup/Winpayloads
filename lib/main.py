@@ -165,22 +165,6 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
 class FUNCTIONS(object):
 
-    def SplashScreen(self):
-        print '=' * (t.width / 2 - 3) + "-MENU-" + '=' * (t.width / 2 - 3)
-        print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
-               t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
-        print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-               ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width) + t.normal
-        print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-               ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
-        print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
-               t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 6) + t.normal
-        print ('[5] Windows Reverse Meterpreter DNS' + t.bold_green + '(Staged)' +
-               t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 4) + t.normal
-        print '=' * t.width
-        print ('Type \'help\' or \'?\' to get detailed infomation').center(t.width + 4) + t.normal
-
-
     def winpayloads_help(self):
         print_payloads =(
 """
@@ -254,7 +238,6 @@ class FUNCTIONS(object):
         print "|" + t.bold_green + "DEPLOYMENT" + t.normal + "|"
         print "|=--------=|"
         print print_deployment
-        self.SplashScreen()
 
 
     def __init__(self):
