@@ -164,6 +164,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 """
 
 class FUNCTIONS(object):
+
     def winpayloads_help(self):
         print_payloads =(
 """
@@ -228,24 +229,16 @@ class FUNCTIONS(object):
         print "\n|=------=|"
         print "|" + t.bold_green + "PAYLOADS" + t.normal + "|"
         print "|=------=|"
-        for char in print_payloads:
-            time.sleep(0.0005)
-            sys.stdout.write(char)
-            sys.stdout.flush()
+        print print_modules
         print "\n|=-----=|"
         print "|" + t.bold_green + "MODULES" + t.normal + "|"
         print "|=-----=|"
-        for char in print_modules:
-            time.sleep(0.0005)
-            sys.stdout.write(char)
-            sys.stdout.flush()
+        print print_payloads
         print "\n|=--------=|"
         print "|" + t.bold_green + "DEPLOYMENT" + t.normal + "|"
         print "|=--------=|"
-        for char in print_deployment:
-            time.sleep(0.0005)
-            sys.stdout.write(char)
-            sys.stdout.flush()
+        print print_deployment
+
 
     def __init__(self):
         self.BLOCK_SIZE = 32
