@@ -243,7 +243,7 @@ try:
         os.system('rm %s/dist -r' % payloaddir)
         os.system('rm %s/build -r' % payloaddir)
         os.system('rm %s/*.spec' % payloaddir)
-        #os.system('rm %s/payload.py' % payloaddir)
+        os.system('rm %s/payload.py' % payloaddir)
         print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' % (payloaddir, payloadname) + t.normal
 
     if want_to_payloadinexe.lower() == 'y':
