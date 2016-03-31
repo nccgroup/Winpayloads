@@ -239,7 +239,6 @@ class FUNCTIONS(object):
         print "|=--------=|"
         print print_deployment
 
-
     def __init__(self):
         self.BLOCK_SIZE = 32
         self.PADDING = '{'
@@ -285,8 +284,11 @@ class FUNCTIONS(object):
         self.imports.append("from Crypto.Cipher import AES as %s" % (aesvar))
 
         random.shuffle(self.imports)
-
-        newoutput = ";".join(self.imports) + "\n"
+        randomstring = ''.join(random.choice(string.lowercase) for x in range(500))
+        randombytes = ''
+        for i in randomstring:
+            randombytes += hex(ord(i))
+        newoutput = "%s%s = \"%s\"\n"%(b64var,aesvar,randombytes) + ";".join(self.imports) + "\n"
 
         newoutput += "exec(%s(\"%s\"))" % (b64var, base64.b64encode(
             "exec(%s.new(\"%s\").decrypt(%s(\"%s\")).rstrip('{'))\n" % (aesvar, key, b64var, encrypted)))

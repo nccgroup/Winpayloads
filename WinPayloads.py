@@ -2,6 +2,7 @@
 from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
+
 try:
     from lib.psexecspray import *
 except:
@@ -19,7 +20,14 @@ try:
 except:
     iperror = True
 
-payload, payloadchoice, payloaddir, want_UACBYPASS, want_ALLCHECKS, want_PERSISTENCE, payloadname, payloadinexe_payloadnameshort = '', '', '/etc/winpayloads', 'n', 'n', 'n', '', None
+payload = ''
+payloadchoice = ''
+payloaddir = '/etc/winpayloads'
+want_UACBYPASS = 'n'
+want_ALLCHECKS = 'n'
+want_PERSISTENCE = 'n'
+payloadname = ''
+payloadinexe_payloadnameshort =  None
 
 try:
     os.mkdir(payloaddir)
@@ -202,7 +210,8 @@ try:
 
         payloadstderr = p.stderr.read()
         if re.search('error', payloadstderr.lower()):
-            print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal + payloadstderr
+            print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal
+            sys.stdout.write(payloadstderr)
             raise KeyboardInterrupt
 
         print '[*] Cleaning Up...'
@@ -234,7 +243,7 @@ try:
         os.system('rm %s/dist -r' % payloaddir)
         os.system('rm %s/build -r' % payloaddir)
         os.system('rm %s/*.spec' % payloaddir)
-        os.system('rm %s/payload.py' % payloaddir)
+        #os.system('rm %s/payload.py' % payloaddir)
         print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' % (payloaddir, payloadname) + t.normal
 
     if want_to_payloadinexe.lower() == 'y':
