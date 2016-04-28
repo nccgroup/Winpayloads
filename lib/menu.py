@@ -31,6 +31,7 @@ mainMenuOptions = OrderedDict([
 
 psMenuOptions = OrderedDict([
     ('1', {'payloadchoice': SHELLCODE.windows_ps_rev_shell, 'payload': 'Windows_Interactive_Reverse_Powershell_Shell', 'extrawork': reversePowerShellGeneration}),
+    ('2', {'payloadchoice': SHELLCODE.windows_ps_rev_watch_screen, 'payload': 'Windows_Reverse_Powershell_ScreenWatch', 'extrawork': reversePowerShellWatchScreenGeneration}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu}),
 ])
 
