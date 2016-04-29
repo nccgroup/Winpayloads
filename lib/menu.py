@@ -94,8 +94,8 @@ class MenuOptions(object):
 def Splash():
     print t.clear + t.bold_red
     print noColourCenter("_       ___       ____              __                __")
-    print noColourCenter("  | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____")
-    print noColourCenter("  | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/")
+    print noColourCenter("   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____")
+    print noColourCenter("   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/")
     print noColourCenter(" | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )")
     print noColourCenter(" |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/")
     print noColourCenter("              /____/Charlie Dean" + t.normal)
