@@ -8,7 +8,10 @@ def noColourLen(colourString):
     return len(re.compile(r'\x1b[^m]*m').sub('', colourString))
 
 def noColourCenter(colourString):
-    return (' '*((t.width / 2) - (noColourLen(colourString) /2))) + colourString
+    len = (t.width / 2) - (noColourLen(colourString) /2 )
+    if len % 2 > 0:
+        len -= 1
+    return (' ' * len) + colourString
 
 def getAndRunPSMenu():
     psMenu = MenuOptions(psMenuOptions)
@@ -82,7 +85,10 @@ class MenuOptions(object):
                 maxlen = nocolourlen
             arr.append(menuPrintString)
         for i in arr:
-            print (' '*((t.width / 2) - (maxlen / 2))) + i + (' '*((t.width / 2) - (maxlen / 2)))
+            spacing = (t.width / 2) - (maxlen / 2)
+            if spacing % 2 > 0:
+                spacing -= 1
+            print (' '* spacing) + i + (' ' * spacing)
         print '='*t.width
 
 def Splash():
