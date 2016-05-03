@@ -68,7 +68,11 @@ class MenuOptions(object):
 
     def printMenues(self):
         Splash()
-        print '=' * (t.width / 2 - 3) + "-MENU-" + '=' * (t.width / 2 - 3)
+        if t.width % 2 > 0:
+            adjust = 1
+        else:
+            adjust = 0
+        print '=' * (t.width / 2 - 3) + "-MENU-" + '=' * (t.width / 2 - (3 - adjust))
         maxlen = 0
         arr = []
         for i in self.choices.iterkeys():
@@ -88,7 +92,11 @@ class MenuOptions(object):
             spacing = (t.width / 2) - (maxlen / 2)
             if spacing % 2 > 0:
                 spacing -= 1
-            print (' '* spacing) + i + (' ' * spacing)
+            if len(i) % 2 > 0:
+                adjust = 0
+            else:
+                adjust = 1
+            print (' '* spacing) + i + (' ' * (spacing - adjust))
         print '='*t.width
 
 def Splash():
