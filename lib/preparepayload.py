@@ -7,7 +7,7 @@ payloaddir = '/etc/winpayloads'
 
 def reversePayloadGeneration(payloadchoice,payloadname):
     portnum = raw_input(
-        '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
     if len(portnum) == 0:
         portnum = 4444
 
@@ -40,7 +40,7 @@ def reversePayloadGeneration(payloadchoice,payloadname):
 
 def bindPayloadGeneration(payloadchoice,payloadname):
     bindport = raw_input(
-            '\n[*] Press Enter For Default Bind Port(4444)\n[*] Port> ')
+            '\n[*] Press Enter For Default Bind Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
     if len(bindport) is 0:
         bindport = 4444
     try:
@@ -58,7 +58,7 @@ def bindPayloadGeneration(payloadchoice,payloadname):
 
 def httpsPayloadGeneration(payloadchoice,payloadname):
     portnum = raw_input(
-        '\n[*] Press Enter For Default Port(443)\n[*] Port> ')
+        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '443' + t.normal))
     if len(portnum) is 0:
         portnum = 443
 
@@ -86,7 +86,7 @@ def httpsPayloadGeneration(payloadchoice,payloadname):
 
 def dnsPayloadGeneration(payloadchoice,payloadname):
     portnum = raw_input(
-        '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
     if len(portnum) is 0:
         portnum = 4444
     try:
@@ -105,7 +105,7 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
 
 def reversePowerShellGeneration(payloadchoice,payloadname):
     portnum = raw_input(
-        '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
     if len(portnum) is 0:
         portnum = 4444
     IP = FUNCTIONS().CheckInternet()
@@ -128,7 +128,7 @@ def reversePowerShellGeneration(payloadchoice,payloadname):
 
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     portnum = raw_input(
-        '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
     if len(portnum) is 0:
         portnum = 4444
     IP = FUNCTIONS().CheckInternet()
@@ -152,7 +152,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     portnum = raw_input(
-        '\n[*] Press Enter For Default Port(4444)\n[*] Port> ')
+        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
     if len(portnum) is 0:
         portnum = 4444
     IP = FUNCTIONS().CheckInternet()
