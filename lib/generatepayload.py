@@ -33,9 +33,14 @@ METASPLOIT_Functions = {
         'persistence': METASPLOIT().metdns_persistence,
         'normal': METASPLOIT().metdns_normal
     },
+    'nclistener': {
+        'nclisten': METASPLOIT().nclisterner,
+    }
 }
-
 def askAndReturnModules(shellcode, metasploit_type):
+    if metasploit_type == 'nclistener':
+        return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['nclisten'])
+
     want_UACBYPASS = raw_input(t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)? y/[n]:' + t.normal)
     if want_UACBYPASS.lower() == 'y':
         return (EXTRAS(shellcode).UACBYPASS(), METASPLOIT_Functions[metasploit_type]['uacbypass'])
