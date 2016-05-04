@@ -13,7 +13,7 @@ def reversePayloadGeneration(payloadchoice,payloadname):
 
     IP = FUNCTIONS().CheckInternet()
     ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
     if len(ipaddr) == 0:
         ipaddr = IP
     if not IP:
@@ -64,7 +64,7 @@ def httpsPayloadGeneration(payloadchoice,payloadname):
 
     IP = FUNCTIONS().CheckInternet()
     ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
     if len(ipaddr) == 0:
         ipaddr = IP
     if not IP:
@@ -110,7 +110,7 @@ def reversePowerShellGeneration(payloadchoice,payloadname):
         portnum = 4444
     IP = FUNCTIONS().CheckInternet()
     ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
     if len(ipaddr) == 0:
         ipaddr = IP
     if not IP:
@@ -133,7 +133,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
         portnum = 4444
     IP = FUNCTIONS().CheckInternet()
     ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
     if len(ipaddr) == 0:
         ipaddr = IP
     if not IP:
@@ -157,7 +157,7 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
         portnum = 4444
     IP = FUNCTIONS().CheckInternet()
     ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically\n[*] IP> ')
+        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
     if len(ipaddr) == 0:
         ipaddr = IP
     if not IP:
