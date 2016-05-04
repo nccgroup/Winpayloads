@@ -67,8 +67,8 @@ def Shellter(ez2read_shellcode):
     os.system('mv %s %s'%(payloadinexe_payloaddir, payloaddir))
     os.remove(payloadinexe_payloaddir + '.bak')
     os.remove('payloadbin')
-    payloadinexe_payloadname = payloadinexe_payloaddir.split('/')[-1]
-    DoPayloadUpload(payloadinexe_payloadname.replace('.exe',''))
+    payloadinexe_payloadname = payloadinexe_payloaddir.split('/')[-1].rstrip('.exe')
+    DoPayloadUpload(payloadinexe_payloadname)
 
 
 def GeneratePayload(ez2read_shellcode,payloadname):
