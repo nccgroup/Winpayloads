@@ -43,10 +43,12 @@ def startSocket(ipaddr, port):
                             if command == "":
                                 continue
                             client['clientinstance'].sendall(command)
-                            data = client['clientinstance'].recv(16834)
-                            if data[-1] == "\x00":
-                                sys.stdout.write(data)
-                                sys.stdout.flush()
+                            a = True
+                            while a == True:
+                                data += client['clientinstance'].recv(16834).encode("utf-8").replace('\n','')
+                                if data[-1] == "\x00":
+                                    a = False
+                            print data
                     elif menu.lower() == "exit":
                         client['clientinstance'].close()
                         clientlist.remove(client)
