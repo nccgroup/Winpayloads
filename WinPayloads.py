@@ -13,10 +13,8 @@ if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
     sys.exit(1)
 
-payloaddir = '/etc/winpayloads'
-
 try:
-    os.mkdir(payloaddir)
+    os.mkdir('/etc/winpayloads')
 except OSError:
     pass
 

