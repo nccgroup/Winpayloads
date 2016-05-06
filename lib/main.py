@@ -363,8 +363,7 @@ class FUNCTIONS(object):
             Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
             httpd = SocketServer.TCPServer(('', 8000), Handler)
             httpd.serve_forever()
-        except Exception as E:
-            print E
+        except:
             print t.bold_red + '\n[*] WebServer Shutdown' + t.normal
 
     def DoServe(self, IP, payloadname, payloaddir):
