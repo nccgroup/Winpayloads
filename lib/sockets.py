@@ -18,11 +18,13 @@ def startSocket(ipaddr, port):
     worker.setDaemon(True)
     worker.start()
     printListener(ipaddr, port)
+    print "Waiting for clients"
     while True:
         for client in clientlist:
             print str(client['client']) + ': ' +  client['clientaddress']
             client['clientinstance'].settimeout(10)
-        targetchoice = raw_input('Choose target :>')
+            if client:
+                targetchoice = raw_input('Choose target :>')
         for client in clientlist:
             if targetchoice == str(client['client']):
                 while client:
