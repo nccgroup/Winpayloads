@@ -80,7 +80,7 @@ class MenuOptions(object):
         for i in self.choices.iterkeys():
             menuPrintString = t.bold_yellow + str(i) + ': ' + t.normal + str(self.choices[i]['payload'])
             try:
-                menuPrintString += t.bold_green + str(self.choices[i]['availablemodules'].keys()).replace('\'','').replace('normal, ','') + t.normal
+                menuPrintString += t.bold_green + ' ' + str(self.choices[i]['availablemodules'].keys()).replace('\'','').replace('normal, ','') + t.normal
             except:
                 pass
 
