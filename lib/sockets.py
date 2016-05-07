@@ -44,7 +44,7 @@ def startSocket(ipaddr, port):
                                 continue
                             client['clientinstance'].sendall(command)
                             a = True
-                            while a == True:
+                            while a:
                                 data += client['clientinstance'].recv(16834).encode("utf-8").replace('\n','')
                                 if data[-1] == "\x00":
                                     a = False

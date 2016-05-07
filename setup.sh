@@ -40,17 +40,6 @@ else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
 fi
 
-echo -e '\033[1;32m[*] Setting Up Shellter \033[0m'
-if ! [ -d "./shellter" ]; then
-  wget --user-agent="Mozilla/5.0 (Windows NT 6.1; WOW64; rv:41.0) Gecko/20100101 Firefox/41.0" "https://www.shellterproject.com/Downloads/Shellter/Latest/shellter.zip"
-  unzip shellter.zip
-  cd shellter
-  rm -r icon shellcode_samples faq.txt readme.txt version_history.txt
-  cd ..
-else
-  echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
-fi
-
 echo -e '\033[1;32m[*] Installing impacket from Git \033[0m'
 if ! [ -f "/usr/local/lib/python2.7/dist-packages/impacket-0.9.15_dev.egg-info" ]; then
   git clone https://github.com/CoreSecurity/impacket.git
