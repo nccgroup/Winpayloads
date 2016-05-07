@@ -234,7 +234,6 @@ class FUNCTIONS(object):
 + Windows Reverse Shell
     - This payload will give the attacker a stageless reverse tcp shell
     - A listener will be automatically started using NetCat
-    - Shellter is the only avalible module for this payload
 
 + Windows Reverse Meterpreter
     - This payload will give the attacker a staged reverse tcp meterpreter shell
@@ -259,11 +258,6 @@ class FUNCTIONS(object):
 """)
         print_modules =(
 """
-+ Shellter
-    - Shellter is a dynamic shellcode injection tool, and the first truly dynamic PE infector ever created
-    - It can be used in order to inject shellcode into native Windows applications (32-bit only)
-    - https://www.shellterproject.com/introducing-shellter/
-
 + UAC Bypass
     - This Module only works on Local Administrator Accounts
     - Using this module, PowerShellEmpire's UAC Bypass will execute on the target
