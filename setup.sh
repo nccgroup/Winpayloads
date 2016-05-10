@@ -41,7 +41,7 @@ else
 fi
 
 echo -e '\033[1;32m[*] Installing impacket from Git \033[0m'
-if ! [ -f "/usr/local/lib/python2.7/dist-packages/impacket-0.9.15_dev.egg-info" ]; then
+if ! [ -d "/usr/local/lib/python2.7/dist-packages/impacket" ]; then
   git clone https://github.com/CoreSecurity/impacket.git
   cd impacket
   python2.7 setup.py install
