@@ -3,7 +3,7 @@
 echo -e '\033[1;32m[*] Installing Dependencies \033[0m'
 dpkg --add-architecture i386
 apt-get update
-apt-get -y install mingw-w64 monodoc-browser monodevelop mono-mcs unzip wget git python2.7 python python-crypto python-pefile python-pip
+apt-get -y unzip wget git python2.7 python python-crypto python-pefile python-pip
 
 echo -e '\033[1;32m[*] Installing Wine \033[0m'
 apt-get -y install wine32
