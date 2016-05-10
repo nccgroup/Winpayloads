@@ -39,7 +39,6 @@ def reversePayloadGeneration(payloadchoice,payloadname):
         sys.exit(1)
     shellcode = payloadchoice % (iphex, porthex)
     print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
-    print payloadname
     if payloadname == "Windows_Reverse_Shell":
         ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'nclistener')
     else:
