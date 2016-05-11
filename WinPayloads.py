@@ -18,6 +18,13 @@ try:
 except OSError:
     pass
 
+print t.bold_green + "Checking if up-to-date" + t.normal
+if subprocess.check_output(['git','pull','--dry-run']):
+    updateornah = raw_input("Do you want to update WinPayloads? y/[n]: ")
+    if updateornah.lower() == "y":
+        os.system('git pull')
+        print t.bold_red + "Reload Winpayloads..." + t.normal
+        sys.exit()
 
 try:
     getAndRunMainMenu()
