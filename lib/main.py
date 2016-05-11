@@ -370,7 +370,7 @@ class FUNCTIONS(object):
 
 class Spinner(object):
 
-    def __init__(self):
+    def __init__(self,text):
         self.spinner = [
             ["|", "\\", "-", "/"],
             ["▁","▃","▄","▅","▆","▇","█","▇","▆","▅","▄","▃"],
@@ -383,8 +383,7 @@ class Spinner(object):
             ["←","↖","↑","↗","→","↘","↓","↙"],
             ["◢","◣","◤","◥"]
             ]
-        self.loading = ['G', 'e', 'n', 'e', 'r', 'a', 't', 'i',
-                        'n', 'g', ' ', 'P', 'a', 'y', 'l', 'o', 'a', 'd']
+        self.loading = list(text)
         self.randomchoice = random.choice(self.spinner)
         self.spin_1 = len(self.randomchoice)
         self.spin_2 = len(self.loading) + 1
