@@ -106,4 +106,4 @@ def Splash():
     print noColourCenter("   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/")
     print noColourCenter(" | |/ |/ / / / / / ____/ /_/ / /_/ / / /_/ / /_/ / /_/ (__  )")
     print noColourCenter(" |__/|__/_/_/ /_/_/    \__,_/\__, /_/\____/\__,_/\__,_/____/")
-    print noColourCenter("              /____/Charlie Dean" + t.normal)
+    print noColourCenter("                        /____/NCCGroup - CharlieDean" + t.normal)
