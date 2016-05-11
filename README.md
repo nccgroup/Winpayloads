@@ -1,12 +1,18 @@
 # Winpayloads - Python2.7
 Undetectable Windows Payload Generation with extras Running on Python2.7
+## Features
+. UACBypass - PowerShellEmpire https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner All rights reserved.
+. PowerUp - PowerShellEmpire https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner All rights reserved.
+. Persistence - Adds payload persistence on reboot
+. Psexec Spray - Spray hashes until successful connection and psexec payload on target
+. Upload to local webserver - Easy deployment
 
 ## Getting Started
 1. ```git clone https://github.com/Charliedean/Winpayloads.git```
 2. ```cd Winpayloads```
 3. ```./setup.sh``` Will Setup Everything Needed for Winpayloads
 4. Start Winpayloads ```./winpayloads```  
-5. Type 'help' or '?' to get a detailed help page 
+5. Type 'help' or '?' to get a detailed help page
 
 #### Rerun setup.sh on every git pull
 
