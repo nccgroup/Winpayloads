@@ -19,7 +19,8 @@ except OSError:
     pass
 
 print t.bold_green + "Checking if up-to-date" + t.normal
-if subprocess.check_output(['git','pull','--dry-run']):
+checkupdate = subprocess.Popen(['git','pull','--dry-run'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+if checkupdate.stderr.read():
     updateornah = raw_input("Do you want to update WinPayloads? y/[n]: ")
     if updateornah.lower() == "y":
         os.system('git pull')
