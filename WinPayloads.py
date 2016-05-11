@@ -27,10 +27,10 @@ while checkupdate.poll() == None:
 print '\r',
 sys.stdout.flush()
 if checkupdate.stderr.read():
-    updateornah = raw_input("Do you want to update WinPayloads? y/[n]: ")
+    updateornah = raw_input(t.bold_red + "Do you want to update WinPayloads? y/[n]: " + t.normal)
     if updateornah.lower() == "y":
         os.system('git pull')
-        print t.bold_red + "Reload Winpayloads..." + t.normal
+        print t.bold_yellow + "Reload Winpayloads..." + t.normal
         sys.exit()
 
 try:
