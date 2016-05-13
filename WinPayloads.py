@@ -17,21 +17,23 @@ try:
     os.mkdir('/etc/winpayloads')
 except OSError:
     pass
-
-print t.bold_green + "Checking if up-to-date" + t.normal
-checkupdate = subprocess.Popen(['git','pull','--dry-run'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-LOADING = Spinner('Checking...')
-while checkupdate.poll() == None:
-    LOADING.Update()
-    time.sleep(0.2)
-print '\r',
-sys.stdout.flush()
-if checkupdate.stderr.read():
-    updateornah = raw_input(t.bold_red + "Do you want to update WinPayloads? y/[n]: " + t.normal)
-    if updateornah.lower() == "y":
-        os.system('git pull')
-        print t.bold_yellow + "Reload Winpayloads..." + t.normal
-        sys.exit()
+try:
+    print t.bold_green + "Checking if up-to-date" + t.normal
+    checkupdate = subprocess.Popen(['git','pull','--dry-run'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    LOADING = Spinner('Checking...')
+    while checkupdate.poll() == None:
+        LOADING.Update()
+        time.sleep(0.2)
+    print '\r',
+    sys.stdout.flush()
+    if checkupdate.stderr.read():
+        updateornah = raw_input(t.bold_red + "Do you want to update WinPayloads? y/[n]: " + t.normal)
+        if updateornah.lower() == "y":
+            os.system('git pull')
+            print t.bold_yellow + "Reload Winpayloads..." + t.normal
+            sys.exit()
+except:
+    pass
 
 try:
     getAndRunMainMenu()
