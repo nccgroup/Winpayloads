@@ -1,4 +1,7 @@
 #!/bin/bash
+########
+winpayloadsdir=$(pwd)
+########
 
 echo -e '\033[1;32m[*] Installing Dependencies \033[0m'
 dpkg --add-architecture i386
@@ -12,11 +15,15 @@ apt-get -y install wine
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 pip install blessings
 pip install pyasn1
+pip install pyminifier
 
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
-if ! [ -d "/opt/pyinstaller-2.0" ]; then
-  wget https://github.com/pyinstaller/pyinstaller/releases/download/v2.0/pyinstaller-2.0.zip
-  unzip -q -o -d /opt pyinstaller-2.0.zip
+if ! [ -d "/opt/pyinstaller" ]; then
+  git clone https://github.com/pyinstaller/pyinstaller.git /opt/pyinstaller
+  cd /opt/pyinstaller
+  wine /root/.wine/drive_c/Python27/python.exe setup.py install
+  cd $winpayloadsdir
+
 else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
 fi

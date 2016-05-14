@@ -4,6 +4,7 @@ from startmetasploit import *
 from generatepayload import *
 from preparepayload import *
 from sockets import *
+from help import *
 
 def noColourLen(colourString):
     return len(re.compile(r'\x1b[^m]*m').sub('', colourString))
@@ -30,7 +31,7 @@ mainMenuOptions = OrderedDict([
     ('5', {'payloadchoice': SHELLCODE.windows_met_rev_shell_dns, 'payload': 'Windows_Meterpreter_Reverse_Dns', 'extrawork': dnsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['dns']}),
     ('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu}),
-    ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': FUNCTIONS().winpayloads_help}),
+    ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help}),
 ])
 
 psMenuOptions = OrderedDict([

