@@ -18,7 +18,7 @@ try:
 except OSError:
     pass
 try:
-    print t.bold_green + "Checking if up-to-date" + t.normal
+    print t.bold_green + "Checking if up-to-date || ctr + c to cancel" + t.normal
     checkupdate = subprocess.Popen(['git','pull','--dry-run'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Checking...')
     while checkupdate.poll() == None:
