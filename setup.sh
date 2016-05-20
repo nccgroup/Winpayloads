@@ -57,6 +57,11 @@ else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
 fi
 
+echo -e '\033[1;32m[*] Grabbing Wine Modules \033[0m'
+wine /root/.wine/drive_c/Python27/Scripts/pip.exe install pefile
+echo -e '\033[1;32m[*] Done \033[0m'
+
+
 echo -e '\033[1;32m[*] Grabbing Modules \033[0m'
 cd lib
 rm psexecspray.py
