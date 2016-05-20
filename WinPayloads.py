@@ -29,7 +29,7 @@ try:
     if checkupdate.stderr.read():
         updateornah = raw_input(t.bold_red + "Do you want to update WinPayloads? y/[n]: " + t.normal)
         if updateornah.lower() == "y":
-            os.system('git pull')
+            subprocess.Popen(['git','pull'])
             print t.bold_yellow + "Re-run setup.sh and reload Winpayloads..." + t.normal
             sys.exit()
 except:
