@@ -3,6 +3,7 @@ from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
 from lib.menu import *
+from lib.sockets import *
 
 try:
     from lib.psexecspray import *
@@ -35,6 +36,10 @@ try:
             sys.exit()
 except:
     pass
+
+worker = Thread(target=startListener)
+worker.setDaemon(True)
+worker.start()
 
 try:
     getAndRunMainMenu()

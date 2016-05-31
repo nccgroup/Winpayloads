@@ -69,3 +69,4 @@ def winpayloads_help():
     print "|" + t.bold_green + "DEPLOYMENT" + t.normal + "|"
     print "|=--------=|"
     print print_deployment
+    return True

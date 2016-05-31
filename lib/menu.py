@@ -18,10 +18,17 @@ def noColourCenter(colourString):
 def getAndRunPSMenu():
     psMenu = MenuOptions(psMenuOptions)
     psMenu.runmenu()
+    return False
+
+def getAndRunClientMenu():
+    clientMenu = MenuOptions(clientMenuOptions)
+    clientMenu.runmenu()
+    return False
 
 def getAndRunMainMenu():
     mainMenu = MenuOptions(mainMenuOptions)
     mainMenu.runmenu()
+    return False
 
 mainMenuOptions = OrderedDict([
     ('1', {'payloadchoice': SHELLCODE.windows_rev_shell, 'payload': 'Windows_Reverse_Shell', 'extrawork': reversePayloadGeneration, 'availablemodules': None}),
@@ -30,6 +37,8 @@ mainMenuOptions = OrderedDict([
     ('4', {'payloadchoice': SHELLCODE.windows_met_rev_https_shell, 'payload': 'Windows_Meterpreter_Reverse_HTTPS', 'extrawork': httpsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['https']}),
     ('5', {'payloadchoice': SHELLCODE.windows_met_rev_shell_dns, 'payload': 'Windows_Meterpreter_Reverse_Dns', 'extrawork': dnsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['dns']}),
     ('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu}),
+    ('stager', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': printListener}),
+    ('clients', {'payloadchoice': None, 'payload': 'Connected Interpreter Clients', 'extrawork': getAndRunClientMenu}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu}),
     ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help}),
 ])
@@ -39,7 +48,13 @@ psMenuOptions = OrderedDict([
     ('2', {'payloadchoice': SHELLCODE.windows_ps_rev_shell, 'payload': 'Windows_Interactive_Reverse_Powershell_Shell', 'extrawork': reversePowerShellGeneration}),
     ('3', {'payloadchoice': SHELLCODE.windows_ps_rev_watch_screen, 'payload': 'Windows_Reverse_Powershell_ScreenWatch', 'extrawork': reversePowerShellWatchScreenGeneration}),
     ('4', {'payloadchoice': SHELLCODE.windows_ps_ask_creds_tcp, 'payload': 'Windows_Reverse_Powershell_Asks_Creds', 'extrawork': reversePowerShellAskCredsGeneration}),
+    ('clients', {'payloadchoice': None, 'payload': 'Connected Interpreter Clients', 'extrawork': getAndRunClientMenu}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu}),
+])
+
+clientMenuOptions = OrderedDict([
+    ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu}),
+    ('refresh', {'payloadchoice': None, 'payload': 'Refresh', 'extrawork': getAndRunClientMenu}),
 ])
 
 class MenuOptions(object):
@@ -63,11 +78,13 @@ class MenuOptions(object):
                 continue
             if extrawork:
                 if payloadchoice:
-                    extrawork(payloadchoice,payload)
+                    result = extrawork(payloadchoice,payload)
                 else:
-                    extrawork()
-            if user_choice != "?":
-                break
+                    result = extrawork()
+                if result == True:
+                    pass
+                if result == False:
+                    break
 
     def printMenues(self):
         Splash()
@@ -79,8 +96,8 @@ class MenuOptions(object):
         maxlen = 0
         arr = []
         for i in self.choices.iterkeys():
-            menuPrintString = t.bold_yellow + str(i) + ': ' + t.normal + str(self.choices[i]['payload'])
             try:
+                menuPrintString = t.bold_yellow + str(i) + ': ' + t.normal + str(self.choices[i]['payload'])
                 menuPrintString += t.bold_green + ' ' + str(self.choices[i]['availablemodules'].keys()).replace('\'','').replace('normal, ','') + t.normal
             except:
                 pass

