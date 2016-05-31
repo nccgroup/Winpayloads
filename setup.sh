@@ -15,7 +15,6 @@ apt-get -y install wine
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 pip install blessings
 pip install pyasn1
-pip install pyminifier
 
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
 if ! [ -d "/opt/pyinstaller" ]; then

