@@ -38,8 +38,10 @@ def startListener():
             from menu import clientMenuOptions
             clientMenuOptions[str(clientnumber)] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': interactShell, 'params': (clientconn,clientnumber)}
         ws.close()
+    except IOError:
+        print t.bold_red + "[*] Rerun ./setup.py to generate certs" + t.normal
     except Exception as E:
-        print t.bold_red + "Error With Listener" + t.normal
+        print t.bold_red + "[*] Error With Listener" + t.normal
         print E
 
 def interactShell(clientconn,clientnumber):
