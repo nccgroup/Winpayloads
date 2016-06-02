@@ -1,2 +1,4 @@
 *.pyc
 /lib/psexecspray.py
+server.crt
+server.key

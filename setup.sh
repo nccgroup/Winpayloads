@@ -68,6 +68,15 @@ wget https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecspra
 cd ..
 echo -e '\033[1;32m[*] Done \033[0m'
 
+echo -e '\033[1;32m[*] Grabbing Certs \033[0m'
+openssl genrsa -out server.pass.key 2048
+openssl rsa -in server.pass.key -out server.key
+openssl req -new -key server.key -out server.csr -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com"
+openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+rm server.csr server.pass.key
+echo -e '\033[1;32m[*] Done \033[0m'
+
+
 echo -e '\033[1;32m[*] Cleaning Up \033[0m'
 rm python-2.7.10.msi pyinstaller-2.0.zip pycrypto-2.6.win32-py2.7.exe vcredist_x86.exe pywin32.exe PLATLIB SCRIPTS impacket -rf
 echo -e '\033[1;32m[*] Done \033[0m'
