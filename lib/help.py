@@ -55,6 +55,21 @@ print_deployment =(
 - Runs as system
 """)
 
+print_ps_menu =(
+"""
++ Powershell Menu
+- Powershell payloads that are executed by Powershell
+
++ Reverse Powershell shell
+- Reverse powershell shell over tcp
+
++ Reverse Watch Screen
+- Streams the targets primary screen to your local machine over tcp
+
++ Ask creds
+- Keeps asking the target for their username and password until the correct credentials are entered.
+- Credentials are then sent over tcp
+""")
 
 def winpayloads_help():
     print "\n|=------=|"
@@ -69,4 +84,8 @@ def winpayloads_help():
     print "|" + t.bold_green + "DEPLOYMENT" + t.normal + "|"
     print "|=--------=|"
     print print_deployment
+    print "\n|=--------=|"
+    print "|" + t.bold_green + " PS MENU  " + t.normal + "|"
+    print "|=--------=|"
+    print print_ps_menu
     return True

