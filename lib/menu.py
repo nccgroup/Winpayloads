@@ -6,6 +6,9 @@ from preparepayload import *
 from sockets import *
 from help import *
 
+def menuRaise():
+    raise
+
 def noColourLen(colourString):
     return len(re.compile(r'\x1b[^m]*m').sub('', colourString))
 
@@ -38,9 +41,10 @@ mainMenuOptions = OrderedDict([
     ('5', {'payloadchoice': SHELLCODE.windows_met_rev_shell_dns, 'payload': 'Windows_Meterpreter_Reverse_Dns', 'extrawork': dnsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['dns'], 'params': None}),
     ('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu, 'params': None}),
     ('stager', {'payloadchoice': None, 'payload': 'Powershell Interpreter Stager', 'extrawork': printListener, 'params': None}),
-    ('clients', {'payloadchoice': None, 'payload': 'Connected Interpreter Clients', 'extrawork': getAndRunClientMenu, 'params': None}),
-    ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
+    ('clients', {'payloadchoice': None, 'payload': 'Connected Interpreter Clients', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
     ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help, 'params': None}),
+    ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
+    ('exit', {'payloadchoice': None, 'payload': 'Exit', 'extrawork': menuRaise, 'params': None}),
 ])
 
 psMenuOptions = OrderedDict([
@@ -98,16 +102,17 @@ class MenuOptions(object):
         maxlen = 0
         arr = []
         for i in self.choices.iterkeys():
-            try:
-                menuPrintString = t.bold_yellow + str(i) + ': ' + t.normal + str(self.choices[i]['payload'])
+            menuPrintString = t.bold_yellow + str(i) + ': ' + t.normal + str(self.choices[i]['payload']).replace('_',' ')
+            if 'availablemodules' in self.choices[i].keys() and self.choices[i]['availablemodules']:
                 menuPrintString += t.bold_green + ' ' + str(self.choices[i]['availablemodules'].keys()).replace('\'','').replace('normal, ','') + t.normal
-            except:
-                pass
+            if 'spacer' in self.choices[i]:
+                menuPrintString += '\n'
 
             nocolourlen = noColourLen(menuPrintString)
             if nocolourlen > maxlen:
                 maxlen = nocolourlen
             arr.append(menuPrintString)
+
         for i in arr:
             spacing = (t.width / 2) - (maxlen / 2)
             if spacing % 2 > 0:
