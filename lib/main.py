@@ -216,7 +216,7 @@ ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 
 class FUNCTIONS(object):
 
-    def powershellShellcodeLayout(self):
+    def powershellShellcodeLayout(self,powershellExec):
         powershellShellcode = re.sub(r'\\x', '0x', powershellExec)
         count = 0
         newpayloadlayout = ''
@@ -226,6 +226,7 @@ class FUNCTIONS(object):
             if count == 4:
                 newpayloadlayout += ','
                 count = 0
+        return newpayloadlayout
 
     def CheckInternet(self):
         try:
