@@ -3,6 +3,7 @@ Undetectable Windows Payload Generation with extras Running on Python2.7
 ## Features
 * UACBypass - PowerShellEmpire https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner. All rights reserved.   
 * PowerUp - PowerShellEmpire https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner. All rights reserved.   
+* Invoke-Shellcode https://github.com/PowerShellMafia/PowerSploit/blob/master/CodeExecution/Invoke-Shellcode.ps1 Copyright (c) 2012, Matthew Graeber. All rights reserved.
 * Persistence - Adds payload persistence on reboot   
 * Psexec Spray - Spray hashes until successful connection and psexec payload on target   
 * Upload to local webserver - Easy deployment   
