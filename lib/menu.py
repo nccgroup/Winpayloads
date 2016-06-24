@@ -7,7 +7,7 @@ from sockets import *
 from help import *
 
 def menuRaise():
-    raise
+    raise KeyboardInterrupt
 
 def noColourLen(colourString):
     return len(re.compile(r'\x1b[^m]*m').sub('', colourString))
