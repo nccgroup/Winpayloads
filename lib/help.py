@@ -71,6 +71,19 @@ print_ps_menu =(
 - Credentials are then sent over tcp
 """)
 
+print_stager =(
+"""
++ Stager
+- Listener starts on port 5555 when starting winpayloads
+- Using the stager main menu item will print the encoded powershell stager command
+- This can then be used in a bat file or executed directly into a cmd prompt
+- A secure encrypted socket connection will be made back to winpayloads
+- Using the clients menu, you can interact will all the clients and drop into a shell
+- When a client has an active connection, all payloads can be executed on the target through the connection
+- Payloads will be invoked without touching disk and powershell payloads will be executed through the shell
+- Multiple payloads can be used while the client is connected
+""")
+
 def winpayloads_help():
     print "\n|=------=|"
     print "|" + t.bold_green + "PAYLOADS" + t.normal + "|"
@@ -88,4 +101,8 @@ def winpayloads_help():
     print "|" + t.bold_green + " PS MENU  " + t.normal + "|"
     print "|=--------=|"
     print print_ps_menu
+    print "\n|=--------=|"
+    print "|" + t.bold_green + "  STAGER  " + t.normal + "|"
+    print "|=--------=|"
+    print print_stager
     return True
