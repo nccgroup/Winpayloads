@@ -6,6 +6,19 @@ from preparepayload import *
 from sockets import *
 from help import *
 
+class AUTOCOMPLETE():
+
+    def autoComplete(self, autoCompleteMenu):
+        autoCompleteList = autoCompleteMenu.keys()
+        def listCompleter(text,state):
+            line = readline.get_line_buffer()
+            if not line:
+                return [c + " " for c in autoCompleteList][state]
+            else:
+                return [c + " " for c in autoCompleteList if c.startswith(line)][state]
+        self.autoCompleteDef = listCompleter
+
+
 def menuRaise():
     raise KeyboardInterrupt
 
@@ -19,16 +32,34 @@ def noColourCenter(colourString):
     return (' ' * len) + colourString
 
 def getAndRunPSMenu():
+    menuAutoComplete = AUTOCOMPLETE()
+    menuAutoComplete.autoComplete(psMenuOptions)
+    readline.set_completer(menuAutoComplete.autoCompleteDef)
+    readline.set_completer_delims('\t')
+    readline.parse_and_bind("tab: complete")
+
     psMenu = MenuOptions(psMenuOptions)
     psMenu.runmenu()
     return False
 
 def getAndRunClientMenu():
+    menuAutoComplete = AUTOCOMPLETE()
+    menuAutoComplete.autoComplete(clientMenuOptions)
+    readline.set_completer(menuAutoComplete.autoCompleteDef)
+    readline.set_completer_delims('\t')
+    readline.parse_and_bind("tab: complete")
+
     clientMenu = MenuOptions(clientMenuOptions)
     clientMenu.runmenu()
     return False
 
 def getAndRunMainMenu():
+    menuAutoComplete = AUTOCOMPLETE()
+    menuAutoComplete.autoComplete(mainMenuOptions)
+    readline.set_completer(menuAutoComplete.autoCompleteDef)
+    readline.set_completer_delims('\t')
+    readline.parse_and_bind("tab: complete")
+    
     mainMenu = MenuOptions(mainMenuOptions)
     mainMenu.runmenu()
     return False
@@ -74,7 +105,7 @@ class MenuOptions(object):
     def runmenu(self):
         self.printMenues()
         while True:
-            user_choice = raw_input('>')
+            user_choice = raw_input('>').rstrip(' ')
             success, payloadchoice, payload, extrawork, params = self._choose(user_choice)
 
             if not success:
