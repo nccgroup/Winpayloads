@@ -35,7 +35,6 @@ def getAndRunPSMenu():
     menuAutoComplete = AUTOCOMPLETE()
     menuAutoComplete.autoComplete(psMenuOptions)
     readline.set_completer(menuAutoComplete.autoCompleteDef)
-    readline.set_completer_delims('\t')
     readline.parse_and_bind("tab: complete")
 
     psMenu = MenuOptions(psMenuOptions)
@@ -46,7 +45,6 @@ def getAndRunClientMenu():
     menuAutoComplete = AUTOCOMPLETE()
     menuAutoComplete.autoComplete(clientMenuOptions)
     readline.set_completer(menuAutoComplete.autoCompleteDef)
-    readline.set_completer_delims('\t')
     readline.parse_and_bind("tab: complete")
 
     clientMenu = MenuOptions(clientMenuOptions)
@@ -57,9 +55,8 @@ def getAndRunMainMenu():
     menuAutoComplete = AUTOCOMPLETE()
     menuAutoComplete.autoComplete(mainMenuOptions)
     readline.set_completer(menuAutoComplete.autoCompleteDef)
-    readline.set_completer_delims('\t')
     readline.parse_and_bind("tab: complete")
-    
+
     mainMenu = MenuOptions(mainMenuOptions)
     mainMenu.runmenu()
     return False

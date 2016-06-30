@@ -13,8 +13,9 @@ from menu import *
 def startBindListener(portnum,useProxy):
     try:
         bs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        bs.bind((FUNCTIONS().CheckInternet(), portnum))
-        bs.listen(1)
+        bssl = ssl.wrap_socket(bs, ssl_version=ssl.PROTOCOL_TLSv1, ciphers="AES256", certfile="server.crt", keyfile="server.key", server_side=True)
+        bssl.bind((FUNCTIONS().CheckInternet(), portnum))
+        bssl.listen(1)
         if useProxy:
             bsp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             bsp.bind(('127.0.0.1', 8888))
@@ -24,7 +25,7 @@ def startBindListener(portnum,useProxy):
 
     print t.bold_red + "listening on port %s"%portnum + t.normal
 
-    bindClient, bindAddress = bs.accept()
+    bindClient, bindAddress = bssl.accept()
     bindIp, bindPort = bindAddress
     print t.bold_green + "connection from %s %s"%(bindIp, bindPort) + t.normal
     if useProxy:
@@ -44,7 +45,7 @@ def startBindListener(portnum,useProxy):
 
     if useProxy:
         bsp.close()
-    bs.close()
+    bssl.close()
 
 
 def startClientListener():
