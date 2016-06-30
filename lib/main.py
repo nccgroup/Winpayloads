@@ -220,19 +220,20 @@ class FUNCTIONS(object):
         except:
             return None
 
-    def ServePayload(self, payloaddirectory):
+    def ServePayload(self, payloaddirectory, port):
         try:
             os.chdir(payloaddirectory)
             Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-            httpd = SocketServer.TCPServer(('', 8000), Handler)
+            httpd = SocketServer.TCPServer(('', port), Handler)
             httpd.serve_forever()
         except:
             print t.bold_red + '\n[*] WebServer Shutdown' + t.normal
 
-    def DoServe(self, IP, payloadname, payloaddir):
-        print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s.exe" % (IP, payloadname) + t.normal
+    def DoServe(self, IP, payloadname, payloaddir, port, printIt):
+        if printIt:
+            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s.exe" % (IP, payloadname) + t.normal
         a = multiprocessing.Process(
-            target=self.ServePayload, args=(payloaddir,))
+            target=self.ServePayload, args=(payloaddir, port))
         a.daemon = True
         a.start()
 

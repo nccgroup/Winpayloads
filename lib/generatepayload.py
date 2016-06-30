@@ -98,9 +98,9 @@ def DoPayloadUpload(payloadname):
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
-        DoPsexecSpray(payloaddir + '/' + payloadname)
+        DoPsexecSpray(payloaddir + '/' + payloadname + '.exe')
     elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
-        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir)
+        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir, port=8000, printIt = True)
 
 def DoClientUpload(payloaddir,payloadname,powershellExec,isExe):
     use_client_upload = raw_input(
