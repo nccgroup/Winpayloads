@@ -15,7 +15,6 @@ apt-get -y install wine
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 pip install blessings
 pip install pyasn1
-pip install pywintypes
 
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
 if ! [ -d "/opt/pyinstaller" ]; then
@@ -59,7 +58,6 @@ fi
 
 echo -e '\033[1;32m[*] Grabbing Wine Modules \033[0m'
 wine /root/.wine/drive_c/Python27/Scripts/pip.exe install pefile
-wine /root/.wine/drive_c/Python27/Scripts/pip.exe install pywintypes
 echo -e '\033[1;32m[*] Done \033[0m'
 
 
