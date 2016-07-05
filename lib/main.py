@@ -231,7 +231,7 @@ class FUNCTIONS(object):
 
     def DoServe(self, IP, payloadname, payloaddir, port, printIt):
         if printIt:
-            print t.bold_green + "\n[*] Serving Payload On http://%s:8000/%s.exe" % (IP, payloadname) + t.normal
+            print t.bold_green + "\n[*] Serving Payload On http://%s:%s/%s.exe" % (IP, port, payloadname) + t.normal
         a = multiprocessing.Process(
             target=self.ServePayload, args=(payloaddir, port))
         a.daemon = True
