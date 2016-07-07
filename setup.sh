@@ -41,7 +41,7 @@ if ! [ -d "/root/.wine/drive_c/Python27/" ]; then
   cp -rf PLATLIB/* ~/.wine/drive_c/Python27/Lib/site-packages/
   cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Lib/site-packages/
   cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Scripts/
-  wine C://Python27//python.exe C://Python27//Scripts//pywin32_postinstall.py -silent -install
+  wine /root/.wine/drive_c/Python27/python.exe /root/.wine/drive_c/Python27/Scripts/pywin32_postinstall.py -install -silent
 else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
 fi
