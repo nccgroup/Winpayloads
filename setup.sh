@@ -35,7 +35,7 @@ if ! [ -d "/root/.wine/drive_c/Python27/" ]; then
   unzip pycrypto-2.6.win32-py2.7.exe
   wget https://download.microsoft.com/download/1/1/1/1116b75a-9ec3-481a-a3c8-1777b5381140/vcredist_x86.exe
   wine vcredist_x86.exe /qb!
-  wget http://sourceforge.net/projects/pywin32/files/pywin32/Build%20219/pywin32-219.win32-py2.7.exe/download
+  wget https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/pywin32-220.win32-py2.7.exe/download
   mv download pywin32.exe
   unzip pywin32.exe
   cp -rf PLATLIB/* ~/.wine/drive_c/Python27/Lib/site-packages/
