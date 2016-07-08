@@ -164,8 +164,7 @@ def pingClients(clientconn,clientnumber):
         while True:
             time.sleep(15)
             clientconn.sendall('\x00')
-    except Exception as E:
-        print E
+    except:
         if str(clientnumber) in clientMenuOptions.keys():
             print t.bold_red + "Client %s Has Disconnected" % clientnumber + t.normal
             del clientMenuOptions[str(clientnumber)]
