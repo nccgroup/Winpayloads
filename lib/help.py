@@ -105,4 +105,4 @@ def winpayloads_help():
     print "|" + t.bold_green + "  STAGER  " + t.normal + "|"
     print "|=--------=|"
     print print_stager
-    return True
+    return "pass"

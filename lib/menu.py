@@ -100,7 +100,7 @@ class MenuOptions(object):
             return (False, None, None, None, None)
 
     def runmenu(self):
-        self.printMenues()
+        self.printMenues(True)
         while True:
             user_choice = raw_input('>').rstrip(' ')
             success, payloadchoice, payload, extrawork, params = self._choose(user_choice)
@@ -114,13 +114,15 @@ class MenuOptions(object):
                     result = extrawork(*params)
                 else:
                     result = extrawork()
-                if result == True:
+                if result == "noClear":
+                    self.printMenues(False)
+                if result == "clear":
+                    self.printMenues(True)
+                if result == "pass":
                     pass
-                if result == False:
-                    break
 
-    def printMenues(self):
-        Splash()
+    def printMenues(self,toClear):
+        Splash(toClear)
         if t.width % 2 > 0:
             adjust = 1
         else:
@@ -151,8 +153,10 @@ class MenuOptions(object):
             print (' '* spacing) + i + (' ' * (spacing - adjust))
         print '='*t.width
 
-def Splash():
-    print t.clear + t.bold_red
+def Splash(toClear):
+    if toClear:
+        print t.clear
+    print t.bold_red
     print noColourCenter("_       ___       ____              __                __")
     print noColourCenter("   | |     / (_)___  / __ \____ ___  __/ /___  ____ _____/ /____")
     print noColourCenter("   | | /| / / / __ \/ /_/ / __ `/ / / / / __ \/ __ `/ __  / ___/")

