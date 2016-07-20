@@ -4,12 +4,10 @@ from startmetasploit import *
 from generatepayload import *
 from sockets import *
 
-payloaddir = '/etc/winpayloads'
-
 def checkClientUpload(payloadname, powershellExec, isExe):
     from menu import clientMenuOptions
     if len(clientMenuOptions.keys()) > 2:
-        DoClientUpload(payloaddir,payloadname,powershellExec,isExe)
+        DoClientUpload(payloaddir(),payloadname,powershellExec,isExe)
     else:
         print powershellExec
 

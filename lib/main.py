@@ -23,7 +23,8 @@ import string
 
 t = blessings.Terminal()
 
-
+def payloaddir():
+    return '/etc/winpayloads'
 
 class SHELLCODE(object):
 

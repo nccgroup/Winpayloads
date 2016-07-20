@@ -113,7 +113,7 @@ def DoClientUpload(payloaddir,payloadname,powershellExec,isExe):
             else:
                 print t.bold_yellow + i +t.normal + ': ' + t.bold_green + clientMenuOptions[i]['payload']  + t.normal + '\n'
         while True:
-            clientchoice = raw_input('>>')
+            clientchoice = raw_input('>> ')
             try:
                 clientconn, clientnumber = clientMenuOptions[clientchoice]['params']
                 break

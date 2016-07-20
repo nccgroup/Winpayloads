@@ -102,7 +102,7 @@ class MenuOptions(object):
     def runmenu(self):
         self.printMenues(True)
         while True:
-            user_choice = raw_input('>').rstrip(' ')
+            user_choice = raw_input('> ').rstrip(' ')
             success, payloadchoice, payload, extrawork, params = self._choose(user_choice)
 
             if not success:
