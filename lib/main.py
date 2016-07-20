@@ -228,8 +228,7 @@ class FUNCTIONS(object):
             Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
             httpd = SocketServer.TCPServer(('', port), Handler)
             httpd.serve_forever()
-        except Exception as e:
-            print e
+        except:
             print t.bold_red + '\n[*] WebServer Error' + t.normal
 
     def DoServe(self, IP, payloadname, payloaddir, port, printIt):
