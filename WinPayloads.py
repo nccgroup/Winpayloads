@@ -34,7 +34,7 @@ try:
             p = subprocess.Popen(['git','pull'])
             p.wait()
             print t.bold_yellow + "Re-run setup.sh and reload Winpayloads..." + t.normal
-            sys.exit()
+            exit()
 except:
     pass
 
