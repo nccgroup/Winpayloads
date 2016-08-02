@@ -1,7 +1,18 @@
 #!/bin/bash
 ########
 winpayloadsdir=$(pwd)
+reinstall=0
+for i in "$@"
+do
+case $i in
+  -r)
+  reinstall=1
+  shift
+  ;;
+esac
+done
 ########
+
 
 echo -e '\033[1;32m[*] Installing Dependencies \033[0m'
 dpkg --add-architecture i386
@@ -17,7 +28,17 @@ pip install blessings
 pip install pyasn1
 
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
-if ! [ -d "/opt/pyinstaller" ]; then
+if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
+  if [ -d "/opt/pyinstaller/.git" ]; then
+    echo -en '\033[1;34m[*] Remove /opt/pyinstaller? [Y/n] \033[0m'
+    read delPyinstaller
+    echo "${delPyinstaller,,}"
+    if [[ "${delPyinstaller,,}" != "y" ]]; then
+      echo "\033[1;31m[*] Reinstall Cancelled \033[0m"
+      exit
+    fi
+    rm /opt/pyinstaller -rf
+  fi
   git clone https://github.com/pyinstaller/pyinstaller.git /opt/pyinstaller
   cd /opt/pyinstaller
   wine /root/.wine/drive_c/Python27/python.exe setup.py install
@@ -28,7 +49,7 @@ else
 fi
 
 echo -e '\033[1;32m[*] Downloading Python27, Pywin32 and Pycrypto For Wine \033[0m'
-if ! [ -d "/root/.wine/drive_c/Python27/" ]; then
+if [[ ! -d "/root/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
   wget https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
   wine msiexec /i python-2.7.10.msi TARGETDIR=C:\Python27 ALLUSERS=1 /q
   wget http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe
@@ -47,7 +68,7 @@ else
 fi
 
 echo -e '\033[1;32m[*] Installing impacket from Git \033[0m'
-if ! [ -d "/usr/local/lib/python2.7/dist-packages/impacket" ]; then
+if [[ ! -d "/usr/local/lib/python2.7/dist-packages/impacket" || $reinstall -eq 1 ]]; then
   git clone https://github.com/CoreSecurity/impacket.git
   cd impacket
   python2.7 setup.py install
