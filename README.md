@@ -6,7 +6,8 @@ Undetectable Windows Payload Generation with extras Running on Python2.7
 * Invoke-Shellcode https://github.com/PowerShellMafia/PowerSploit/blob/master/CodeExecution/Invoke-Shellcode.ps1 Copyright (c) 2012, Matthew Graeber. All rights reserved.
 * Persistence - Adds payload persistence on reboot   
 * Psexec Spray - Spray hashes until successful connection and psexec payload on target   
-* Upload to local webserver - Easy deployment   
+* Upload to local webserver - Easy deployment
+* Powershell stager - allows invoking payloads in memory & more
 
 ## Getting Started
 1. ```git clone https://github.com/Charliedean/Winpayloads.git```
