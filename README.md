@@ -12,7 +12,7 @@ Undetectable Windows Payload Generation with extras Running on Python2.7
 ## Getting Started
 1. ```git clone https://github.com/nccgroup/winpayloads.git```
 2. ```cd winpayloads```
-3. ```./setup.sh``` Will Setup Everything Needed for Winpayloads
+3. ```./setup.sh``` will setup everything needed for Winpayloads
 4. Start Winpayloads ```./Winpayloads.py```  
 5. Type 'help' or '?' to get a detailed help page  
   ```setup.sh -r``` will reinstall  
