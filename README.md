@@ -10,7 +10,7 @@ Undetectable Windows Payload Generation with extras Running on Python2.7
 * Powershell stager - allows invoking payloads in memory & more
 
 ## Getting Started
-1. ```git clone https://github.com/nccgroup/Winpayloads.git```
+1. ```git clone https://github.com/nccgroup/winpayloads.git```
 2. ```cd winpayloads```
 3. ```./setup.sh``` Will Setup Everything Needed for Winpayloads
 4. Start Winpayloads ```./Winpayloads.py```  
