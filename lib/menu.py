@@ -37,7 +37,7 @@ def getAndRunPSMenu():
     readline.set_completer(menuAutoComplete.autoCompleteDef)
     readline.parse_and_bind("tab: complete")
 
-    psMenu = MenuOptions(psMenuOptions)
+    psMenu = MenuOptions(psMenuOptions, menuName="PS Menu")
     psMenu.runmenu()
     return False
 
@@ -47,7 +47,7 @@ def getAndRunClientMenu():
     readline.set_completer(menuAutoComplete.autoCompleteDef)
     readline.parse_and_bind("tab: complete")
 
-    clientMenu = MenuOptions(clientMenuOptions)
+    clientMenu = MenuOptions(clientMenuOptions, menuName="Client Menu")
     clientMenu.runmenu()
     return False
 
@@ -57,7 +57,7 @@ def getAndRunMainMenu():
     readline.set_completer(menuAutoComplete.autoCompleteDef)
     readline.parse_and_bind("tab: complete")
 
-    mainMenu = MenuOptions(mainMenuOptions)
+    mainMenu = MenuOptions(mainMenuOptions, menuName="Main Menu")
     mainMenu.runmenu()
     return False
 
@@ -89,20 +89,22 @@ clientMenuOptions = OrderedDict([
 
 
 class MenuOptions(object):
-    def __init__(self, choices):
+    def __init__(self, choices, menuName):
         self.choices = choices
+        self.menuName = menuName
 
     def _choose(self, n):
         if self.choices.has_key(n):
             return (True, self.choices[n]['payloadchoice'], self.choices[n]['payload'], self.choices[n]['extrawork'], self.choices[n]['params'])
         else:
-            print t.bold_red + '[*] Wrong Selection' + t.normal
+            if not n == "":
+                print t.bold_red + '[*] Wrong Selection' + t.normal
             return (False, None, None, None, None)
 
     def runmenu(self):
         self.printMenues(True)
         while True:
-            user_choice = raw_input('> ').rstrip(' ')
+            user_choice = raw_input(('%s > ')% (t.bold_yellow + self.menuName + t.normal)).rstrip(' ')
             success, payloadchoice, payload, extrawork, params = self._choose(user_choice)
 
             if not success:

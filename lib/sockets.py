@@ -70,7 +70,7 @@ def startClientListener():
         sys.stdout.flush()
         sys.exit(1)
 
-    sys.stdout.write('\r' + t.bold_red + "listening on port 5555" + t.normal + '\n> ')
+    sys.stdout.write('\r' + t.bold_red + "listening on port 5555" + t.normal + t.bold_yellow + '\nMain Menu' + t.normal + ' > ')
     sys.stdout.flush()
     clientnumber = 0
 
