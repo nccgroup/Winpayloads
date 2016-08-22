@@ -117,7 +117,7 @@ class MenuOptions(object):
                     result = extrawork(*params)
                 else:
                     result = extrawork()
-                if result == "noClear":
+                if result == "noclear":
                     self.printMenues(False)
                 if result == "clear":
                     self.printMenues(True)
