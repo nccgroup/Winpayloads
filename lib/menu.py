@@ -127,10 +127,10 @@ class MenuOptions(object):
     def printMenues(self,toClear):
         Splash(toClear)
         if t.width % 2 > 0:
-            adjust = 1
-        else:
             adjust = 0
-        print '=' * (t.width / 2 - 3) + "-MENU-" + '=' * (t.width / 2 - (3 - adjust))
+        else:
+            adjust = -1
+        print t.bold_black + '=' * (t.width / 2 - (len(self.menuName) / 2)) + t.yellow + self.menuName + t.bold_black + '=' * (t.width / 2 - ((len(self.menuName) / 2)- adjust))
         maxlen = 0
         arr = []
         for i in self.choices.iterkeys():
@@ -154,7 +154,7 @@ class MenuOptions(object):
             else:
                 adjust = 1
             print (' '* spacing) + i + (' ' * (spacing - adjust))
-        print '='*t.width
+        print t.bold_black + '='*t.width + t.normal
 
 def Splash(toClear):
     if toClear:
