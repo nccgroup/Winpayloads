@@ -1,5 +1,9 @@
 # Winpayloads - Python2.7
 Undetectable Windows Payload Generation with extras Running on Python2.7
+
+## As usual, Don't upload payloads to any online virus checkers  
+  
+  
 ## Features
 * UACBypass - PowerShellEmpire https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner. All rights reserved.   
 * PowerUp - PowerShellEmpire https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner. All rights reserved.   
