@@ -2,7 +2,8 @@
 Undetectable Windows Payload Generation with extras Running on Python2.7
 
 ## As usual, Don't upload payloads to any online virus checkers  
-  
+- Virus Total Detection - Updated 30/9/2016 - Detected by 8 AV
+https://www.virustotal.com/en/file/23a24f99c3c6c00cd4bf6cb968f813ba2ceadfa846c7f169f412bcbb71ba6573/analysis/1475232549/  
   
 ## Features
 * UACBypass - PowerShellEmpire https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner. All rights reserved.   
