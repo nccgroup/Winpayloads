@@ -110,7 +110,6 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice % (DNSaddr,porthex)
     print t.bold_green + '[*] DNS HOSTNAME SET AS %s\n[*] PORT SET AS %s\n' % (DNSaddr, portnum) + t.normal
     ez2read_shellcode, startDnsMetasploit = askAndReturnModules(shellcode,'dns')
-    print ez2read_shellcode
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startDnsMetasploit(portnum,DNSaddr)
     return "clear"
