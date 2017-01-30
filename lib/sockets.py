@@ -112,7 +112,7 @@ def interactShell(clientconn,clientnumber):
             clientconn.sendall("\n")
         elif command.lower() == "exit":
             if str(clientnumber) in clientMenuOptions.keys():
-                print t.bold_red + "Client Connection Killed" + t.normal
+                print t.bold_red + "Client %s Connection Killed"% clientnumber + t.normal
                 del clientMenuOptions[str(clientnumber)]
                 clientconn.close()
                 time.sleep(2)
