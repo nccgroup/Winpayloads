@@ -26,6 +26,11 @@ t = blessings.Terminal()
 def payloaddir():
     return '/etc/winpayloads'
 
+class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
+    def log_message(self, format, *args):
+        return
+
+
 class SHELLCODE(object):
 
     windows_rev_shell = (
@@ -234,8 +239,7 @@ class FUNCTIONS(object):
     def ServePayload(self, payloaddirectory, port):
         try:
             os.chdir(payloaddirectory)
-            Handler = SimpleHTTPServer.SimpleHTTPRequestHandler
-            httpd = SocketServer.TCPServer(('', port), Handler)
+            httpd = SocketServer.TCPServer(('', port), HANDLER)
             httpd.serve_forever()
         except:
             print t.bold_red + '\n[*] WebServer Error' + t.normal
