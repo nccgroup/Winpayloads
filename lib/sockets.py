@@ -152,7 +152,7 @@ def clientUpload(fileToUpload,clientconn,powershellExec,isExe):
 
 def printListener():
     while True:
-        bindOrReverse = raw_input('(b)ind/[r]everse: ').lower()
+        bindOrReverse = raw_input(t.bold_green + '[?] (b)ind/[r]everse: ' + t.normal).lower()
         if bindOrReverse == 'b' or bindOrReverse == 'r':
             break
 
@@ -213,7 +213,7 @@ def printListener():
 
     ipADDR = False
     if bindOrReverse == 'b':
-        ipADDR = raw_input('IP After Run Bind Shell on Target: ')
+        ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
     worker = Thread(target=startClientListener, args=(bindOrReverse, ipADDR))
     worker.setDaemon(True)
     worker.start()
