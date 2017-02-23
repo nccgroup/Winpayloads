@@ -11,8 +11,6 @@ from threading import Thread
 from main import *
 from menu import *
 
-listener = []
-
 def startBindListener(portnum,useProxy):
     try:
         bs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -216,12 +214,9 @@ def printListener():
     ipADDR = False
     if bindOrReverse == 'b':
         ipADDR = raw_input('IP After Run Bind Shell on Target: ')
-    if listener:
-        listener[0].kill()
     worker = Thread(target=startClientListener, args=(bindOrReverse, ipADDR))
     worker.setDaemon(True)
     worker.start()
-    listener.append(worker)
     return "pass"
 
 def pingClients(clientconn,clientnumber):
