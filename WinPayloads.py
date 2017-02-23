@@ -38,10 +38,6 @@ try:
 except KeyboardInterrupt:
     pass
 
-worker = Thread(target=startClientListener)
-worker.setDaemon(True)
-worker.start()
-
 try:
     getAndRunMainMenu()
 except KeyboardInterrupt:
