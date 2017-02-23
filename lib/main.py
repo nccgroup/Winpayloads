@@ -29,6 +29,7 @@ def payloaddir():
 class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
     def log_message(self, format, *args):
         return
+        
 
 
 class SHELLCODE(object):
