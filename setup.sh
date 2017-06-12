@@ -41,7 +41,7 @@ if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
   fi
   git clone https://github.com/pyinstaller/pyinstaller.git /opt/pyinstaller
   cd /opt/pyinstaller
-  wine /root/.wine/drive_c/Python27/python.exe setup.py install
+  wine ~/.wine/drive_c/Python27/python.exe setup.py install
   cd $winpayloadsdir
 
 else
@@ -49,7 +49,7 @@ else
 fi
 
 echo -e '\033[1;32m[*] Downloading Python27, Pywin32 and Pycrypto For Wine \033[0m'
-if [[ ! -d "/root/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
+if [[ ! -d "~/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
   wget https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
   wine msiexec /i python-2.7.10.msi TARGETDIR=C:\Python27 ALLUSERS=1 /q
   wget http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe
@@ -62,7 +62,7 @@ if [[ ! -d "/root/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
   cp -rf PLATLIB/* ~/.wine/drive_c/Python27/Lib/site-packages/
   cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Lib/site-packages/
   cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Scripts/
-  wine /root/.wine/drive_c/Python27/python.exe /root/.wine/drive_c/Python27/Scripts/pywin32_postinstall.py -install -silent
+  wine ~/.wine/drive_c/Python27/python.exe ~/.wine/drive_c/Python27/Scripts/pywin32_postinstall.py -install -silent
 else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
 fi
@@ -78,7 +78,7 @@ else
 fi
 
 echo -e '\033[1;32m[*] Grabbing Wine Modules \033[0m'
-wine /root/.wine/drive_c/Python27/Scripts/pip.exe install pefile
+wine ~/.wine/drive_c/Python27/Scripts/pip.exe install pefile
 echo -e '\033[1;32m[*] Done \033[0m'
 
 
