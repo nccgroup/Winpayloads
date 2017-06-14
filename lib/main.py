@@ -5,7 +5,7 @@ import re
 import subprocess
 import struct
 import sys
-import blessings
+import blessed
 import random
 import SimpleHTTPServer
 import SocketServer
@@ -20,16 +20,18 @@ import psexec
 import urllib2
 from collections import OrderedDict
 import string
+import asyncore
+import ssl
 
-t = blessings.Terminal()
+t = blessed.Terminal()
 
 def payloaddir():
-    return '/etc/winpayloads'
+    return os.path.expanduser('~') + '/winpayloads'
 
 class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
     def log_message(self, format, *args):
         return
-        
+
 
 
 class SHELLCODE(object):

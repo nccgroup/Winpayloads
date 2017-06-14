@@ -3,7 +3,6 @@ from lib.main import *
 from lib.payloadextras import *
 from lib.startmetasploit import *
 from lib.menu import *
-from lib.sockets import *
 
 try:
     from lib.psexecspray import *
@@ -14,10 +13,10 @@ if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
     sys.exit(1)
 
-try:
-    os.mkdir('/etc/winpayloads')
-except OSError:
-    pass
+DIR = os.path.expanduser('~') + '/winpayloads'
+if not os.path.isdir(DIR):
+    os.mkdir(DIR)
+
 
 try:
     print t.bold_green + "Checking if up-to-date || ctr + c to cancel" + t.normal

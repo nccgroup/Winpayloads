@@ -24,7 +24,7 @@ apt-get -y install wine32
 apt-get -y install wine
 
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
-pip install blessings
+pip install blessed
 pip install pyasn1
 
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
@@ -34,8 +34,8 @@ if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
     read delPyinstaller
     echo "${delPyinstaller,,}"
     if [[ "${delPyinstaller,,}" != "y" ]]; then
-      echo "\033[1;31m[*] Reinstall Cancelled \033[0m"
-      exit
+    echo "Not reinstalling..."
+    exit
     fi
     rm /opt/pyinstaller -rf
   fi

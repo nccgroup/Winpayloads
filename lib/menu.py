@@ -3,7 +3,7 @@ from payloadextras import *
 from startmetasploit import *
 from generatepayload import *
 from preparepayload import *
-from sockets import *
+from stager import *
 from help import *
 
 class AUTOCOMPLETE():

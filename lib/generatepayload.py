@@ -62,7 +62,8 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     print '[*] Creating Payload using Pyinstaller...'
 
     randomenckey = ''.join(random.sample(string.ascii_lowercase, 16))
-    p = subprocess.Popen(['wine', '/root/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
+
+    p = subprocess.Popen(['wine', os.path.expanduser('~') + '/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
                           '%s/payload.py' % payloaddir(), '--noconsole', '--onefile', '--key',randomenckey], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Payload')
     while p.poll() == None:
