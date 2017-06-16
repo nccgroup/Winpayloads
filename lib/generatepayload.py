@@ -5,7 +5,6 @@ from startmetasploit import *
 from generatepayload import *
 from menu import *
 from encrypt import *
-from sockets import *
 
 
 METASPLOIT_Functions = {
