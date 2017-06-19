@@ -2,7 +2,6 @@ from main import *
 from payloadextras import *
 from startmetasploit import *
 from generatepayload import *
-from sockets import *
 
 def checkClientUpload(payloadname, powershellExec, isExe):
     from menu import clientMenuOptions
