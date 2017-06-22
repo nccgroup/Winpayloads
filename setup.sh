@@ -25,6 +25,7 @@ apt-get -y install wine
 
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 pip install blessed
+pip install blessings
 pip install pyasn1
 
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
