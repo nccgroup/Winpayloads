@@ -3,11 +3,11 @@ from stager import *
 class Handler(asyncore.dispatcher):
     def __init__(self, clientconn, server):
         asyncore.dispatcher.__init__(self, sock=clientconn)
-        from menu import clientMenuOptions
         self.server = server
-        clientMenuOptions[self.server.get_clientnumber()] =  {'payloadchoice': None, 'payload':str(clientconn.getpeername()[0]) + ":" + str(clientconn.getpeername()[1]), 'extrawork': interactShell, 'params': (self.server.get_clientnumber())}
         self.in_buffer = []
         self.out_buffer = []
+        self.user_name = ''
+        self.is_admin = ''
         return
 
     def handle_close(self):
@@ -18,9 +18,15 @@ class Handler(asyncore.dispatcher):
         return True
 
     def handle_read(self):
-        data = self.recv(8000).replace('\x00','').replace('\r','')
+        data = self.recv(8000).replace('\r','')
         if data:
-            self.in_buffer.append(data)
+            if data.replace('\x00',''):
+                self.in_buffer.append(data)
+            if '\x00' in data and ':' in data:
+                self.user_name, self.is_admin = data.split(':')
+                from menu import clientMenuOptions
+                clientMenuOptions[self.server.get_clientnumber()] =  {'payloadchoice': None, 'payload':str(self.getpeername()[0]) + ":" + str(self.getpeername()[1]), 'extrawork': interactShell, 'params': (self.server.get_clientnumber())}
+                self.in_buffer = []
 
     def writable(self):
         return len(self.out_buffer) > 0
