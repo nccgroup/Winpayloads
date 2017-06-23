@@ -1,4 +1,3 @@
-from threading import Thread
 from stager import *
 
 class Handler(asyncore.dispatcher):

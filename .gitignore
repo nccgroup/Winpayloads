@@ -2,3 +2,4 @@
 /lib/psexecspray.py
 server.crt
 server.key
+/lib/sockets.py
