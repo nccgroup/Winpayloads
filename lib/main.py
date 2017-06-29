@@ -238,7 +238,7 @@ class FUNCTIONS(object):
             IP = s.getsockname()[0]
             return IP
         except:
-            return None
+            return "0.0.0.0"
 
     def ServePayload(self, payloaddirectory, port):
         try:
