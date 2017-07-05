@@ -5,6 +5,7 @@ from startmetasploit import *
 from generatepayload import *
 from menu import *
 from encrypt import *
+from stager import *
 
 
 METASPLOIT_Functions = {
@@ -113,9 +114,8 @@ def DoClientUpload(payloaddir,payloadname,powershellExec,isExe):
         while True:
             clientchoice = raw_input('>> ')
             try:
-                clientconn, clientnumber = clientMenuOptions[clientchoice]['params']
+                clientnumber = clientMenuOptions[clientchoice]['params']
                 break
             except:
                 continue
-
-        clientUpload((payloaddir + '/' + payloadname),clientconn,powershellExec,isExe)
+        clientUpload((payloaddir + '/' + payloadname),clientnumber,powershellExec,isExe)
