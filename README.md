@@ -16,17 +16,10 @@ https://www.virustotal.com/en/file/23a24f99c3c6c00cd4bf6cb968f813ba2ceadfa846c7f
 * Upload to local webserver - Easy deployment
 * Powershell stager - allows invoking payloads in memory & more
 
-## Getting Started
-1. ```git clone https://github.com/nccgroup/winpayloads.git```
-2. ```cd winpayloads```
-3. ```./setup.sh``` will setup everything needed for Winpayloads
-4. Start Winpayloads ```./Winpayloads.py```  
-5. Type 'help' or '?' to get a detailed help page  
-  ```setup.sh -r``` will reinstall  
-
-#### Rerun setup.sh on every git pull
+## Check out the Wiki for installation and more!
+https://github.com/nccgroup/Winpayloads/wiki  
 
 ![alt tag](https://raw.githubusercontent.com/Charliedean/charliedean.github.io/master/images/2016-02-16%2010_12_29-Kali2%20-%20VMware%20Workstation.png)
 
-# Video and Information on Blog  
+# Video and Information on Blog  (OUTDATED)
 https://charliedean.github.io  
