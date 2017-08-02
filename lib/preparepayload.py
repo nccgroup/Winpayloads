@@ -28,7 +28,6 @@ def reverseIpAndPort(port):
             '\n[*] Please Enter Your IP Manually(Automatic Disabled)\n[*] IP> ')
     return (portnum,ipaddr)
 
-
 def reversePayloadGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
     try:
@@ -53,9 +52,6 @@ def reversePayloadGeneration(payloadchoice,payloadname):
     startRevMetasploit(portnum)
     return "clear"
 
-
-
-
 def bindPayloadGeneration(payloadchoice,payloadname):
     bindport = raw_input(
             '\n[*] Press Enter For Default Bind Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
@@ -75,7 +71,6 @@ def bindPayloadGeneration(payloadchoice,payloadname):
     startBindMetasploit(bindport,bindip)
     return "clear"
 
-
 def httpsPayloadGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('443')
     try:
@@ -91,7 +86,6 @@ def httpsPayloadGeneration(payloadchoice,payloadname):
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
     startHttpsMetasploit(portnum)
     return "clear"
-
 
 def dnsPayloadGeneration(payloadchoice,payloadname):
     portnum = raw_input(
@@ -115,7 +109,6 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     startDnsMetasploit(portnum,DNSaddr)
     return "clear"
 
-
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
 
@@ -138,7 +131,6 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
             listenerserver.close()
             del listenerserver
     return "pass"
-
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
