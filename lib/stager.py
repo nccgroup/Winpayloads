@@ -69,16 +69,16 @@ def printListener():
             ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
             connectserver = Server(ipADDR, 5556, bindsocket=False)
             serverlist.append(connectserver)
-            connectworker = threading.Thread(target=asyncore.loop, args=(0.1,))
-            connectworker.setDaemon(True)
-            connectworker.start()
+            async = threading.Thread(target=asyncore.loop)
+            async.setDaemon(True)
+            async.start()
     else:
         if not '5555' in str(serverlist):
             listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
             serverlist.append(listenerserver)
-            listenerworker = threading.Thread(target=asyncore.loop, args=(0.1,))
-            listenerworker.setDaemon(True)
-            listenerworker.start()
+            async = threading.Thread(target=asyncore.loop)
+            async.setDaemon(True)
+            async.start()
     return "pass"
 
 
