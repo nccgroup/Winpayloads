@@ -23,7 +23,7 @@ def menuRaise():
     raise KeyboardInterrupt
 
 def noColourLen(colourString):
-    return len(re.compile(r'\x1b[^m]*m').sub('', colourString))
+    return len(re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]').sub('', colourString))
 
 def noColourCenter(colourString):
     len = (t.width / 2) - (noColourLen(colourString) /2 )
@@ -67,7 +67,7 @@ mainMenuOptions = OrderedDict([
     ('3', {'payloadchoice': SHELLCODE.windows_met_bind_shell, 'payload': 'Windows_Meterpreter_Bind_Shell', 'extrawork': bindPayloadGeneration, 'availablemodules': METASPLOIT_Functions['bind'], 'params': None}),
     ('4', {'payloadchoice': SHELLCODE.windows_met_rev_https_shell, 'payload': 'Windows_Meterpreter_Reverse_HTTPS', 'extrawork': httpsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['https'], 'params': None}),
     ('5', {'payloadchoice': SHELLCODE.windows_met_rev_shell_dns, 'payload': 'Windows_Meterpreter_Reverse_Dns', 'extrawork': dnsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['dns'], 'params': None}),
-    ('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu, 'params': None}),
+    #('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu, 'params': None}),
     ('stager', {'payloadchoice': None, 'payload': 'Powershell Interpreter Stager', 'extrawork': printListener, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Connected Interpreter Clients', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
     ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help, 'params': None}),
@@ -76,7 +76,7 @@ mainMenuOptions = OrderedDict([
 ])
 
 psMenuOptions = OrderedDict([
-    #('1', {'payloadchoice': SHELLCODE.windows_ps_rev_watch_screen, 'payload': 'Windows_Reverse_Powershell_ScreenWatch', 'extrawork': reversePowerShellWatchScreenGeneration, 'params': None}),
+    ('1', {'payloadchoice': SHELLCODE.windows_ps_rev_watch_screen, 'payload': 'Windows_Reverse_Powershell_ScreenWatch', 'extrawork': reversePowerShellWatchScreenGeneration, 'params': None}),
     ('2', {'payloadchoice': SHELLCODE.windows_ps_ask_creds_tcp, 'payload': 'Windows_Reverse_Powershell_Asks_Creds', 'extrawork': reversePowerShellAskCredsGeneration, 'params': None}),
     ('3', {'payloadchoice': SHELLCODE.windows_invoke_mimikatz, 'payload': 'Windows_Reverse_Powershell_Invoke_Mimikatz', 'extrawork': reversePowerShellInvokeMimikatzGeneration, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Connected Interpreter Clients', 'extrawork': getAndRunClientMenu, 'params': None}),
