@@ -256,7 +256,6 @@ class FUNCTIONS(object):
         a.daemon = True
         a.start()
 
-
 class Spinner(object):
 
     def __init__(self,text):

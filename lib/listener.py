@@ -22,9 +22,9 @@ class Handler(asyncore.dispatcher):
         if data:
             if data.replace('\x00',''):
                 self.in_buffer.append(data)
-            if '\x00' in data and ':' in data:
-                self.user_name = "User:" + data.split(':')[0].replace('\x00','')
-                self.is_admin = "Admin:" + data.split(':')[1]
+            if '[#check#]' in data:
+                self.user_name = "User:" + data.split(':')[0].replace('\x00','').replace('[#check#]','')
+                self.is_admin = "Admin:" + data.split(':')[1].replace('\x00','').replace('[#check#]','')
                 from menu import clientMenuOptions
                 clientMenuOptions[self.server.get_clientnumber()] =  {'payloadchoice': None, 'payload':str(self.getpeername()[0]) + ":" + str(self.getpeername()[1]), 'extrawork': interactShell, 'params': (self.server.get_clientnumber()), 'availablemodules':{self.user_name: '', self.is_admin: ''}}
                 self.in_buffer = []
@@ -44,8 +44,6 @@ class Server(asyncore.dispatcher):
         self.set_reuse_addr()
         self.handlers = {}
         self.clientnumber = 0
-
-
         if bindsocket:
             self.bind((host, port))
             self.listen(30)
@@ -78,7 +76,6 @@ class Server(asyncore.dispatcher):
             self.clientnumber += 1
             handler = Handler(self.socket, self)
             self.handlers[self.clientnumber] = handler
-
 
     def handle_accept(self):
         self.socket = ssl.wrap_socket(self.socket, ssl_version=ssl.PROTOCOL_TLSv1, ciphers='AES256', server_side=True, certfile='server.crt', keyfile='server.key')

