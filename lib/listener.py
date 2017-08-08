@@ -23,9 +23,10 @@ class Handler(asyncore.dispatcher):
             if data.replace('\x00',''):
                 self.in_buffer.append(data)
             if '\x00' in data and ':' in data:
-                self.user_name, self.is_admin = data.split(':')
+                self.user_name = "User:" + data.split(':')[0].replace('\x00','')
+                self.is_admin = "Admin:" + data.split(':')[1]
                 from menu import clientMenuOptions
-                clientMenuOptions[self.server.get_clientnumber()] =  {'payloadchoice': None, 'payload':str(self.getpeername()[0]) + ":" + str(self.getpeername()[1]), 'extrawork': interactShell, 'params': (self.server.get_clientnumber())}
+                clientMenuOptions[self.server.get_clientnumber()] =  {'payloadchoice': None, 'payload':str(self.getpeername()[0]) + ":" + str(self.getpeername()[1]), 'extrawork': interactShell, 'params': (self.server.get_clientnumber()), 'availablemodules':{self.user_name: '', self.is_admin: ''}}
                 self.in_buffer = []
 
     def writable(self):
