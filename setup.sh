@@ -26,7 +26,7 @@ apt-get -y install wine
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 pip install blessed
 pip install pyasn1
-pip install prompt_toolkit
+pip install --upgrade --force-reinstall prompt_toolkit
 
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
 if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
