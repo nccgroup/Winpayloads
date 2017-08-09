@@ -41,7 +41,7 @@ def askAndReturnModules(shellcode, metasploit_type):
     if metasploit_type == 'nclistener':
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['nclisten'])
     else:
-        want_UACBYPASS = raw_input(t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)? y/[n]:' + t.normal)
+        want_UACBYPASS = raw_input(t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)?' + t.bold_yellow +' [WIN8 and below]' + t.bold_red + ' y/[n]:' + t.normal)
         if want_UACBYPASS.lower() == 'y':
             return (EXTRAS(shellcode).UACBYPASS(), METASPLOIT_Functions[metasploit_type]['uacbypass'])
 
