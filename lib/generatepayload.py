@@ -73,9 +73,9 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     sys.stdout.flush()
 
     payloadstderr = p.stderr.read()
-    if re.search('error', payloadstderr.lower()):
-        print t.bold_red + '[*] Error In Creating Payload? \n' + t.normal
-        sys.stdout.write(payloadstderr)
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "-debug":
+            sys.stdout.write(payloadstderr)
     os.system('mv dist/payload.exe %s/%s.exe'% (payloaddir(),payloadname))
     print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir(), payloadname) + t.normal
     CleanUpPayloadMess(payloadname)
