@@ -57,10 +57,12 @@ if [[ ! -d "~/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
   unzip pycrypto-2.6.win32-py2.7.exe
   wget https://download.microsoft.com/download/1/1/1/1116b75a-9ec3-481a-a3c8-1777b5381140/vcredist_x86.exe
   wine vcredist_x86.exe /qb!
-  #wget https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/pywin32-220.win32-py2.7.exe/download
-  #mv download pywin32.exe
-  #unzip pywin32.exe
+  wget https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/pywin32-220.win32-py2.7.exe/download
+  mv download pywin32.exe
+  unzip pywin32.exe
   cp -rf PLATLIB/* ~/.wine/drive_c/Python27/Lib/site-packages/
+  cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Lib/site-packages/
+  cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Scripts/
   wine ~/.wine/drive_c/Python27/python.exe ~/.wine/drive_c/Python27/Scripts/pywin32_postinstall.py -install -silent
 else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
@@ -77,7 +79,6 @@ else
 fi
 
 echo -e '\033[1;32m[*] Grabbing Wine Modules \033[0m'
-wine ~/.wine/drive_c/Python27/Scripts/pip.exe install pypiwin32
 wine ~/.wine/drive_c/Python27/Scripts/pip.exe install pefile
 echo -e '\033[1;32m[*] Done \033[0m'
 
@@ -99,5 +100,5 @@ echo -e '\033[1;32m[*] Done \033[0m'
 
 
 echo -e '\033[1;32m[*] Cleaning Up \033[0m'
-rm python-2.7.10.msi pyinstaller-2.0.zip vcredist_x86.exe pywin32.exe PLATLIB impacket -rf
+rm python-2.7.10.msi pyinstaller-2.0.zip pycrypto-2.6.win32-py2.7.exe vcredist_x86.exe pywin32.exe PLATLIB SCRIPTS impacket -rf
 echo -e '\033[1;32m[*] Done \033[0m'
