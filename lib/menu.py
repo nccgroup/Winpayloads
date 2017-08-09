@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from main import *
 from payloadextras import *
 from startmetasploit import *
@@ -5,18 +6,15 @@ from generatepayload import *
 from preparepayload import *
 from stager import *
 from help import *
+import prompt_toolkit
 
-class AUTOCOMPLETE():
+class promptComplete(prompt_toolkit.completion.Completer):
+    def __init__(self, choices):
+        super(promptComplete, self).__init__()
+        self.choices = choices
 
-    def autoComplete(self, autoCompleteMenu):
-        autoCompleteList = autoCompleteMenu.keys()
-        def listCompleter(text,state):
-            line = readline.get_line_buffer()
-            if not line:
-                return [c + " " for c in autoCompleteList][state]
-            else:
-                return [c + " " for c in autoCompleteList if c.startswith(line)][state]
-        self.autoCompleteDef = listCompleter
+    def get_completions(self, document, complete_event):
+        return [prompt_toolkit.completion.Completion(x, start_position=-document.cursor_position) for x in self.choices if x.startswith(document.text)]
 
 
 def menuRaise():
@@ -32,31 +30,16 @@ def noColourCenter(colourString):
     return (' ' * len) + colourString
 
 def getAndRunPSMenu():
-    menuAutoComplete = AUTOCOMPLETE()
-    menuAutoComplete.autoComplete(psMenuOptions)
-    readline.set_completer(menuAutoComplete.autoCompleteDef)
-    readline.parse_and_bind("tab: complete")
-
     psMenu = MenuOptions(psMenuOptions, menuName="PS Menu")
     psMenu.runmenu()
     return False
 
 def getAndRunClientMenu():
-    menuAutoComplete = AUTOCOMPLETE()
-    menuAutoComplete.autoComplete(clientMenuOptions)
-    readline.set_completer(menuAutoComplete.autoCompleteDef)
-    readline.parse_and_bind("tab: complete")
-
     clientMenu = MenuOptions(clientMenuOptions, menuName="Client Menu")
     clientMenu.runmenu()
     return False
 
 def getAndRunMainMenu():
-    menuAutoComplete = AUTOCOMPLETE()
-    menuAutoComplete.autoComplete(mainMenuOptions)
-    readline.set_completer(menuAutoComplete.autoCompleteDef)
-    readline.parse_and_bind("tab: complete")
-
     mainMenu = MenuOptions(mainMenuOptions, menuName="Main Menu")
     mainMenu.runmenu()
     return False
@@ -93,6 +76,9 @@ class MenuOptions(object):
     def __init__(self, choices, menuName):
         self.choices = choices
         self.menuName = menuName
+        self.style = prompt_toolkit.styles.style_from_dict({
+            prompt_toolkit.token.Token:  '#FFCC66'
+        })
 
     def _choose(self, n):
         if self.choices.has_key(n):
@@ -105,7 +91,7 @@ class MenuOptions(object):
     def runmenu(self):
         self.printMenues(True)
         while True:
-            user_choice = raw_input(('%s > ')% (t.bold_yellow + self.menuName + t.normal)).rstrip(' ')
+            user_choice = prompt_toolkit.prompt('%s > '%(self.menuName),style=self.style, patch_stdout=True, completer=promptComplete(self.choices)).rstrip(' ')
             success, payloadchoice, payload, extrawork, params = self._choose(user_choice)
 
             if not success:
