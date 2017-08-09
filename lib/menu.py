@@ -6,7 +6,6 @@ from generatepayload import *
 from preparepayload import *
 from stager import *
 from help import *
-import prompt_toolkit
 
 class promptComplete(prompt_toolkit.completion.Completer):
     def __init__(self, choices):

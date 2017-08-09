@@ -1,5 +1,9 @@
+from __future__ import unicode_literals
 from main import *
 from menu import *
+from prompt_toolkit.contrib.completers import WordCompleter
+
+history = prompt_toolkit.history.InMemoryHistory()
 
 serverlist = []
 
@@ -91,7 +95,7 @@ def interactShell(clientnumber):
             while True:
                 if server.handlers[clientnumber].in_buffer:
                     print server.handlers[clientnumber].in_buffer.pop()
-                command = raw_input("PS >")
+                command = prompt_toolkit.prompt("PS >", completer=WordCompleter(['back', 'exit']), history=history)
                 if command.lower() == "back":
                     break
                 elif command.lower() == "exit":

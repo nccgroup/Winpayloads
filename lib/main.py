@@ -23,6 +23,7 @@ import string
 import asyncore
 import ssl
 import threading
+import prompt_toolkit
 
 t = blessed.Terminal()
 
