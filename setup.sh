@@ -31,13 +31,6 @@ pip install --upgrade --force-reinstall prompt_toolkit
 echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
 if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
   if [ -d "/opt/pyinstaller/.git" ]; then
-    echo -en '\033[1;34m[*] Remove /opt/pyinstaller? [Y/n] \033[0m'
-    read delPyinstaller
-    echo "${delPyinstaller,,}"
-    if [[ "${delPyinstaller,,}" != "y" ]]; then
-    echo "Not reinstalling..."
-    exit
-    fi
     rm /opt/pyinstaller -rf
   fi
   git clone https://github.com/pyinstaller/pyinstaller.git /opt/pyinstaller
