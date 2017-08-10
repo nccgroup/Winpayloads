@@ -7,6 +7,8 @@ https://www.virustotal.com/en/file/23a24f99c3c6c00cd4bf6cb968f813ba2ceadfa846c7f
 
 ## For Fully Undetectable Payloads please use the stager functionality [Youtube Video](https://youtu.be/eRl5H5wHqKY)
 
+
+  
 ## Features
 * UACBypass - PowerShellEmpire https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner. All rights reserved.   
 * PowerUp - PowerShellEmpire https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1 Copyright (c) 2015, Will Schroeder and Justin Warner. All rights reserved.   
