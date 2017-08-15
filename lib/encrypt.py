@@ -8,8 +8,8 @@ def randomVar():
 
 def randomJunk():
     newString = ''
-    for i in xrange(random.randint(30, 200)):
-        newString += ''.join(random.sample(string.ascii_lowercase, 3))
+    for i in xrange(random.randint(1, 26)):
+        newString += ''.join(random.sample(string.ascii_lowercase, i))
     return newString
 
 def do_Encryption(payload):
