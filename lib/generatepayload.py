@@ -41,9 +41,12 @@ def askAndReturnModules(shellcode, metasploit_type):
     if metasploit_type == 'nclistener':
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['nclisten'])
     else:
-        want_UACBYPASS = raw_input(t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)?' + t.bold_yellow +' [WIN8 and below]' + t.bold_red + ' y/[n]:' + t.normal)
+        want_UACBYPASS = raw_input(t.bold_red + '[*] Try UAC Bypass(Only Works For Local Admin Account)?' + t.bold_red + ' y/[n]:' + t.normal)
         if want_UACBYPASS.lower() == 'y':
-            return (EXTRAS(shellcode).UACBYPASS(), METASPLOIT_Functions[metasploit_type]['uacbypass'])
+            win7orwin10 = raw_input(t.bold_red + '[*] Windows 7 or 10?' + t.bold_red + ' 7/[10]:' + t.normal)
+            if not win7orwin10:
+                win7orwin10 = "10"
+            return (EXTRAS(shellcode).UACBYPASS(win7orwin10), METASPLOIT_Functions[metasploit_type]['uacbypass'])
 
         want_ALLCHECKS = raw_input(t.bold_red + '[*] Invoke Priv Esc Checks? y/[n]:' + t.normal)
         if want_ALLCHECKS.lower() == 'y':
