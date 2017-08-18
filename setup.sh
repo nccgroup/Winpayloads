@@ -73,6 +73,7 @@ fi
 
 echo -e '\033[1;32m[*] Grabbing Wine Modules \033[0m'
 wine ~/.wine/drive_c/Python27/Scripts/pip.exe install pefile
+wine ~/.wine/drive_c/Python27/Scripts/pip.exe install dis3
 echo -e '\033[1;32m[*] Done \033[0m'
 
 
