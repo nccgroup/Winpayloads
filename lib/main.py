@@ -257,6 +257,26 @@ class FUNCTIONS(object):
         a.daemon = True
         a.start()
 
+    def randomUnusedPort(self):
+        s = socket.socket()
+        s.bind(('', 0))
+        port = s.getsockname()[1]
+        s.close()
+        return port
+
+    def stagePowershellCode(self, powershellFileContents, port):
+        DIR = 'stager'
+        if not os.path.isdir(DIR):
+            os.mkdir(DIR)
+        os.chdir(DIR)
+        with open('stage.ps1','w') as psFile:
+            psFile.write(powershellFileContents)
+        httpd = SocketServer.TCPServer(('', port), HANDLER)
+        httpd.handle_request()
+        os.chdir('..')
+        import shutil
+        shutil.rmtree(DIR)
+
 class Spinner(object):
 
     def __init__(self,text):

