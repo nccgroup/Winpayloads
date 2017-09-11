@@ -28,22 +28,6 @@ pip install blessed
 pip install pyasn1
 pip install --upgrade --force-reinstall prompt_toolkit
 
-echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
-if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
-  if [ -d "/opt/pyinstaller/.git" ]; then
-    rm /opt/pyinstaller -rf
-  fi
-  curl -O -L https://github.com/pyinstaller/pyinstaller/releases/download/v3.2.1/PyInstaller-3.2.1.zip
-  unzip PyInstaller-3.2.1.zip -d /opt
-  mv /opt/PyInstaller-3.2.1 /opt/pyinstaller
-  cd /opt/pyinstaller
-  wine ~/.wine/drive_c/Python27/python.exe setup.py install
-  cd $winpayloadsdir
-
-else
-  echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
-fi
-
 echo -e '\033[1;32m[*] Downloading Python27, Pywin32 and Pycrypto For Wine \033[0m'
 if [[ ! -d "~/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
   wget https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
@@ -62,6 +46,23 @@ if [[ ! -d "~/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
 else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
 fi
+
+echo -e '\033[1;32m[*] Installing Pyinstaller \033[0m'
+if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
+  if [ -d "/opt/pyinstaller/.git" ]; then
+    rm /opt/pyinstaller -rf
+  fi
+  curl -O -L https://github.com/pyinstaller/pyinstaller/releases/download/v3.2.1/PyInstaller-3.2.1.zip
+  unzip PyInstaller-3.2.1.zip -d /opt
+  mv /opt/PyInstaller-3.2.1 /opt/pyinstaller
+  cd /opt/pyinstaller
+  wine ~/.wine/drive_c/Python27/python.exe setup.py install
+  cd $winpayloadsdir
+
+else
+  echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
+fi
+
 
 echo -e '\033[1;32m[*] Installing impacket from Git \033[0m'
 if [[ ! -d "/usr/local/lib/python2.7/dist-packages/impacket" || $reinstall -eq 1 ]]; then
