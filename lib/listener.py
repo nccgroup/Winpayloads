@@ -18,7 +18,7 @@ class Handler(asyncore.dispatcher):
         return True
 
     def handle_read(self):
-        data = self.recv(8000).replace('\r','')
+        data = self.recv(8000)
         if data:
             if data.replace('\x00',''):
                 self.in_buffer.append(data)
@@ -38,15 +38,20 @@ class Handler(asyncore.dispatcher):
 class Server(asyncore.dispatcher):
     want_read = want_write = True
 
-    def __init__(self, host, port, bindsocket):
+    def __init__(self, host, port, bindsocket=False, relay=False):
         asyncore.dispatcher.__init__(self)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.set_reuse_addr()
         self.handlers = {}
         self.clientnumber = 0
-        if bindsocket:
+        self.bindsocket = bindsocket
+        self.relay = relay
+        if self.bindsocket:
             self.bind((host, port))
             self.listen(30)
+        elif self.relay:
+            self.bind((host, port))
+            self.listen(1)
         else:
             self.connect((host, port))
 
@@ -78,7 +83,8 @@ class Server(asyncore.dispatcher):
             self.handlers[self.clientnumber] = handler
 
     def handle_accept(self):
-        self.socket = ssl.wrap_socket(self.socket, ssl_version=ssl.PROTOCOL_TLSv1, ciphers='AES256', server_side=True, certfile='server.crt', keyfile='server.key')
+        if self.bindsocket:
+            self.socket = ssl.wrap_socket(self.socket, ssl_version=ssl.PROTOCOL_TLSv1, ciphers='AES256', server_side=True, certfile='server.crt', keyfile='server.key')
         clientconn, address = self.accept()
         if clientconn:
             print '[*] Connection from %s:%s'%(address)

