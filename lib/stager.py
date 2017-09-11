@@ -72,10 +72,16 @@ def printListener():
         if not '5556' in str(serverlist):
             ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
             connectserver = Server(ipADDR, 5556, bindsocket=False)
+            async = threading.Thread(target=asyncore.loop, args=(0.1,))
+            async.setDaemon(True)
+            async.start()
             serverlist.append(connectserver)
     else:
         if not '5555' in str(serverlist):
             listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
+            async = threading.Thread(target=asyncore.loop, args=(0.1,))
+            async.setDaemon(True)
+            async.start()
             serverlist.append(listenerserver)
     return "pass"
 
