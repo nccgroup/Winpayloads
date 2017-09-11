@@ -33,7 +33,9 @@ if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
   if [ -d "/opt/pyinstaller/.git" ]; then
     rm /opt/pyinstaller -rf
   fi
-  git clone https://github.com/pyinstaller/pyinstaller.git /opt/pyinstaller
+  curl -O -L https://github.com/pyinstaller/pyinstaller/releases/download/v3.2.1/PyInstaller-3.2.1.zip
+  unzip PyInstaller-3.2.1.zip -d /opt
+  mv /opt/PyInstaller-3.2.1 /opt/pyinstaller
   cd /opt/pyinstaller
   wine ~/.wine/drive_c/Python27/python.exe setup.py install
   cd $winpayloadsdir
@@ -94,5 +96,5 @@ echo -e '\033[1;32m[*] Done \033[0m'
 
 
 echo -e '\033[1;32m[*] Cleaning Up \033[0m'
-rm python-2.7.10.msi pyinstaller-2.0.zip pycrypto-2.6.win32-py2.7.exe vcredist_x86.exe pywin32.exe PLATLIB SCRIPTS impacket -rf
+rm python-2.7.10.msi PyInstaller-3.2.1.zip pycrypto-2.6.win32-py2.7.exe vcredist_x86.exe pywin32.exe PLATLIB SCRIPTS impacket -rf
 echo -e '\033[1;32m[*] Done \033[0m'
