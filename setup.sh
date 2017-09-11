@@ -1,6 +1,7 @@
 #!/bin/bash
 ########
 winpayloadsdir=$(pwd)
+
 reinstall=0
 for i in "$@"
 do
@@ -15,18 +16,18 @@ done
 
 
 echo -e '\033[1;32m[*] Installing Dependencies \033[0m'
-dpkg --add-architecture i386
-apt-get update
-apt-get -y install winbind unzip wget git python2.7 python python-crypto python-pefile python-pip
+sudo dpkg --add-architecture i386
+sudo apt-get update
+sudo apt-get -y install winbind unzip wget git python2.7 python python-crypto python-pefile python-pip
 
 echo -e '\033[1;32m[*] Installing Wine \033[0m'
-apt-get -y install wine32
-apt-get -y install wine
+sudo apt-get -y install wine32
+sudo apt-get -y install wine
 
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
-pip install blessed
-pip install pyasn1
-pip install --upgrade --force-reinstall prompt_toolkit
+sudo pip install blessed
+sudo pip install pyasn1
+sudo pip install --upgrade --force-reinstall prompt_toolkit
 
 echo -e '\033[1;32m[*] Downloading Python27, Pywin32 and Pycrypto For Wine \033[0m'
 if [[ ! -d "~/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
