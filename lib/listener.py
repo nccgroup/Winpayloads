@@ -13,9 +13,7 @@ class StartAsync(threading.Thread):
     def run(self):
         while True:
             if self.started:
-                print "starting async"
                 asyncore.loop(timeout=0.5, map=self.map)
-                print "stopped async"
                 self.started = False
             else:
                 while not self.map:
