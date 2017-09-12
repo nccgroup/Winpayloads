@@ -37,8 +37,8 @@ try:
 except KeyboardInterrupt:
     pass
 
-async = threading.Thread(target=asyncore.loop, args=(0.1,))
-async.setDaemon(True)
+from lib.listener import StartAsync
+async = StartAsync()
 async.start()
 
 try:

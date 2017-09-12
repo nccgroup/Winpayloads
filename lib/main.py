@@ -35,7 +35,6 @@ class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver t
         return
 
 
-
 class SHELLCODE(object):
 
     windows_rev_shell = (

@@ -1,8 +1,31 @@
 from stager import *
+import threading
+
+amap = {}
+
+class StartAsync(threading.Thread):
+    def __init__(self, map=amap):
+        threading.Thread.__init__(self)
+        self.setDaemon(True)
+        self.map = amap
+        self.started = False
+
+    def run(self):
+        while True:
+            if self.started:
+                print "starting async"
+                asyncore.loop(timeout=0.5, map=self.map)
+                print "stopped async"
+                self.started = False
+            else:
+                while not self.map:
+                    time.sleep(0.5)
+                self.started = True
+
 
 class Handler(asyncore.dispatcher):
-    def __init__(self, clientconn, server):
-        asyncore.dispatcher.__init__(self, sock=clientconn)
+    def __init__(self, clientconn, server, map):
+        asyncore.dispatcher.__init__(self, sock=clientconn, map=amap)
         self.server = server
         self.in_buffer = []
         self.out_buffer = []
@@ -37,15 +60,16 @@ class Handler(asyncore.dispatcher):
 
 class Server(asyncore.dispatcher):
     want_read = want_write = True
-
-    def __init__(self, host, port, bindsocket=False, relay=False):
-        asyncore.dispatcher.__init__(self)
+    def __init__(self, host, port, bindsocket=False, relay=False, map=amap):
+        asyncore.dispatcher.__init__(self, map=amap)
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         self.set_reuse_addr()
         self.handlers = {}
         self.clientnumber = 0
         self.bindsocket = bindsocket
         self.relay = relay
+        self.map = amap
+
         if self.bindsocket:
             self.bind((host, port))
             self.listen(30)
@@ -79,7 +103,7 @@ class Server(asyncore.dispatcher):
                 raise
         else:
             self.clientnumber += 1
-            handler = Handler(self.socket, self)
+            handler = Handler(self.socket, self, map=self.map)
             self.handlers[self.clientnumber] = handler
 
     def handle_accept(self):
@@ -89,7 +113,7 @@ class Server(asyncore.dispatcher):
         if clientconn:
             print '[*] Connection from %s:%s'%(address)
             self.clientnumber += 1
-            handler = Handler(clientconn, self)
+            handler = Handler(clientconn, self, map=self.map)
             self.handlers[self.clientnumber] = handler
 
 

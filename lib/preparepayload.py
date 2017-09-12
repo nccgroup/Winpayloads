@@ -127,10 +127,6 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     except KeyboardInterrupt:
         if listenerserver.handlers:
             listenerserver.handlers[1].handle_close()
-        listenerserver.close()
-        relayserver.close()
-        del listenerserver
-        del relayserver
     return "pass"
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
@@ -152,8 +148,6 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     except KeyboardInterrupt:
         if listenerserver.handlers:
             listenerserver.handlers[1].handle_close()
-        listenerserver.close()
-        del listenerserver
     return "pass"
 
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
@@ -175,6 +169,4 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     except KeyboardInterrupt:
         if listenerserver.handlers:
             listenerserver.handlers[1].handle_close()
-        listenerserver.close()
-        del listenerserver
     return "pass"
