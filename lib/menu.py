@@ -29,8 +29,11 @@ def noColourCenter(colourString):
     return (' ' * len) + colourString
 
 def getAndRunPSMenu():
-    psMenu = MenuOptions(psMenuOptions, menuName="PS Menu")
-    psMenu.runmenu()
+    if len(clientMenuOptions) > 2:
+        psMenu = MenuOptions(psMenuOptions, menuName="PS Menu")
+        psMenu.runmenu()
+    else:
+        print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
     return False
 
 def getAndRunClientMenu():

@@ -121,4 +121,5 @@ def DoClientUpload(payloaddir,payloadname,powershellExec,isExe):
             except:
                 continue
         clientUpload((payloaddir + '/' + payloadname),clientnumber,powershellExec,isExe)
-        print "Allow 20 seconds for payload connection..."
+        print "Allow 20 seconds..."
+        return clientnumber

