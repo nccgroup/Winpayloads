@@ -92,6 +92,9 @@ echo -e '\033[1;32m[*] Grabbing External Modules \033[0m'
 mkdir externalmodules
 cd externalmodules
 curl -O https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/CodeExecution/Invoke-Shellcode.ps1
+sed -i -e 's/Invoke-Shellcode/Invoke-Code/g' Invoke-Shellcode.ps1
+sed -i -e '/<#/,/#>/c\\' Invoke-Shellcode.ps1
+sed -i -e 's/^[[:space:]]*#.*$//g' Invoke-Shellcode.ps
 curl -O https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/privesc/Invoke-BypassUAC.ps1
 curl -O https://raw.githubusercontent.com/Charliedean/Invoke-SilentCleanUpBypass/master/Invoke-SilentCleanUpBypass.ps1
 curl -O https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1
