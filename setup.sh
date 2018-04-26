@@ -88,6 +88,18 @@ curl -O https://raw.githubusercontent.com/Charliedean/PsexecSpray/master/psexecs
 cd ..
 echo -e '\033[1;32m[*] Done \033[0m'
 
+echo -e '\033[1;32m[*] Grabbing External Modules \033[0m'
+mkdir externalmodules
+cd externalmodules
+curl -O https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/CodeExecution/Invoke-Shellcode.ps1
+curl -O https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/privesc/Invoke-BypassUAC.ps1
+curl -O https://raw.githubusercontent.com/Charliedean/Invoke-SilentCleanUpBypass/master/Invoke-SilentCleanUpBypass.ps1
+curl -O https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1
+curl -O https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1
+cd ..
+echo -e '\033[1;32m[*] Done \033[0m'
+
+
 echo -e '\033[1;32m[*] Grabbing Certs \033[0m'
 openssl genrsa -out server.pass.key 2048
 openssl rsa -in server.pass.key -out server.key

