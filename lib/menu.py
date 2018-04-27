@@ -37,8 +37,11 @@ def getAndRunPSMenu():
     return False
 
 def getAndRunClientMenu():
-    clientMenu = MenuOptions(clientMenuOptions, menuName="Client Menu")
-    clientMenu.runmenu()
+    if len(clientMenuOptions) > 2:
+        clientMenu = MenuOptions(clientMenuOptions, menuName="Client Menu")
+        clientMenu.runmenu()
+    else:
+        print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
     return False
 
 def getAndRunMainMenu():

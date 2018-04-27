@@ -94,7 +94,7 @@ cd externalmodules
 curl -O https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/CodeExecution/Invoke-Shellcode.ps1
 sed -i -e 's/Invoke-Shellcode/Invoke-Code/g' Invoke-Shellcode.ps1
 sed -i -e '/<#/,/#>/c\\' Invoke-Shellcode.ps1
-sed -i -e 's/^[[:space:]]*#.*$//g' Invoke-Shellcode.ps
+sed -i -e 's/^[[:space:]]*#.*$//g' Invoke-Shellcode.ps1
 curl -O https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/privesc/Invoke-BypassUAC.ps1
 curl -O https://raw.githubusercontent.com/Charliedean/Invoke-SilentCleanUpBypass/master/Invoke-SilentCleanUpBypass.ps1
 curl -O https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1
