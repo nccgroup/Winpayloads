@@ -18,7 +18,7 @@ done
 echo -e '\033[1;32m[*] Installing Dependencies \033[0m'
 sudo dpkg --add-architecture i386
 sudo apt-get update
-sudo apt-get -y install winbind unzip wget git python2.7 python python-crypto python-pefile python-pip
+sudo apt-get -y install winbind unzip wget git python2.7 python python-crypto python-pefile python-pip curl
 
 echo -e '\033[1;32m[*] Installing Wine \033[0m'
 sudo apt-get -y install wine32
