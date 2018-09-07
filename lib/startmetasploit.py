@@ -2,7 +2,7 @@ import os
 
 class METASPLOIT(object):
     def __init__(self):
-        if os.geteuid == 0:
+        if os.geteuid() == 0:
             self.placeholder = ''
         else:
             self.placeholder = 'sudo '
