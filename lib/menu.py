@@ -6,6 +6,7 @@ from generatepayload import *
 from preparepayload import *
 from stager import *
 from help import *
+import glob
 
 class promptComplete(prompt_toolkit.completion.Completer):
     def __init__(self, choices):
@@ -46,8 +47,8 @@ def getAndRunClientMenu():
 
 def cleanUpPayloads():
     payloadsRemoved = 0
-    for i in os.listdir(payloaddir()):
-        os.remove(payloaddir() + '/' + i)
+    for i in glob.glob(payloaddir() + "/*.exe"):
+        os.remove(i)
         payloadsRemoved += 1
     print t.bold_green + "[*] %s Payloads removed...."% payloadsRemoved + t.normal
     return False
@@ -69,7 +70,7 @@ mainMenuOptions = OrderedDict([
     ('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu, 'params': None}),
     ('stager', {'payloadchoice': None, 'payload': 'Powershell Stager', 'extrawork': printListener, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Stager Connected Clients', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
-    ('cleanup', {'payloadchoice': None, 'payload': 'Clean Up Payload Directory', 'extrawork': cleanUpPayloads, 'params': None, 'availablemodules': {len(os.listdir(payloaddir())): ''}}),
+    ('cleanup', {'payloadchoice': None, 'payload': 'Clean Up Payload Directory', 'extrawork': cleanUpPayloads, 'params': None, 'availablemodules': {len(glob.glob(payloaddir() + "/*.exe")): ''}}),
     ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help, 'params': None}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
     ('exit', {'payloadchoice': None, 'payload': 'Exit', 'extrawork': menuRaise, 'params': None}),
