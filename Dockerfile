@@ -14,8 +14,7 @@ RUN apt-get update && \
     apt-get install metasploit-framework -y && \
     rm -rf /var/lib/apt/lists/*
 
-#RUN git clone https://github.com/nccgroup/winpayloads.git /root/winpayloads
-COPY ./ /root/winpayloads
+RUN git clone https://github.com/nccgroup/winpayloads.git /root/winpayloads
 
 WORKDIR /root/winpayloads
 
