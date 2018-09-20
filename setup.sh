@@ -2,6 +2,8 @@
 ########
 winpayloadsdir=$(pwd)
 
+export DEBIAN_FRONTEND=noninteractive
+
 reinstall=0
 for i in "$@"
 do
@@ -18,11 +20,16 @@ done
 echo -e '\033[1;32m[*] Installing Dependencies \033[0m'
 sudo dpkg --add-architecture i386
 sudo apt-get update
-sudo apt-get -y install winbind unzip wget git python2.7 python python-crypto python-pefile python-pip curl
+sudo apt-get -y install unzip wget python2.7 python-crypto python-pip curl winbind
 
 echo -e '\033[1;32m[*] Installing Wine \033[0m'
 sudo apt-get -y install wine32
 sudo apt-get -y install wine
+export WINEARCH=win32
+export WINEPREFIX=~/.win32
+echo -e '\033[1;32m'
+wine cmd.exe /c 'wmic os get osarchitecture'
+echo -e '\033[0m'
 
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 sudo pip install blessed
@@ -30,7 +37,7 @@ sudo pip install pyasn1
 sudo pip install --force-reinstall prompt-toolkit==1.0.15
 
 echo -e '\033[1;32m[*] Downloading Python27, Pywin32 and Pycrypto For Wine \033[0m'
-if [[ ! -d "~/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
+if [[ ! -d "~/.win32/drive_c/Python27/" || $reinstall -eq 1 ]]; then
   wget https://www.python.org/ftp/python/2.7.10/python-2.7.10.msi
   wine msiexec /i python-2.7.10.msi TARGETDIR=C:\Python27 ALLUSERS=1 /q
   wget http://www.voidspace.org.uk/downloads/pycrypto26/pycrypto-2.6.win32-py2.7.exe
@@ -40,10 +47,10 @@ if [[ ! -d "~/.wine/drive_c/Python27/" || $reinstall -eq 1 ]]; then
   wget https://sourceforge.net/projects/pywin32/files/pywin32/Build%20220/pywin32-220.win32-py2.7.exe/download
   mv download pywin32.exe
   unzip pywin32.exe
-  cp -rf PLATLIB/* ~/.wine/drive_c/Python27/Lib/site-packages/
-  cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Lib/site-packages/
-  cp -rf SCRIPTS/* ~/.wine/drive_c/Python27/Scripts/
-  wine ~/.wine/drive_c/Python27/python.exe ~/.wine/drive_c/Python27/Scripts/pywin32_postinstall.py -install -silent
+  cp -rf PLATLIB/* ~/.win32/drive_c/Python27/Lib/site-packages/
+  cp -rf SCRIPTS/* ~/.win32/drive_c/Python27/Lib/site-packages/
+  cp -rf SCRIPTS/* ~/.win32/drive_c/Python27/Scripts/
+  wine ~/.win32/drive_c/Python27/python.exe ~/.win32/drive_c/Python27/Scripts/pywin32_postinstall.py -install -silent
 else
   echo -e '\033[1;32m[*] Installed Already, Skipping! \033[0m'
 fi
@@ -57,7 +64,7 @@ if [[ ! -d "/opt/pyinstaller" || $reinstall -eq 1 ]]; then
   sudo unzip PyInstaller-3.2.1.zip -d /opt
   sudo mv /opt/PyInstaller-3.2.1 /opt/pyinstaller
   cd /opt/pyinstaller
-  wine ~/.wine/drive_c/Python27/python.exe setup.py install
+  wine ~/.win32/drive_c/Python27/python.exe setup.py install
   cd $winpayloadsdir
 
 else
@@ -76,8 +83,8 @@ else
 fi
 
 echo -e '\033[1;32m[*] Grabbing Wine Modules \033[0m'
-wine ~/.wine/drive_c/Python27/Scripts/pip.exe install pefile
-wine ~/.wine/drive_c/Python27/Scripts/pip.exe install dis3
+wine ~/.win32/drive_c/Python27/Scripts/pip.exe install pefile
+wine ~/.win32/drive_c/Python27/Scripts/pip.exe install dis3
 echo -e '\033[1;32m[*] Done \033[0m'
 
 

