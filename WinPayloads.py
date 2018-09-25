@@ -20,19 +20,15 @@ if not os.path.isdir(DIR):
 
 try:
     print t.bold_green + "Checking if up-to-date || ctr + c to cancel" + t.normal
-    checkupdate = subprocess.Popen(['git','pull','--dry-run'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    LOADING = Spinner('Checking...')
-    while checkupdate.poll() == None:
-        LOADING.Update()
-        time.sleep(0.2)
-    print '\r',
-    sys.stdout.flush()
-    if checkupdate.stderr.read():
+    gitrev = subprocess.check_output(['git', 'rev-parse', 'HEAD']).rstrip()
+    gitlsremote = subprocess.check_output(['git', 'ls-remote', 'origin', 'master']).split()[0]
+
+    if gitrev != gitlsremote:
         updateornah = raw_input(t.bold_red + "Do you want to update WinPayloads? y/[n]: " + t.normal)
         if updateornah.lower() == "y":
             p = subprocess.Popen(['git','pull'])
             p.wait()
-            print t.bold_yellow + "Re-run setup.sh and reload Winpayloads..." + t.normal
+            print t.bold_yellow + "Reload Winpayloads..." + t.normal
             sys.exit()
 except KeyboardInterrupt:
     pass
