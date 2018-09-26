@@ -8,6 +8,8 @@ https://www.virustotal.com/en/file/23a24f99c3c6c00cd4bf6cb968f813ba2ceadfa846c7f
 ## For Fully Undetectable Payloads please use the stager functionality [Youtube Video](https://youtu.be/eRl5H5wHqKY)
 
 ## Docker!  
+Normal installation is deprecated, Please use docker now.  
+
 `docker run --net=host -it charliedean07/winpayloads`  
 
   
