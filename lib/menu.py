@@ -80,7 +80,7 @@ psMenuOptions = OrderedDict([
     ('1', {'payloadchoice': None, 'payload': 'Screen_Watch', 'extrawork': returnText , 'params': (t.bold_red, 'Module is borked...')}),
     ('2', {'payloadchoice': SHELLCODE.windows_ps_ask_creds_tcp, 'payload': 'Asks_Creds', 'extrawork': reversePowerShellAskCredsGeneration, 'params': None}),
     ('3', {'payloadchoice': SHELLCODE.windows_invoke_mimikatz, 'payload': 'Invoke_Mimikatz', 'extrawork': reversePowerShellInvokeMimikatzGeneration, 'params': None}),
-    #('4', {'payloadchoice': SHELLCODE.windows_uac_bypass, 'payload': 'UAC_Bypass', 'extrawork': UACBypassGeneration, 'params': None}),
+    ('4', {'payloadchoice': SHELLCODE.windows_uac_bypass, 'payload': 'UAC_Bypass', 'extrawork': UACBypassGeneration, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Connected Interpreter Clients', 'extrawork': getAndRunClientMenu, 'params': None}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
 ])

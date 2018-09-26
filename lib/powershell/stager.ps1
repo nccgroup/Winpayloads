@@ -41,7 +41,7 @@ Function Connect-Server ($ip, $port) {
 		}
 	} else {
 		$SSLcertfake = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2([System.Convert]::FromBase64String($Base64Cert), $CertPassword)
-		$listener = [System.Net.Sockets.TcpListener]$port
+		$listener = [System.Net.Sockets.TcpListener][int]$port
 		$listener.start()
 		$Socket = $listener.AcceptTcpClient()
 	}

