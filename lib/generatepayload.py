@@ -104,9 +104,10 @@ def CleanUpPayloadMess(randoFileName):
     os.system('rm %s/%s.py' % (payloaddir(), randoFileName))
 
 def DoPayloadUpload(payloadname):
+    from menu import returnIP
     want_to_upload = raw_input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
         DoPsexecSpray(payloaddir() + '/' + payloadname + '.exe')
     elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
-        FUNCTIONS().DoServe(FUNCTIONS().CheckInternet(), payloadname, payloaddir(), port=8000, printIt = True)
+        FUNCTIONS().DoServe(returnIP, payloadname, payloaddir(), port=8000, printIt = True)
