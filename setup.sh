@@ -35,6 +35,7 @@ echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
 sudo pip install blessed
 sudo pip install pyasn1
 sudo pip install --force-reinstall prompt-toolkit==1.0.15
+sudo pip install netifaces
 
 echo -e '\033[1;32m[*] Downloading Python27, Pywin32 and Pycrypto For Wine \033[0m'
 if [[ ! -d "~/.win32/drive_c/Python27/" || $reinstall -eq 1 ]]; then
