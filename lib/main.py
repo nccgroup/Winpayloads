@@ -47,6 +47,7 @@ def msfvenomGeneration(payload, ip, port):
 
     payload = p.stdout.read()
     compPayload = re.findall(r'"(.*?)"', payload)
+    
 
     return ''.join(map(str, compPayload))
 
