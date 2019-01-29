@@ -4,6 +4,7 @@ from lib.payloadextras import *
 from lib.startmetasploit import *
 from lib.menu import *
 
+
 try:
     from lib.psexecspray import *
 except:
@@ -22,7 +23,6 @@ try:
     print t.bold_green + "Checking if up-to-date || ctr + c to cancel" + t.normal
     gitrev = subprocess.check_output(['git', 'rev-parse', 'HEAD']).rstrip()
     gitlsremote = subprocess.check_output(['git', 'ls-remote', 'origin', 'master']).split()[0]
-
     if gitrev != gitlsremote:
         updateornah = raw_input(t.bold_red + "Do you want to update WinPayloads? y/[n]: " + t.normal)
         if updateornah.lower() == "y":

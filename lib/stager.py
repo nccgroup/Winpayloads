@@ -7,6 +7,16 @@ history = prompt_toolkit.history.InMemoryHistory()
 
 serverlist = []
 
+def killAllClients():
+    numberofclientskilled = 0
+    from menu import clientMenuOptions
+    if len(clientMenuOptions) > 2:
+        for server in serverlist:
+            for clientnumber in server.handlers.keys():
+                numberofclientskilled += 1
+                server.handlers[clientnumber].handle_close()
+    return numberofclientskilled
+
 def printListener(printit=True):
     from listener import Server
     from menu import returnIP

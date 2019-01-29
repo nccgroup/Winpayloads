@@ -10,13 +10,19 @@ import glob
 
 GetIP = InterfaceSelecta()
 
+
 def returnIP():
     return GetIP.ChooseInterface()['addr']
 
 def returnINTER():
     return str(GetIP.ChooseInterface()['interface'])
 
+def doInterfaceSelect():
+    GetIP.ChooseInterface(set=True)
+    return "clear"
+
 def menuRaise():
+    killAllClients()
     raise KeyboardInterrupt
 
 def noColourLen(colourString):
@@ -28,9 +34,17 @@ def noColourCenter(colourString):
         len -= 1
     return (' ' * len) + colourString
 
+def cleanUpPayloads():
+    payloadsRemoved = 0
+    for i in glob.glob(payloaddir() + "/*.exe"):
+        os.remove(i)
+        payloadsRemoved += 1
+    print t.bold_green + "[*] %s Payloads removed...."% payloadsRemoved + t.normal
+    return "clear"
+
 def getAndRunPSMenu():
     if len(clientMenuOptions) > 2:
-        psMenu = MenuOptions(psMenuOptions, menuName="PS Menu")
+        psMenu = MenuOptions(psMenuOptions(), menuName="PS Menu")
         psMenu.runmenu()
     else:
         print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
@@ -44,23 +58,16 @@ def getAndRunClientMenu():
         print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
     return False
 
-def cleanUpPayloads():
-    payloadsRemoved = 0
-    for i in glob.glob(payloaddir() + "/*.exe"):
-        os.remove(i)
-        payloadsRemoved += 1
-    print t.bold_green + "[*] %s Payloads removed...."% payloadsRemoved + t.normal
-    return False
-
 def getAndRunMainMenu():
-    mainMenu = MenuOptions(mainMenuOptions, menuName="Main Menu")
+    mainMenu = MenuOptions(mainMenuOptions(), menuName="Main Menu")
     mainMenu.runmenu()
     return False
 
 def returnText(colour, text):
     print colour + text + t.normal
 
-mainMenuOptions = OrderedDict([
+def mainMenuOptions():
+    return OrderedDict([
     ('1', {'payloadchoice': SHELLCODE.windows_rev_shell, 'payload': 'Windows_Reverse_Shell', 'extrawork': reversePayloadGeneration, 'availablemodules': None, 'params': None}),
     ('2', {'payloadchoice': SHELLCODE.windows_met_rev_shell, 'payload': 'Windows_Meterpreter_Reverse_Shell', 'extrawork': reversePayloadGeneration, 'availablemodules': METASPLOIT_Functions['reverse'], 'params': None}),
     ('3', {'payloadchoice': SHELLCODE.windows_met_bind_shell, 'payload': 'Windows_Meterpreter_Bind_Shell', 'extrawork': bindPayloadGeneration, 'availablemodules': METASPLOIT_Functions['bind'], 'params': None}),
@@ -70,15 +77,14 @@ mainMenuOptions = OrderedDict([
     ('stager', {'payloadchoice': None, 'payload': 'Powershell Stager', 'extrawork': printListener, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Stager Connected Clients', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
     ('cleanup', {'payloadchoice': None, 'payload': 'Clean Up Payload Directory', 'extrawork': cleanUpPayloads, 'params': None, 'availablemodules': {len(glob.glob(payloaddir() + "/*.exe")): ''}}),
-    ('interface', {'payloadchoice': None, 'payload': 'Set Default Network Interface', 'extrawork': GetIP.ChooseInterface, 'params': {'set': True}, 'availablemodules': {returnINTER(): ''}}),
+    ('interface', {'payloadchoice': None, 'payload': 'Set Default Network Interface', 'extrawork': doInterfaceSelect, 'params': None, 'availablemodules': {returnINTER(): ''}}),
     ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help, 'params': None}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
     ('exit', {'payloadchoice': None, 'payload': 'Exit', 'extrawork': menuRaise, 'params': None}),
-    ('test', {'payloadchoice': None, 'payload': 'interface test 1', 'extrawork': GetIP.ChooseInterface, 'params': None}),
-    ('test2', {'payloadchoice': None, 'payload': 'interface test 2', 'extrawork': GetIP.ChooseInterface, 'params': {'set': True}}),
 ])
 
-psMenuOptions = OrderedDict([
+def psMenuOptions():
+    return OrderedDict([
     ('1', {'payloadchoice': None, 'payload': 'Screen_Watch', 'extrawork': returnText , 'params': (t.bold_red, 'Module is borked...')}),
     ('2', {'payloadchoice': SHELLCODE.windows_ps_ask_creds_tcp, 'payload': 'Asks_Creds', 'extrawork': reversePowerShellAskCredsGeneration, 'params': None}),
     ('3', {'payloadchoice': SHELLCODE.windows_invoke_mimikatz, 'payload': 'Invoke_Mimikatz', 'extrawork': reversePowerShellInvokeMimikatzGeneration, 'params': None}),
@@ -135,7 +141,12 @@ class MenuOptions(object):
                 if result == "noclear":
                     self.printMenues(False)
                 if result == "clear":
-                    self.printMenues(True)
+                    if self.menuName == 'Main Menu':
+                        getAndRunMainMenu()
+                    elif self.menuName == 'PowerShell Menu':
+                        getAndRunPSMenu()
+                    elif self.menuName == 'Stager Connected Clients':
+                        self.printMenues(True)
                 if result == "pass":
                     pass
 
@@ -145,7 +156,7 @@ class MenuOptions(object):
             adjust = 0
         else:
             adjust = -1
-        print t.bold_black + '=' * (t.width / 2 - (len(self.menuName) / 2)) + t.yellow + self.menuName + t.bold_black + '=' * (t.width / 2 - ((len(self.menuName) / 2)- adjust))
+        print t.bold_black + '=' * (t.width / 2 - (len(self.menuName) / 2)) + t.yellow + self.menuName + t.bold_black + '=' * (t.width / 2 - ((len(self.menuName) / 2)- adjust)) + t.normal
         maxlen = 0
         arr = []
         for i in self.choices.iterkeys():
