@@ -11,11 +11,17 @@ def killAllClients():
     numberofclientskilled = 0
     from menu import clientMenuOptions
     if len(clientMenuOptions) > 2:
-        for server in serverlist:
-            for clientnumber in server.handlers.keys():
-                numberofclientskilled += 1
-                server.handlers[clientnumber].handle_close()
-    return numberofclientskilled
+        suretoquit = raw_input('You have clients connected. Are you sure you want to exit? [y]/n: ')
+        if suretoquit.lower() == 'y' or suretoquit.lower() == '':
+            for server in serverlist:
+                for clientnumber in server.handlers.keys():
+                    numberofclientskilled += 1
+                    server.handlers[clientnumber].handle_close()
+            return True
+        else:
+            return False
+    else:
+        return True
 
 def printListener(printit=True):
     from listener import Server

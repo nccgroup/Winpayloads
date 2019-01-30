@@ -22,8 +22,8 @@ def doInterfaceSelect():
     return "clear"
 
 def menuRaise():
-    killAllClients()
-    raise KeyboardInterrupt
+    if killAllClients():
+        raise KeyboardInterrupt
 
 def noColourLen(colourString):
     return len(re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]').sub('', colourString))
