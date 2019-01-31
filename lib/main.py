@@ -48,6 +48,10 @@ def msfvenomGeneration(payload, ip, port):
     payload = p.stdout.read()
     compPayload = re.findall(r'"(.*?)"', payload)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
     return ''.join(map(str, compPayload))
 
 class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
@@ -74,7 +78,11 @@ class InterfaceSelecta():
 
         for i in interfaces:
             isdefault = ''
+<<<<<<< HEAD
             if self.defaultInterface == i['interface']:
+=======
+            if self.defaultInterface and self.defaultInterface == i['interface']:
+>>>>>>> dev
                 isdefault = t.bold_green + ' [Default]' + t.normal
                 defaultsetinterface = i
             if set:
@@ -88,7 +96,10 @@ class InterfaceSelecta():
                         self.defaultInterface = i['interface']
                         return i
         else:
+<<<<<<< HEAD
             print defaultsetinterface
+=======
+>>>>>>> dev
             return defaultsetinterface
 
 
@@ -194,6 +205,7 @@ class FUNCTIONS(object):
             pass
         except:
             print t.bold_red + '\n[*] Port in use' + t.normal
+<<<<<<< HEAD
 
 
     def ChooseInterface(self):
@@ -214,6 +226,8 @@ class FUNCTIONS(object):
 
         #interfaceSelection = prompt_toolkit.prompt("Interface >", completer=WordCompleter(['back', 'exit']), style=prompt_toolkit.styles.style_from_dict({prompt_toolkit.token.Token: '#FFCC66'})
 
+=======
+>>>>>>> dev
 
     def DoServe(self, IP, payloadname, payloaddir, port, printIt):
         if printIt:
