@@ -60,7 +60,6 @@ def askAndReturnModules(shellcode, metasploit_type):
 
 def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
     randoFileName = ''.join(random.sample(string.ascii_lowercase, 8))
-    randomenckey = ''.join(random.sample(string.ascii_lowercase, 16))
     with open('%s/%s.py' % (payloaddir(), randoFileName), 'w+') as Filesave:
         Filesave.write(do_Encryption(SHELLCODE.injectwindows % (ez2read_shellcode)))
         Filesave.close()
