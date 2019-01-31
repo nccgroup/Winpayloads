@@ -131,9 +131,7 @@ if ($Client.Connected) {
 		}
 
 		if ($multiple -eq 'exec') {
-			echo "starting multi exec"
 			Start-Process -NoNewWindow -FilePath powershell.exe -ArgumentList ('-c ' + $multiplescript) 2>&1 | Out-String
-			echo "done"
 			$multiplescript = ""
 		}
 
