@@ -76,7 +76,7 @@ class InterfaceSelecta():
             isdefault = ''
             if self.defaultInterface and self.defaultInterface == i['interface']:
                 isdefault = t.bold_green + ' [Default]' + t.normal
-                defaultsetinterface = i
+                self.defaultsetinterface = i
             if set:
                 print t.bold_yellow + str(i['num']) +  ': ' + t.normal + i['addr'] + ' (' + i['interface'] + ')' + isdefault
 
@@ -88,7 +88,7 @@ class InterfaceSelecta():
                         self.defaultInterface = i['interface']
                         return i
         else:
-            return defaultsetinterface
+            return self.defaultsetinterface
 
 
 
