@@ -3,6 +3,8 @@ MAINTAINER Charlie Dean
 LABEL version="1.0"
 LABEL description="Winpayloads Docker"
 
+ENV PYTHONIOENCODING UTF-8
+
 RUN apt-get update && \
     apt-get install gnupg git ruby curl -y && \
     rm -rf /var/lib/apt/lists/*
