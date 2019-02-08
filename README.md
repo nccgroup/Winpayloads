@@ -10,7 +10,7 @@ https://www.virustotal.com/#/file/93662e60e4874d88fdf3824b71d1c264bda7fa18d6822e
 ## Docker!  
 Normal installation is deprecated, Please use docker now.  
 
-`docker run --net=host -it charliedean07/winpayloads`  
+`docker run -e LANG=C.UTF-8 --net=host -it charliedean07/winpayloads`  
 
   
 ## Features
