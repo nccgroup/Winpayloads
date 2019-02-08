@@ -91,11 +91,11 @@ class InterfaceSelecta():
     def ChooseInterface(self, set=False):
         if set:
             for i in self.interfaces:
-                if i['default']:
-                    defaultstring =  t.bold_green + ' *Default*'
+                if self.interface == i:
+                    currentinterface = t.bold_green + ' *'
                 else:
-                    defaultstring = ''
-                print t.bold_yellow + str(i['num']) +  ': ' + t.normal + i['addr'] + ' (' + i['interface'] + ')' + defaultstring
+                    currentinterface = ''
+                print t.bold_yellow + str(i['num']) +  ': ' + t.normal + i['addr'] + ' (' + i['interface'] + ')' + currentinterface
 
             while True:
                 interinput = prompt_toolkit.prompt("Interface > ", completer=WordCompleter([str(x+1) for x in range(self.num-1)]), style=prompt_toolkit.styles.style_from_dict({prompt_toolkit.token.Token: '#FFCC66'}))
