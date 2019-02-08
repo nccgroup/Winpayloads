@@ -56,39 +56,55 @@ class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver t
 
 class InterfaceSelecta():
     def __init__(self):
+        self.num = 0
+        self.interfaces = []
+        self.interface = None
+        self.defaultInterfaceName = None
+
         try:
-            self.defaultInterface = netifaces.gateways()['default'][netifaces.AF_INET][1]
+            self.defaultInterfaceName = netifaces.gateways()['default'][netifaces.AF_INET][1]
         except KeyError:
             pass
 
-    def ChooseInterface(self, set=False, test=False):
-        num = 0
-        interfaces = []
-
         for interface in netifaces.interfaces():
-            num += 1
+            self.num += 1
+
+            if self.defaultInterfaceName == interface:
+                isdefault = True
+            else:
+                isdefault = False
             try:
-                interfaces += [{'num': num, 'interface': interface, 'addr': netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']}]
-            except Exception:
-                break
+                self.interfaces += [{'num': self.num, 'interface': interface, 'addr': netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr'], 'default': isdefault}]
+            except:
+                pass
 
-        for i in interfaces:
-            isdefault = ''
-            if self.defaultInterface and self.defaultInterface == i['interface']:
-                isdefault = t.bold_green + ' [Default]' + t.normal
-                self.defaultsetinterface = i
-            if set:
-                print t.bold_yellow + str(i['num']) +  ': ' + t.normal + i['addr'] + ' (' + i['interface'] + ')' + isdefault
+        for interface in self.interfaces:
+            if interface['default']:
+                self.interface = interface
+            if not self.interface:
+                if interface['interface'] == 'lo':
+                    self.interface = interface
+                else:
+                    self.interface = interface
 
+
+    def ChooseInterface(self, set=False):
         if set:
+            for i in self.interfaces:
+                if i['default']:
+                    defaultstring =  t.bold_green + ' *Default*'
+                else:
+                    defaultstring = ''
+                print t.bold_yellow + str(i['num']) +  ': ' + t.normal + i['addr'] + ' (' + i['interface'] + ')' + defaultstring
+
             while True:
-                interinput = prompt_toolkit.prompt("Interface > ", completer=WordCompleter([str(x+1) for x in range(num-1)]), style=prompt_toolkit.styles.style_from_dict({prompt_toolkit.token.Token: '#FFCC66'}))
-                for i in interfaces:
+                interinput = prompt_toolkit.prompt("Interface > ", completer=WordCompleter([str(x+1) for x in range(self.num-1)]), style=prompt_toolkit.styles.style_from_dict({prompt_toolkit.token.Token: '#FFCC66'}))
+                for i in self.interfaces:
                     if interinput == str(i['num']):
-                        self.defaultInterface = i['interface']
-                        return i
-        else:
-            return self.defaultsetinterface
+                        self.interface = i
+                        return self.interface
+
+        return self.interface
 
 
 
