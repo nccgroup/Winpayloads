@@ -24,9 +24,9 @@ def getSandboxScripts(sandboxLang):
     for i in sandboxMenuOptions:
         if sandboxMenuOptions[str(i)]['availablemodules']:
             if sandboxLang == 'python':
-                sandboxContent = open('externalmodules/sandbox/python/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.py', 'r').read()
+                sandboxContent = open('lib/sandbox/python/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.py', 'r').read()
             elif sandboxLang == 'powershell':
-                sandboxContent = open('externalmodules/sandbox/powershell/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.ps1', 'r').read()
+                sandboxContent = open('lib/sandbox/powershell/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.ps1', 'r').read()
             sandboxScripts += sandboxContent
     print sandboxScripts
     return sandboxScripts
