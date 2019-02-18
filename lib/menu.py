@@ -106,10 +106,12 @@ clientMenuOptions = OrderedDict([
 ])
 
 sandboxMenuOptions = OrderedDict([
-    ('1', {'payloadchoice': 'https://raw.githubusercontent.com/Arvanaghi/CheckPlease/master/Python/click_tracker.py', 'payload': 'Click Tracker', 'extrawork': sandboxChoose, 'params': '1', 'availablemodules': None}),
-    ('2', {'payloadchoice': 'https://raw.githubusercontent.com/Arvanaghi/CheckPlease/master/Python/user_prompt.py', 'payload': 'User Prompt', 'extrawork': sandboxChoose, 'params': '2', 'availablemodules': None}),
-    ('3', {'payloadchoice': 'https://raw.githubusercontent.com/Arvanaghi/CheckPlease/master/Python/check_all_process_names.py', 'payload': 'Check Known Virtual Machine Processes', 'extrawork': sandboxChoose, 'params': '3', 'availablemodules': None}),
-    ('4', {'payloadchoice': 'https://raw.githubusercontent.com/Arvanaghi/CheckPlease/master/Python/check_all_DLL_names.py', 'payload': 'Check Known Virtual Machine DLL\'s', 'extrawork': sandboxChoose, 'params': '4', 'availablemodules': None}),
+    ('1', {'payloadchoice': 'click_tracker', 'payload': 'Wait for 10 Mouse Clicks', 'extrawork': sandboxChoose, 'params': '1', 'availablemodules': None}),
+    ('2', {'payloadchoice': 'user_prompt', 'payload': 'Wait until User Accepts Prompt', 'extrawork': sandboxChoose, 'params': '2', 'availablemodules': None}),
+    ('3', {'payloadchoice': 'check_all_process_names', 'payload': 'Check Known Sandboxing Processes', 'extrawork': sandboxChoose, 'params': '3', 'availablemodules': None}),
+    ('4', {'payloadchoice': 'check_all_DLL_names', 'payload': 'Check Known Sandboxing DLL\'s', 'extrawork': sandboxChoose, 'params': '4', 'availablemodules': None}),
+    ('5', {'payloadchoice': 'disk_size', 'payload': 'Check Disk Size > 50gb', 'extrawork': sandboxChoose, 'params': '5', 'availablemodules': None}),
+    ('6', {'payloadchoice': 'registry_size', 'payload': 'Check Registry Size > 55mb', 'extrawork': sandboxChoose, 'params': '6', 'availablemodules': None}),
     ('print', {'payloadchoice': None, 'payload': 'Print Currently Selected Scripts', 'extrawork': getSandboxScripts, 'params': None, 'availablemodules': None}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None, 'availablemodules': None}),
 ])
