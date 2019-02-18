@@ -32,6 +32,14 @@ import netifaces
 
 t = blessed.Terminal()
 
+def sandboxChoose(choice):
+    from menu import sandboxMenuOptions, getAndRunSandboxMenu
+    if sandboxMenuOptions[choice]['availablemodules']:
+        sandboxMenuOptions[choice]['availablemodules'] = None
+    else:
+        sandboxMenuOptions[choice]['availablemodules'] = {str('ON'): ''}
+    return "clear"
+
 
 def payloaddir():
     return os.path.expanduser('~') + '/winpayloads'
@@ -140,6 +148,7 @@ class SHELLCODE(object):
             else:
                 customshell += buildstr
         return customshell
+
 
 
     windows_ps_rev_watch_screen = (

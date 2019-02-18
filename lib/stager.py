@@ -23,7 +23,7 @@ def killAllClients():
     else:
         return True
 
-def printListener(printit=True):
+def printListener(printit=True, returnit=False):
     from listener import Server
     from menu import returnIP
     powershellFileName = 'p.ps1'
@@ -61,8 +61,10 @@ def printListener(printit=True):
         if not '5555' in str(serverlist):
             listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
             serverlist.append(listenerserver)
-
-    return stagerexec
+    if returnit:
+        return stagerexec
+    else:
+        return "pass"
 
 
 def interactShell(clientnumber):
