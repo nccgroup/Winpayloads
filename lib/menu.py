@@ -42,13 +42,18 @@ def cleanUpPayloads():
     print t.bold_green + "[*] %s Payloads removed...."% payloadsRemoved + t.normal
     return "clear"
 
+def getAndRunSandboxMenu():
+    sandboxMenu = MenuOptions(sandboxMenuOptions, menuName="Sandbox Menu")
+    sandboxMenu.runmenu()
+    return "pass"
+
 def getAndRunPSMenu():
     if len(clientMenuOptions) > 2:
         psMenu = MenuOptions(psMenuOptions(), menuName="PS Menu")
         psMenu.runmenu()
     else:
         print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
-    return False
+    return "pass"
 
 def getAndRunClientMenu():
     if len(clientMenuOptions) > 2:
@@ -56,12 +61,12 @@ def getAndRunClientMenu():
         clientMenu.runmenu()
     else:
         print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
-    return False
+    return "pass"
 
 def getAndRunMainMenu():
     mainMenu = MenuOptions(mainMenuOptions(), menuName="Main Menu")
     mainMenu.runmenu()
-    return False
+    return "pass"
 
 def returnText(colour, text):
     print colour + text + t.normal
@@ -73,9 +78,11 @@ def mainMenuOptions():
     ('3', {'payloadchoice': SHELLCODE.windows_met_bind_shell, 'payload': 'Windows_Meterpreter_Bind_Shell', 'extrawork': bindPayloadGeneration, 'availablemodules': METASPLOIT_Functions['bind'], 'params': None}),
     ('4', {'payloadchoice': SHELLCODE.windows_met_rev_https_shell, 'payload': 'Windows_Meterpreter_Reverse_HTTPS', 'extrawork': httpsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['https'], 'params': None}),
     ('5', {'payloadchoice': SHELLCODE.windows_met_rev_shell_dns, 'payload': 'Windows_Meterpreter_Reverse_Dns', 'extrawork': dnsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['dns'], 'params': None}),
+    ('6', {'payloadchoice': SHELLCODE.windows_custom_shellcode, 'payload': 'Windows_Custom_Shellcode', 'extrawork': customShellcodeGeneration, 'availablemodules': None, 'params': None, 'spacer': True}),
+    ('sandbox', {'payloadchoice': None, 'payload': 'Sandbox Evasion Menu', 'extrawork': getAndRunSandboxMenu, 'params': None}),
     ('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu, 'params': None}),
+    ('clients', {'payloadchoice': None, 'payload': 'Client Menu', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
     ('stager', {'payloadchoice': None, 'payload': 'Powershell Stager', 'extrawork': printListener, 'params': None}),
-    ('clients', {'payloadchoice': None, 'payload': 'Stager Connected Clients', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
     ('cleanup', {'payloadchoice': None, 'payload': 'Clean Up Payload Directory', 'extrawork': cleanUpPayloads, 'params': None, 'availablemodules': {len(glob.glob(payloaddir() + "/*.exe")): ''}}),
     ('interface', {'payloadchoice': None, 'payload': 'Set Default Network Interface', 'extrawork': doInterfaceSelect, 'params': None, 'availablemodules': {returnINTER(): ''}}),
     ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help, 'params': None}),
@@ -97,6 +104,18 @@ clientMenuOptions = OrderedDict([
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
     ('r', {'payloadchoice': None, 'payload': 'Refresh', 'extrawork': getAndRunClientMenu, 'params': None}),
 ])
+
+sandboxMenuOptions = OrderedDict([
+    ('1', {'payloadchoice': 'click_tracker', 'payload': 'Wait for 10 Mouse Clicks', 'extrawork': sandboxChoose, 'params': '1', 'availablemodules': None}),
+    ('2', {'payloadchoice': 'user_prompt', 'payload': 'Wait until User Accepts Prompt', 'extrawork': sandboxChoose, 'params': '2', 'availablemodules': None}),
+    ('3', {'payloadchoice': 'check_all_process_names', 'payload': 'Check Known Sandboxing Processes', 'extrawork': sandboxChoose, 'params': '3', 'availablemodules': None}),
+    ('4', {'payloadchoice': 'check_all_DLL_names', 'payload': 'Check Known Sandboxing DLL\'s', 'extrawork': sandboxChoose, 'params': '4', 'availablemodules': None}),
+    ('5', {'payloadchoice': 'disk_size', 'payload': 'Check Disk Size > 50gb', 'extrawork': sandboxChoose, 'params': '5', 'availablemodules': None}),
+    ('6', {'payloadchoice': 'registry_size', 'payload': 'Check Registry Size > 55mb', 'extrawork': sandboxChoose, 'params': '6', 'availablemodules': None}),
+    ('print', {'payloadchoice': None, 'payload': 'Print Currently Selected Scripts', 'extrawork': getSandboxScripts, 'params': None, 'availablemodules': None}),
+    ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None, 'availablemodules': None}),
+])
+
 
 class promptComplete(prompt_toolkit.completion.Completer):
     def __init__(self, choices):
@@ -132,7 +151,7 @@ class MenuOptions(object):
             if not success:
                 continue
             if extrawork:
-                if payloadchoice:
+                if payloadchoice and callable(payloadchoice):
                     result = extrawork(payloadchoice,payload)
                 elif params:
                     result = extrawork(*params)
@@ -147,8 +166,13 @@ class MenuOptions(object):
                         getAndRunPSMenu()
                     elif self.menuName == 'Stager Connected Clients':
                         self.printMenues(True)
-                if result == "pass":
+                    elif self.menuName == 'Sandbox Menu':
+                        getAndRunSandboxMenu()
+                elif result == "pass":
                     pass
+                else:
+                    if result:
+                        print result
 
     def printMenues(self,toClear):
         Splash(toClear)

