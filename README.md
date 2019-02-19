@@ -23,6 +23,8 @@ Normal installation is deprecated, Please use docker now.
 * Psexec Spray - Spray hashes until successful connection and psexec payload on target   
 * Upload to local webserver - Easy deployment
 * Powershell stager - allows invoking payloads in memory & more
+* Anti sandboxing techniques
+* Custom shellcode 
 
 ## Check out the Wiki for installation and more!
 https://github.com/nccgroup/Winpayloads/wiki  
