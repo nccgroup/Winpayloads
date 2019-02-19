@@ -11,8 +11,6 @@ import sys
 count = 0
 minClicks = 10
 
-if len(sys.argv) == 2:
-	minClicks = int(sys.argv[1])
 
 while count < minClicks:
 	new_state_left_click = win32api.GetAsyncKeyState(1)

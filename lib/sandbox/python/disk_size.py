@@ -10,8 +10,6 @@ import sys
 
 minDiskSizeGB = 50
 
-if len(sys.argv) > 1:
-    minDiskSizeGB = float(sys.argv[1])
 
 _, diskSizeBytes, _ = win32api.GetDiskFreeSpaceEx()
 

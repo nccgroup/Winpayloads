@@ -5,16 +5,12 @@
 #   Twitter: @arvanaghi
 #	  Edited for use in winpayloads
 
-if ($Args.count -eq 0) {
-  $minDiskSizeGB = 50
-} else {
-  $minDiskSizeGB = $($args[0])
-}
+$minDiskSizeGB = 50
 
 $diskSizeGB = (GWMI -Class Win32_LogicalDisk | Measure-Object -Sum Size | Select-Object -Expand Sum) / 1073741824
 
 if ($diskSizeGB -gt $minDiskSizeGB) {
-  continue
+  $a = 1
 } else {
   exit
 }

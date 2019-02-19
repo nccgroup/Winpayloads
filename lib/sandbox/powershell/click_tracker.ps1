@@ -7,9 +7,6 @@
 
 $minClicks = 10
 $count = 0
-if ($Args.count -eq 1) {
-    $minClicks = $($args[0])
-}
 
 $getAsyncKeyProto = @'
 [DllImport("user32.dll", CharSet=CharSet.Auto, ExactSpelling=true)]

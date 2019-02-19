@@ -11,9 +11,6 @@ from win32com.client import GetObject
 
 minRegistrySizeMB = 55
 
-if len(sys.argv) > 1:
-	minRegistrySizeMB	= int(sys.argv[1])
-
 regObjects = GetObject("winmgmts:").ExecQuery("SELECT CurrentSize FROM Win32_Registry")
 
 for regObject in regObjects:

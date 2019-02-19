@@ -28,7 +28,6 @@ def getSandboxScripts(sandboxLang):
             elif sandboxLang == 'powershell':
                 sandboxContent = open('lib/sandbox/powershell/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.ps1', 'r').read()
             sandboxScripts += sandboxContent
-    print sandboxScripts
     return sandboxScripts
 
 
