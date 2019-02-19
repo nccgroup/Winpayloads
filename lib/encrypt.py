@@ -18,7 +18,7 @@ def randomJunk():
         newString += ''.join(random.sample(string.ascii_lowercase, random.randint(1, 26)))
     return newString
 
-def getSandboxScripts(sandboxLang):
+def getSandboxScripts(sandboxLang='python'):
     sandboxScripts = ''
     from menu import sandboxMenuOptions
     for i in sandboxMenuOptions:
