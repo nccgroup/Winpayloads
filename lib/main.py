@@ -58,6 +58,28 @@ def msfvenomGeneration(payload, ip, port):
 
     return ''.join(map(str, compPayload))
 
+
+def getHelp(*helpItem):
+    helpItem = ''.join(helpItem)
+    helpDict = {
+    '1' : '- Generates a metasploit reverse tcp shell.',
+    '2' : '- Generates a metasploit reverse tcp meterpreter shell.',
+    '3' : '- Generates a metasploit bind tcp meterpreter shell.',
+    '4' : '- Generates a metasploit reverse HTTPS meterpreter shell.',
+    '5' : '- Generates a metasploit reverse meterpreter shell with DNS.',
+    '6' : '- Generates a custom payload from user input (shellcode)',
+    'stager' : '- Produces a small base64 encoded powershell one liner that can be used for metasploit payloads and the powershell menu.'\
+               ' It is small enough to fit in a windows run prompt and can be used with a ducky for quick exploitation\n'\
+               '- After a connection has been made, you can select any metasploit payload and it will give you the option to execute the'\
+               ' payload over the powershell stager(without touching disk)',
+    'sandbox' : '- Select anti sandboxing techniques for use in metasploit payloads and stager payloads.'
+    }
+
+    if helpDict.has_key(helpItem):
+        return helpDict[helpItem]
+    else:
+        return t.bold_red + '[!] Enter a valid menu option to recieve help'
+
 class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
     def log_message(self, format, *args):
         return

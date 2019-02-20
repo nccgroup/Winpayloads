@@ -5,7 +5,6 @@ from startmetasploit import *
 from generatepayload import *
 from preparepayload import *
 from stager import *
-from help import *
 import glob
 
 GetIP = InterfaceSelecta()
@@ -84,9 +83,8 @@ def mainMenuOptions():
     ('clients', {'payloadchoice': None, 'payload': 'Client Menu', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
     ('stager', {'payloadchoice': None, 'payload': 'Powershell Stager', 'extrawork': printListener, 'params': None}),
     ('cleanup', {'payloadchoice': None, 'payload': 'Clean Up Payload Directory', 'extrawork': cleanUpPayloads, 'params': None, 'availablemodules': {len(glob.glob(payloaddir() + "/*.exe")): ''}}),
-    ('interface', {'payloadchoice': None, 'payload': 'Set Default Network Interface', 'extrawork': doInterfaceSelect, 'params': None, 'availablemodules': {returnINTER(): ''}}),
-    ('?', {'payloadchoice': None, 'payload': 'Print Detailed Help', 'extrawork': winpayloads_help, 'params': None}),
-    ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
+    ('interface', {'payloadchoice': None, 'payload': 'Set Default Network Interface', 'extrawork': doInterfaceSelect, 'params': None, 'availablemodules': {returnINTER(): ''}, 'spacer': True}),
+    ('?', {'payloadchoice': None, 'payload': 'Help', 'extrawork': getHelp, 'params': None}),
     ('exit', {'payloadchoice': None, 'payload': 'Exit', 'extrawork': menuRaise, 'params': None}),
 ])
 
@@ -135,8 +133,14 @@ class MenuOptions(object):
         })
 
     def _choose(self, n):
+        option = None
+        if ' ' in n:
+            n, option = n.split()
         if self.choices.has_key(n):
-            return (True, self.choices[n]['payloadchoice'], self.choices[n]['payload'], self.choices[n]['extrawork'], self.choices[n]['params'])
+            if n == '?':
+                return (True, self.choices[n]['payloadchoice'], self.choices[n]['payload'], self.choices[n]['extrawork'], option)
+            else:
+                return (True, self.choices[n]['payloadchoice'], self.choices[n]['payload'], self.choices[n]['extrawork'], self.choices[n]['params'])
         else:
             if not n == "":
                 print t.bold_red + '[*] Wrong Selection' + t.normal
@@ -151,7 +155,7 @@ class MenuOptions(object):
             if not success:
                 continue
             if extrawork:
-                if payloadchoice and callable(payloadchoice):
+                if payloadchoice and callable(payloadchoice) and payloadchoice != 'help':
                     result = extrawork(payloadchoice,payload)
                 elif params:
                     result = extrawork(*params)
