@@ -32,6 +32,22 @@ import netifaces
 
 t = blessed.Terminal()
 
+helpDict = {
+'1' : '- Generates a metasploit reverse tcp shell.',
+'2' : '- Generates a metasploit reverse tcp meterpreter shell.',
+'3' : '- Generates a metasploit bind tcp meterpreter shell.',
+'4' : '- Generates a metasploit reverse HTTPS meterpreter shell.',
+'5' : '- Generates a metasploit reverse meterpreter shell with DNS.',
+'6' : '- Generates a custom payload from user input (shellcode)',
+'stager' : '- Produces a small base64 encoded powershell one liner that can be used for metasploit payloads and the powershell menu.'\
+           ' It is small enough to fit in a windows run prompt and can be used with a ducky for quick exploitation\n'\
+           '- After a connection has been made, you can select any metasploit payload and it will give you the option to execute the'\
+           ' payload over the powershell stager(without touching disk)',
+'sandbox' : '- Select anti sandboxing techniques for use in metasploit payloads and stager payloads.',
+'persistence' : '- Adds a registry thingy'
+}
+
+
 def sandboxChoose(choice):
     from menu import sandboxMenuOptions, getAndRunSandboxMenu
     if sandboxMenuOptions[choice]['availablemodules']:
@@ -61,19 +77,7 @@ def msfvenomGeneration(payload, ip, port):
 
 def getHelp(*helpItem):
     helpItem = ''.join(helpItem)
-    helpDict = {
-    '1' : '- Generates a metasploit reverse tcp shell.',
-    '2' : '- Generates a metasploit reverse tcp meterpreter shell.',
-    '3' : '- Generates a metasploit bind tcp meterpreter shell.',
-    '4' : '- Generates a metasploit reverse HTTPS meterpreter shell.',
-    '5' : '- Generates a metasploit reverse meterpreter shell with DNS.',
-    '6' : '- Generates a custom payload from user input (shellcode)',
-    'stager' : '- Produces a small base64 encoded powershell one liner that can be used for metasploit payloads and the powershell menu.'\
-               ' It is small enough to fit in a windows run prompt and can be used with a ducky for quick exploitation\n'\
-               '- After a connection has been made, you can select any metasploit payload and it will give you the option to execute the'\
-               ' payload over the powershell stager(without touching disk)',
-    'sandbox' : '- Select anti sandboxing techniques for use in metasploit payloads and stager payloads.'
-    }
+
 
     if helpDict.has_key(helpItem):
         return helpDict[helpItem]
