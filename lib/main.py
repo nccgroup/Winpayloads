@@ -28,23 +28,33 @@ import prompt_toolkit
 from prompt_toolkit.contrib.completers import WordCompleter
 import netifaces
 
-
-
 t = blessed.Terminal()
 
 helpDict = {
-'1' : '- Generates a metasploit reverse tcp shell.',
-'2' : '- Generates a metasploit reverse tcp meterpreter shell.',
-'3' : '- Generates a metasploit bind tcp meterpreter shell.',
-'4' : '- Generates a metasploit reverse HTTPS meterpreter shell.',
-'5' : '- Generates a metasploit reverse meterpreter shell with DNS.',
-'6' : '- Generates a custom payload from user input (shellcode)',
-'stager' : '- Produces a small base64 encoded powershell one liner that can be used for metasploit payloads and the powershell menu.'\
-           ' It is small enough to fit in a windows run prompt and can be used with a ducky for quick exploitation\n'\
-           '- After a connection has been made, you can select any metasploit payload and it will give you the option to execute the'\
-           ' payload over the powershell stager(without touching disk)',
-'sandbox' : '- Select anti sandboxing techniques for use in metasploit payloads and stager payloads.',
-'persistence' : '- Adds a registry thingy'
+    '1' : '- Generates a metasploit reverse tcp shell.',
+    '2' : '- Generates a metasploit reverse tcp meterpreter shell.',
+    '3' : '- Generates a metasploit bind tcp meterpreter shell.',
+    '4' : '- Generates a metasploit reverse HTTPS meterpreter shell.',
+    '5' : '- Generates a metasploit reverse meterpreter shell with DNS.',
+    '6' : '- Generates a custom payload from user input (shellcode)',
+    'stager' : '- Produces a small base64 encoded powershell one liner that can be used for metasploit payloads and the powershell menu.'\
+               ' It is small enough to fit in a windows run prompt and can be used with a ducky for quick exploitation\n'\
+               '- After a connection has been made, you can select any metasploit payload and it will give you the option to execute the'\
+               ' payload over the powershell stager(without touching disk) and therefore has improved AV evasion.\n'\
+               '- Stagers can be used in reverse (prefered) or bind TCP and traffic is encrypted.',
+    'sandbox' : '- Select anti sandboxing techniques for use in metasploit payloads and stager payloads.',
+    'persistence' : '- After payload executes, a registry key will be added and the powershell payload will'\
+                    'be saved on the file system as $env:USERPROFILE/update.txt. Upon boot, the payload will execute.',
+    'uacbypass' : '- Will try to bypass UAC on users that run as local admin. If bypass successfull, two shells should return'\
+                  ' and one of them will be running as local administrator.',
+    'allchecks' : '- After meterpreter connection, AllChecks.ps1 will execute, giving the user posible ways to privilige escalate.',
+    'interface' : '- This menu allows you to select the default interface for WinPayloads to use for all network tasks',
+    'cleanup' : '- Will remove all .exe in the default payload directory',
+    'clients' : '- This is the client menu. You will only be able to access this after recieving a stager connection. '\
+                '- A client connection can be made from using the stager menu option',
+    'ps' : '- This is the powershell scripts menu, it can only be accessed after recieveing a stager connection.\n'\
+           '- Payloads in this menu will be directly executed over the stager connection.'
+
 }
 
 
@@ -77,8 +87,6 @@ def msfvenomGeneration(payload, ip, port):
 
 def getHelp(*helpItem):
     helpItem = ''.join(helpItem)
-
-
     if helpDict.has_key(helpItem):
         return helpDict[helpItem]
     else:

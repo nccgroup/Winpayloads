@@ -143,8 +143,10 @@ class MenuOptions(object):
 
     def _choose(self, n):
         option = None
-        if ' ' in n:
+        try:
             n, option = n.split()
+        except:
+            pass
         if self.choices.has_key(n):
             if n == '?':
                 return (True, self.choices[n]['payloadchoice'], self.choices[n]['payload'], self.choices[n]['extrawork'], option)
