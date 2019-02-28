@@ -5,7 +5,7 @@
 #   Twitter: @arvanaghi
 #	  Edited for use in winpayloads
 
-$minClicks = 10
+*$minClicks* = $10$
 $count = 0
 
 $getAsyncKeyProto = @'

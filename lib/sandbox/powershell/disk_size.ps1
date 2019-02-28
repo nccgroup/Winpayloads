@@ -5,7 +5,7 @@
 #   Twitter: @arvanaghi
 #	  Edited for use in winpayloads
 
-$minDiskSizeGB = 50
+*$minDiskSizeGB* = $50$
 
 $diskSizeGB = (GWMI -Class Win32_LogicalDisk | Measure-Object -Sum Size | Select-Object -Expand Sum) / 1073741824
 

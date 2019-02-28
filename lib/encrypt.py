@@ -23,11 +23,26 @@ def getSandboxScripts(sandboxLang='python'):
     from menu import sandboxMenuOptions
     for i in sandboxMenuOptions:
         if sandboxMenuOptions[str(i)]['availablemodules']:
+            payloadChoice = sandboxMenuOptions[str(i)]['payloadchoice']
             if sandboxLang == 'python':
-                sandboxContent = open('lib/sandbox/python/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.py', 'r').read()
+                sandboxContent = open('lib/sandbox/python/' + payloadChoice + '.py', 'r').read()
             elif sandboxLang == 'powershell':
-                sandboxContent = open('lib/sandbox/powershell/' + sandboxMenuOptions[str(i)]['payloadchoice'] + '.ps1', 'r').read()
+                sandboxContent = open('lib/sandbox/powershell/' + payloadChoice + '.ps1', 'r').read()
+
+            rex = re.search('\*([^\*]*)\*.*\$([^\*]..*)\$', sandboxContent) # Regex is ugly pls help
+            if rex:
+                originalString, scriptVariable, variableValue = rex.group(), rex.group(1), rex.group(2)
+                setVariable = raw_input(t.bold_green + '\n[!] {} Sandbox Script Configuration:\n'.format(payloadChoice) + t.bold_red + '[*] {}? [{}]:'.format(scriptVariable, variableValue)  + t.normal)
+                if setVariable:
+                    try:
+                        int(setVariable)
+                    except:
+                        setVariable = "'{}'".format(setVariable)
+                    variableValue = setVariable
+                newString = scriptVariable + ' = ' + variableValue
+                sandboxContent = sandboxContent.replace(originalString, newString)
             sandboxScripts += sandboxContent
+    print sandboxScripts
     return sandboxScripts
 
 

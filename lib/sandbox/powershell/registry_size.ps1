@@ -5,7 +5,7 @@
 #   Twitter: @arvanaghi
 #	  Edited for use in winpayloads
 
-$minRegSizeMB = 55
+*$minRegSizeMB* = $55$
 
 $regSize = GWMI -Class Win32_Registry | Select-Object -Expand CurrentSize
 

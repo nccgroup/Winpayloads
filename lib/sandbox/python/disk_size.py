@@ -8,7 +8,7 @@
 import win32api
 import sys
 
-minDiskSizeGB = 50
+*minDiskSizeGB* = $50$
 
 
 _, diskSizeBytes, _ = win32api.GetDiskFreeSpaceEx()

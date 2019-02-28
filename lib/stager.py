@@ -128,7 +128,7 @@ def checkPayloadLength(payload):
 
 def checkUpload():
     from menu import clientMenuOptions
-    use_client_upload = prompt_toolkit.prompt('[?] Upload Using Client Connection? [y]/n: ', patch_stdout=True, completer=WordCompleter(['y', 'n']))
+    use_client_upload = prompt_toolkit.prompt('\n[?] Upload Using Client Connection? [y]/n: ', patch_stdout=True, completer=WordCompleter(['y', 'n']))
     print
     if use_client_upload.lower() == 'y' or use_client_upload == '':
         clientList = []
@@ -147,7 +147,7 @@ def checkUpload():
                 continue
     return False
 
-def clientUpload(fileToUpload, powershellExec, isExe, json):
+def clientUpload(powershellExec, isExe, json):
     from menu import returnIP
     from encrypt import getSandboxScripts
     clientnumber = checkUpload()
