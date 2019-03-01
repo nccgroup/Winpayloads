@@ -136,7 +136,7 @@ if ($Client.Connected) {
 		}
 
 		if ($sendoutput -eq 'true') {
-			$asciiBytes = ([text.encoding]::ASCII).GetBytes($sendtoServer, 0, $sendtoServer.Length)
+			$asciiBytes = ([text.encoding]::ASCII).GetBytes(' ' + $sendtoServer, 0, $sendtoServer.Length)
 			$Client.Client.Write($asciiBytes)
 			$Client.Client.Flush()
 		}
