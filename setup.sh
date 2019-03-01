@@ -100,7 +100,7 @@ echo -e '\033[1;32m[*] Done \033[0m'
 echo -e '\033[1;32m[*] Grabbing External Modules \033[0m'
 mkdir externalmodules
 cd externalmodules
-curl -O https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/CodeExecution/Invoke-Shellcode.ps1
+curl -O https://raw.githubusercontent.com/Charliedean/InvokeShellcode1803/master/Invoke-Shellcode.ps1
 sed -i -e 's/Invoke-Shellcode/Invoke-Code/g' Invoke-Shellcode.ps1
 sed -i -e '/<#/,/#>/c\\' Invoke-Shellcode.ps1
 sed -i -e 's/^[[:space:]]*#.*$//g' Invoke-Shellcode.ps1
