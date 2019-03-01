@@ -121,6 +121,7 @@ class promptComplete(prompt_toolkit.completion.Completer):
         self.choices = choices
 
     def get_completions(self, document, complete_event):
+        lastWord, firstWord = None, None
         word_before_cursor = document.get_word_before_cursor(WORD=True).lower()
         all_text = document.text_before_cursor
         try:
@@ -128,7 +129,7 @@ class promptComplete(prompt_toolkit.completion.Completer):
             firstWord = all_text.split()[0]
         except:
             pass
-        if all_text == '? ':
+        if firstWord == '?':
             return [prompt_toolkit.completion.Completion(x, start_position=-len(word_before_cursor)) for x in helpDict if x.startswith(word_before_cursor)]
         return [prompt_toolkit.completion.Completion(x, start_position=-len(word_before_cursor)) for x in self.choices if x.startswith(document.text)]
 

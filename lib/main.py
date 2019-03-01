@@ -42,7 +42,8 @@ helpDict = {
                '- After a connection has been made, you can select any metasploit payload and it will give you the option to execute the'\
                ' payload over the powershell stager(without touching disk) and therefore has improved AV evasion.\n'\
                '- Stagers can be used in reverse (prefered) or bind TCP and traffic is encrypted.',
-    'sandbox' : '- Select anti sandboxing techniques for use in metasploit payloads and stager payloads.',
+    'sandbox' : '- Select anti sandboxing techniques for use in metasploit payloads and stager payloads.\n'\
+                '- Values in [] are default values and when generating a payload user input will be taken',
     'persistence' : '- After payload executes, a registry key will be added and the powershell payload will'\
                     'be saved on the file system as $env:USERPROFILE/update.txt. Upon boot, the payload will execute.',
     'uacbypass' : '- Will try to bypass UAC on users that run as local admin. If bypass successfull, two shells should return'\
