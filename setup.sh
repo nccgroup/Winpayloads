@@ -32,6 +32,7 @@ wine cmd.exe /c 'wmic os get osarchitecture'
 echo -e '\033[0m'
 
 echo -e '\033[1;32m[*] Installing Python Requirements \033[0m'
+sudo pip install pywintypes
 sudo pip install blessed
 sudo pip install pyasn1
 sudo pip install --force-reinstall prompt-toolkit==1.0.15
