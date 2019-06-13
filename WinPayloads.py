@@ -1,14 +1,14 @@
 #!/usr/bin/python
-from lib.main import *
-from lib.payloadextras import *
-from lib.startmetasploit import *
-from lib.menu import *
+from menu import getAndRunMainMenu
+from lib.listener import StartAsync
+import blessed
+import sys
+import subprocess
+import os
+import re
 
 
-try:
-    from lib.psexecspray import *
-except:
-    print t.bold_red + "[!] Rerun the setup.sh" + t.normal
+t = blessed.Terminal()
 
 if not re.search('winpayloads', os.getcwd().lower()):
     print t.bold_red + "[!!] Please Run From Winpayloads Dir" + t.normal
@@ -26,19 +26,18 @@ try:
     if gitrev != gitlsremote:
         updateornah = raw_input(t.bold_red + "Do you want to update WinPayloads? y/[n]: " + t.normal)
         if updateornah.lower() == "y":
-            p = subprocess.Popen(['git','pull'])
+            p = subprocess.Popen(['git', 'pull'])
             p.wait()
             print t.bold_yellow + "Reload Winpayloads..." + t.normal
             sys.exit()
 except subprocess.CalledProcessError:
-    print  t.bold_red + "[!] No Connection to Github" + t.normal
+    print t.bold_red + "[!] No Connection to Github" + t.normal
 except KeyboardInterrupt:
     pass
 
 
-from lib.listener import StartAsync
-async = StartAsync()
-async.start()
+winasync = StartAsync()
+winasync.start()
 
 try:
     getAndRunMainMenu()
