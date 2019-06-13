@@ -4,7 +4,6 @@ import blessed
 import socket
 import asyncore
 import time
-from stager import interactShell
 
 t = blessed.Terminal()
 
@@ -54,6 +53,7 @@ class Handler(asyncore.dispatcher):
                 self.user_name = "User:" + data.split(':')[0].replace('\x00', '').replace('[#check#]', '')
                 self.is_admin = "Admin:" + data.split(':')[1].replace('\x00', '').replace('[#check#]', '')
                 from menu import clientMenuOptions
+                from stager import interactShell
                 clientMenuOptions[self.server.get_clientnumber()] =  {'payloadchoice': None, 'payload': str(self.getpeername()[0]) + ":" + str(self.getpeername()[1]), 'extrawork': interactShell, 'params': (self.server.get_clientnumber()), 'availablemodules': {self.user_name: '', self.is_admin: ''}}
                 self.in_buffer = []
 

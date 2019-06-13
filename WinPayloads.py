@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from menu import getAndRunMainMenu
+from lib.menu import getAndRunMainMenu
 from lib.listener import StartAsync
 import blessed
 import sys

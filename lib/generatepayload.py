@@ -1,5 +1,6 @@
 from startmetasploit import METASPLOIT
-from main import Spinner, payloaddir, injectwindows, DoServe, DoPsexecSpray
+from main import Spinner, payloaddir, injectwindows, DoServe
+from psexecspray import DoPsexecSpray
 from payloadextras import EXTRAS
 from encrypt import do_Encryption
 import os

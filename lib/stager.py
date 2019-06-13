@@ -6,7 +6,6 @@ import time
 from prompt_toolkit.contrib.completers import WordCompleter
 from base64 import b64encode
 from listener import Server
-from menu import clientMenuOptions, returnIP
 from main import amsiPatch, payloaddir, randomUnusedPort, DoServe, \
                  powershellShellcodeLayout, randomisePS1
 
@@ -19,6 +18,7 @@ serverlist = []
 
 
 def killAllClients():
+    from menu import clientMenuOptions
     numberofclientskilled = 0
     if len(clientMenuOptions) > 2:
         suretoquit = raw_input('You have clients connected. Are you sure you want to exit? [y]/n: ')
@@ -35,6 +35,7 @@ def killAllClients():
 
 
 def printListener(printit=True, returnit=False):
+    from menu import returnIP
     powershellFileName = 'p.ps1'
 
     while True:

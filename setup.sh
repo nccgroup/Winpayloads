@@ -107,8 +107,7 @@ curl -O https://raw.githubusercontent.com/Charliedean/InvokeShellcode1803/master
 curl -O https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/privesc/Invoke-BypassUAC.ps1
 curl -O https://raw.githubusercontent.com/Charliedean/Invoke-SilentCleanUpBypass/master/Invoke-SilentCleanUpBypass.ps1
 curl -O https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1
-curl -O https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1
-sed -i -e '/<#/,/#>/c\\' Invoke-Shellcode.ps1 Invoke-Mimikatz.ps1 Invoke-BypassUAC.ps1 PowerUp.ps1
+curl -O https://raw.githubusercontent.com/EmpireProject/Empire/dev/data/module_source/credentials/Invoke-Mimikatz.ps1
 cd ..
 echo -e '\033[1;32m[*] Done \033[0m'
 
