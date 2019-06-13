@@ -37,6 +37,7 @@ sudo pip install pyasn1
 sudo pip install --force-reinstall prompt-toolkit==1.0.15
 sudo pip install netifaces
 sudo pip install requests
+sudo pip install lxml
 
 echo -e '\033[1;32m[*] Downloading Python27, Pywin32 and Pycrypto For Wine \033[0m'
 if [[ ! -d "~/.win32/drive_c/Python27/" || $reinstall -eq 1 ]]; then
@@ -98,21 +99,21 @@ cd ..
 echo -e '\033[1;32m[*] Done \033[0m'
 
 echo -e '\033[1;32m[*] Grabbing External Modules \033[0m'
+rm -rf externalmodules
 mkdir externalmodules
 cd externalmodules
+mkdir staged
 curl -O https://raw.githubusercontent.com/Charliedean/InvokeShellcode1803/master/Invoke-Shellcode.ps1
-sed -i -e 's/Invoke-Shellcode/Invoke-Code/g' Invoke-Shellcode.ps1
-sed -i -e '/<#/,/#>/c\\' Invoke-Shellcode.ps1
-sed -i -e 's/^[[:space:]]*#.*$//g' Invoke-Shellcode.ps1
 curl -O https://raw.githubusercontent.com/EmpireProject/Empire/master/data/module_source/privesc/Invoke-BypassUAC.ps1
 curl -O https://raw.githubusercontent.com/Charliedean/Invoke-SilentCleanUpBypass/master/Invoke-SilentCleanUpBypass.ps1
 curl -O https://raw.githubusercontent.com/PowerShellEmpire/PowerTools/master/PowerUp/PowerUp.ps1
 curl -O https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Exfiltration/Invoke-Mimikatz.ps1
+sed -i -e '/<#/,/#>/c\\' Invoke-Shellcode.ps1 Invoke-Mimikatz.ps1 Invoke-BypassUAC.ps1 PowerUp.ps1
 cd ..
 echo -e '\033[1;32m[*] Done \033[0m'
 
 
-echo -e '\033[1;32m[*] Grabbing Certs \033[0m'
+echo -e '\033[1;32m[*] Generating Certs \033[0m'
 openssl genrsa -out server.pass.key 2048
 openssl rsa -in server.pass.key -out server.key
 openssl req -new -key server.key -out server.csr -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com"

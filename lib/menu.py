@@ -72,12 +72,12 @@ def returnText(colour, text):
 
 def mainMenuOptions():
     return OrderedDict([
-    ('1', {'payloadchoice': SHELLCODE.windows_rev_shell, 'payload': 'Windows_Reverse_Shell', 'extrawork': reversePayloadGeneration, 'availablemodules': None, 'params': None}),
-    ('2', {'payloadchoice': SHELLCODE.windows_met_rev_shell, 'payload': 'Windows_Meterpreter_Reverse_Shell', 'extrawork': reversePayloadGeneration, 'availablemodules': METASPLOIT_Functions['reverse'], 'params': None}),
-    ('3', {'payloadchoice': SHELLCODE.windows_met_bind_shell, 'payload': 'Windows_Meterpreter_Bind_Shell', 'extrawork': bindPayloadGeneration, 'availablemodules': METASPLOIT_Functions['bind'], 'params': None}),
-    ('4', {'payloadchoice': SHELLCODE.windows_met_rev_https_shell, 'payload': 'Windows_Meterpreter_Reverse_HTTPS', 'extrawork': httpsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['https'], 'params': None}),
-    ('5', {'payloadchoice': SHELLCODE.windows_met_rev_shell_dns, 'payload': 'Windows_Meterpreter_Reverse_Dns', 'extrawork': dnsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['dns'], 'params': None}),
-    ('6', {'payloadchoice': SHELLCODE.windows_custom_shellcode, 'payload': 'Windows_Custom_Shellcode', 'extrawork': customShellcodeGeneration, 'availablemodules': None, 'params': None, 'spacer': True}),
+    ('1', {'payloadchoice': windows_rev_shell, 'payload': 'Windows_Reverse_Shell', 'extrawork': reversePayloadGeneration, 'availablemodules': None, 'params': None}),
+    ('2', {'payloadchoice': windows_met_rev_shell, 'payload': 'Windows_Meterpreter_Reverse_Shell', 'extrawork': reversePayloadGeneration, 'availablemodules': METASPLOIT_Functions['reverse'], 'params': None}),
+    ('3', {'payloadchoice': windows_met_bind_shell, 'payload': 'Windows_Meterpreter_Bind_Shell', 'extrawork': bindPayloadGeneration, 'availablemodules': METASPLOIT_Functions['bind'], 'params': None}),
+    ('4', {'payloadchoice': windows_met_rev_https_shell, 'payload': 'Windows_Meterpreter_Reverse_HTTPS', 'extrawork': httpsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['https'], 'params': None}),
+    ('5', {'payloadchoice': windows_met_rev_shell_dns, 'payload': 'Windows_Meterpreter_Reverse_Dns', 'extrawork': dnsPayloadGeneration, 'availablemodules': METASPLOIT_Functions['dns'], 'params': None}),
+    ('6', {'payloadchoice': windows_custom_shellcode, 'payload': 'Windows_Custom_Shellcode', 'extrawork': customShellcodeGeneration, 'availablemodules': None, 'params': None, 'spacer': True}),
     ('sandbox', {'payloadchoice': None, 'payload': 'Sandbox Evasion Menu', 'extrawork': getAndRunSandboxMenu, 'params': None}),
     ('ps', {'payloadchoice': None, 'payload': 'PowerShell Menu', 'extrawork': getAndRunPSMenu, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Client Menu', 'extrawork': getAndRunClientMenu, 'params': None, 'spacer': True}),
@@ -91,9 +91,9 @@ def mainMenuOptions():
 def psMenuOptions():
     return OrderedDict([
     ('1', {'payloadchoice': None, 'payload': 'Screen_Watch', 'extrawork': returnText , 'params': (t.bold_red, 'Module is borked...')}),
-    ('2', {'payloadchoice': SHELLCODE.windows_ps_ask_creds_tcp, 'payload': 'Asks_Creds', 'extrawork': reversePowerShellAskCredsGeneration, 'params': None}),
-    ('3', {'payloadchoice': SHELLCODE.windows_invoke_mimikatz, 'payload': 'Invoke_Mimikatz', 'extrawork': reversePowerShellInvokeMimikatzGeneration, 'params': None}),
-    ('4', {'payloadchoice': SHELLCODE.windows_uac_bypass, 'payload': 'UAC_Bypass', 'extrawork': UACBypassGeneration, 'params': None}),
+    ('2', {'payloadchoice': windows_ps_ask_creds_tcp, 'payload': 'Asks_Creds', 'extrawork': reversePowerShellAskCredsGeneration, 'params': None}),
+    ('3', {'payloadchoice': windows_invoke_mimikatz, 'payload': 'Invoke_Mimikatz', 'extrawork': reversePowerShellInvokeMimikatzGeneration, 'params': None}),
+    ('4', {'payloadchoice': windows_uac_bypass, 'payload': 'UAC_Bypass', 'extrawork': UACBypassGeneration, 'params': None}),
     ('clients', {'payloadchoice': None, 'payload': 'Connected Interpreter Clients', 'extrawork': getAndRunClientMenu, 'params': None}),
     ('back', {'payloadchoice': None, 'payload': 'Main Menu', 'extrawork': getAndRunMainMenu, 'params': None}),
 ])
