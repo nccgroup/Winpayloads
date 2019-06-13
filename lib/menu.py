@@ -1,11 +1,25 @@
 from __future__ import unicode_literals
-from main import *
-from payloadextras import *
-from startmetasploit import *
-from generatepayload import *
-from preparepayload import *
-from stager import *
+from main import InterfaceSelecta, payloaddir, windows_rev_shell, \
+                 windows_met_rev_shell, windows_met_rev_https_shell, \
+                 windows_met_rev_shell_dns, windows_custom_shellcode, \
+                 sandboxChoose, helpDict, windows_uac_bypass, getHelp, \
+                 windows_invoke_mimikatz, windows_ps_ask_creds_tcp, \
+                 windows_met_bind_shell
+from preparepayload import reversePayloadGeneration, bindPayloadGeneration, \
+                           UACBypassGeneration, httpsPayloadGeneration, \
+                           dnsPayloadGeneration, customShellcodeGeneration, \
+                           reversePowerShellAskCredsGeneration, \
+                           reversePowerShellInvokeMimikatzGeneration
+from generatepayload import METASPLOIT_Functions
+from stager import killAllClients, printListener
+from collections import OrderedDict
+import re
 import glob
+import blessed
+import os
+import prompt_toolkit
+
+t = blessed.Terminal()
 
 GetIP = InterfaceSelecta()
 
@@ -13,25 +27,31 @@ GetIP = InterfaceSelecta()
 def returnIP():
     return GetIP.ChooseInterface()['addr']
 
+
 def returnINTER():
     return str(GetIP.ChooseInterface()['interface'])
+
 
 def doInterfaceSelect():
     GetIP.ChooseInterface(set=True)
     return "clear"
 
+
 def menuRaise():
     if killAllClients():
         raise KeyboardInterrupt
 
+
 def noColourLen(colourString):
     return len(re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]').sub('', colourString))
+
 
 def noColourCenter(colourString):
     len = (t.width / 2) - (noColourLen(colourString) /2 )
     if len % 2 > 0:
         len -= 1
     return (' ' * len) + colourString
+
 
 def cleanUpPayloads():
     payloadsRemoved = 0
@@ -41,10 +61,12 @@ def cleanUpPayloads():
     print t.bold_green + "[*] %s Payloads removed...."% payloadsRemoved + t.normal
     return "clear"
 
+
 def getAndRunSandboxMenu():
     sandboxMenu = MenuOptions(sandboxMenuOptions, menuName="Sandbox Menu")
     sandboxMenu.runmenu()
     return "pass"
+
 
 def getAndRunPSMenu():
     if len(clientMenuOptions) > 2:
@@ -54,6 +76,7 @@ def getAndRunPSMenu():
         print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
     return "pass"
 
+
 def getAndRunClientMenu():
     if len(clientMenuOptions) > 2:
         clientMenu = MenuOptions(clientMenuOptions, menuName="Client Menu")
@@ -62,13 +85,16 @@ def getAndRunClientMenu():
         print t.bold_red + "[!] Clients are needed to access this menu" + t.normal
     return "pass"
 
+
 def getAndRunMainMenu():
     mainMenu = MenuOptions(mainMenuOptions(), menuName="Main Menu")
     mainMenu.runmenu()
     return "pass"
 
+
 def returnText(colour, text):
     print colour + text + t.normal
+
 
 def mainMenuOptions():
     return OrderedDict([
