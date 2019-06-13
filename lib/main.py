@@ -11,6 +11,7 @@ import SimpleHTTPServer
 import SocketServer
 import multiprocessing
 import time
+import string
 import prompt_toolkit
 from prompt_toolkit.contrib.completers import WordCompleter
 import netifaces
