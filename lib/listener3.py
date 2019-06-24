@@ -37,7 +37,6 @@ class Client():
     async def client_task(self):
         while True:
             data = await self.reader.read(8000)
-            senddata = yeild from out_buffer
             if data == b'':
                 print('Received EOF. Client disconnected.')
                 return
