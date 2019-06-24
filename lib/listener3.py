@@ -34,15 +34,34 @@ class Client():
         self.in_buffer = []
         self.out_buffer = []
 
-    async def client_task(self):
+    async def recieve(self):
+        print("started reading")
         while True:
             data = await self.reader.read(8000)
-            if data == b'':
-                print('Received EOF. Client disconnected.')
-                return
-            else:
-                self.in_buffer.append(data)
-                await self.writer.drain()
+            print("read data")
+            if data:
+                if data == b'':
+                    print('Received EOF. Client disconnected.')
+                    return
+                else:
+                    self.in_buffer.append(data.decode())
+
+    async def send(self):
+        print("started sending")
+        while True:
+            data = await self.writable()
+            print("sent data")
+            self.writer.write(data.encode())
+            await self.writer.drain()
+
+    async def writable(self):
+        while True:
+            if len(self.out_buffer) > 0:
+                return self.out_buffer.pop()
+
+    async def close_client(self):
+        self.writer.close()
+        self.reader.close()
 
 
 class Server():
@@ -50,14 +69,17 @@ class Server():
         self.clients = {}
         self.clientnumber = 0
 
-    def client_connect(self, client_reader, client_writer):
+    async def client_connect(self, client_reader, client_writer):
         addr = client_writer.get_extra_info('peername')
         print('Client connected: {}'.format(addr))
 
         client = Client(client_writer, client_reader)
-        task = asyncio.ensure_future(client.client_task())
         self.clientnumber += 1
         self.clients[self.clientnumber] = client
+        await asyncio.gather(
+            client.recieve(),
+            client.send()
+        )
 
 
 if __name__ == '__main__':
@@ -69,9 +91,9 @@ if __name__ == '__main__':
         while True:
             comm = input(': ')
             if comm == 'print':
-                if a.server.clients[1].in_buffer:
-                    print(a.server.clients[1].in_buffer.pop())
+                if listener.server.clients[1].in_buffer:
+                    print(listener.server.clients[1].in_buffer.pop())
             if 'send' in comm:
-                a.server.clients[1].out_buffer.append(comm.split(' ')[1])
+                listener.server.clients[1].out_buffer.append(comm.split()[1])
     except KeyboardInterrupt:
         listener.close()
