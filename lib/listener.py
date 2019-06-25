@@ -38,7 +38,6 @@ class Client():
         self.writer = writer
         self.reader = reader
         self.in_buffer = []
-        self.out_buffer = []
         self.username = ''
         self.is_admin = ''
 
@@ -59,17 +58,11 @@ class Client():
                 else:
                     self.in_buffer.append(data)
 
-    async def send(self):
-        while True:
-            if len(self.out_buffer) > 0:
-                data = self.out_buffer.pop()
-                self.writer.write(data.encode())
-                await self.writer.drain()
-            await asyncio.sleep(0.2)
-
     def close_client(self):
-        self.writer.close()
+        self.writer._transport.close()
+        self.reader._transport.close()
         print("Closing Client {}".format(self.addr))
+        return
 
 
 class Server():
@@ -78,16 +71,13 @@ class Server():
         self.clientnumber = 0
 
     async def client_connect(self, client_reader, client_writer):
-        addr = client_writer.get_extra_info('peername')
+        rawaddr = client_writer.get_extra_info('peername')
+
         print('Client connected: {}'.format(addr))
         self.clientnumber += 1
         client = Client(self.clientnumber, addr, client_writer, client_reader)
         self.clients[self.clientnumber] = client
-        await asyncio.gather(
-            client.send(),
-            client.receive()
-
-        )
+        await asyncio.gather(client.receive())
 
     def close(self):
         for clientnum, client in list(self.clients.items()):
@@ -104,6 +94,6 @@ if __name__ == '__main__':
                 if listener.server.clients[1].in_buffer:
                     print(listener.server.clients[1].in_buffer.pop())
             if 'send' in comm:
-                listener.server.clients[1].out_buffer.append(comm.split()[1])
+                listener.server.clients[1].writer.write(comm.split()[1])
     except KeyboardInterrupt:
         listener.stop()

@@ -83,15 +83,15 @@ def interactShell(clientnumber):
                     if command.lower() == "back":
                         break
                     if command.lower() == "exit":
-                        server.server.clients[clientnumber].close()
+                        server.server.clients[clientnumber].close_client()
                         del clientMenuOptions[str(clientnumber)]
                         time.sleep(2)
                         break
                     if command == "":
-                        server.server.clients[clientnumber].out_buffer.append('{"type":"", "data":"", "sendoutput":""}')
+                        server.server.clients[clientnumber].writer.write('{"type":"", "data":"", "sendoutput":""}'.encode())
                     else:
                         json = '{"type":"exec", "data":"%s", "sendoutput":"true"}' % (b64encode(command.encode('UTF_16_le'))).decode()
-                        server.server.clients[clientnumber].out_buffer.append(json)
+                        server.server.clients[clientnumber].writer.write(json.encode())
                         while not server.server.clients[clientnumber].in_buffer:
                             time.sleep(0.01)
                         print(server.server.clients[clientnumber].in_buffer.pop())
