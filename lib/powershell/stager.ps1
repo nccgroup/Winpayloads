@@ -86,6 +86,7 @@ if ($Client.Connected) {
 		$error.clear()
 		$serverData = $Client.Client.Read($byteAmount, 0, $byteAmount.Length)
 		$asciiData = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($byteAmount, 0, $serverData)
+		echo $asciiData
 		try {
       $type = ($asciiData | ConvertFrom-Json).type
       $b64Data = ($asciiData | ConvertFrom-Json).data

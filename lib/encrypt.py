@@ -13,13 +13,13 @@ def randomVar():
 
 def randomJunk():
     newString = ''
-    for i in xrange(random.randint(1, 10)):
+    for i in range(random.randint(1, 10)):
         newString += ''.join(random.sample(string.ascii_lowercase, random.randint(1, 26)))
     return newString
 
 def getSandboxScripts(sandboxLang='python'):
     sandboxScripts = ''
-    from menu import sandboxMenuOptions
+    from .menu import sandboxMenuOptions
     for i in sandboxMenuOptions:
         if sandboxMenuOptions[str(i)]['availablemodules']:
             payloadChoice = sandboxMenuOptions[str(i)]['payloadchoice']
@@ -31,7 +31,7 @@ def getSandboxScripts(sandboxLang='python'):
             rex = re.search('\*([^\*]*)\*.*\$([^\*]..*)\$', sandboxContent) # Regex is ugly pls help
             if rex:
                 originalString, scriptVariable, variableValue = rex.group(), rex.group(1), rex.group(2)
-                setVariable = raw_input(t.bold_green + '\n[!] {} Sandbox Script Configuration:\n'.format(payloadChoice) + t.bold_red + '[*] {}? [{}]:'.format(scriptVariable, variableValue)  + t.normal)
+                setVariable = input(t.bold_green + '\n[!] {} Sandbox Script Configuration:\n'.format(payloadChoice) + t.bold_red + '[*] {}? [{}]:'.format(scriptVariable, variableValue)  + t.normal)
                 if setVariable:
                     try:
                         int(setVariable)
@@ -41,7 +41,7 @@ def getSandboxScripts(sandboxLang='python'):
                 newString = scriptVariable + ' = ' + variableValue
                 sandboxContent = sandboxContent.replace(originalString, newString)
             sandboxScripts += sandboxContent
-    print sandboxScripts
+    print(sandboxScripts)
     return sandboxScripts
 
 
@@ -67,7 +67,7 @@ def do_Encryption(payload):
         randomPython = rawHTML.cssselect('pre')[0].text_content()
     except Exception as E:
         print(E)
-        print t.bold_red + '[!] No network Connection, random python not generated.' + t.normal
+        print(t.bold_red + '[!] No network Connection, random python not generated.' + t.normal)
         randomPython = 'if __name__ == \'__main__\':'
 
 
