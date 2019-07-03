@@ -72,7 +72,7 @@ class Server():
 
     async def client_connect(self, client_reader, client_writer):
         rawaddr = client_writer.get_extra_info('peername')
-
+        addr = '{}:{}'.format(rawaddr[0], rawaddr[1])
         print('Client connected: {}'.format(addr))
         self.clientnumber += 1
         client = Client(self.clientnumber, addr, client_writer, client_reader)

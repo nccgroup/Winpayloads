@@ -12,6 +12,7 @@ from .preparepayload import reversePayloadGeneration, bindPayloadGeneration, \
 from .generatepayload import METASPLOIT_Functions
 from .stager import killAllClients, printListener
 from collections import OrderedDict
+from prompt_toolkit.patch_stdout import patch_stdout
 import re
 import glob
 import blessed
@@ -186,7 +187,8 @@ class MenuOptions(object):
     def runmenu(self):
         self.printMenues(True)
         while True:
-            user_choice = prompt_toolkit.prompt('%s > '%(self.menuName),style=self.style, completer=promptComplete(self.choices)).rstrip(' ')
+            with patch_stdout():
+                user_choice = prompt_toolkit.prompt('%s > '%(self.menuName),style=self.style, completer=promptComplete(self.choices)).rstrip(' ')
             success, payloadchoice, payload, extrawork, params = self._choose(user_choice)
 
             if not success:
