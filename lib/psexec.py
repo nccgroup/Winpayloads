@@ -23,7 +23,11 @@ import random
 import string
 import time
 
-from impacket import logger
+try:
+    from impacket.examples import logger
+except:
+    from impacket import logger
+
 from impacket import version, smb
 from impacket.smbconnection import SMBConnection
 from impacket.dcerpc.v5 import transport
